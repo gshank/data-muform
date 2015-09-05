@@ -1,6 +1,6 @@
 package HTML::MooForm::Meta;
 
-use Moo;
+use Moo::Role;
 use Moo::_Utils;
 use Import::Into;
 
@@ -9,7 +9,6 @@ sub import {
     my $class = shift;
 
    _install_coderef "${target}::has_field" => "HTML::MooForm::Meta::has_field" => \&has_field;
-   _install_coderef "${target}::has_block" => "HTML::MooForm::Meta::has_block" => \&has_block;
    _install_coderef "${target}::_meta_fields" => "HTML::MooForm::Meta::_meta_fields" => \&_meta_fields;
 }
 
@@ -19,10 +18,6 @@ sub has_field {
     my ( $name, @options ) = @_;
     return unless $name;
     push @_meta_fields, { name => $name, @options };
-}
-
-sub has_block {
-    my $self = shift;
 }
 
 sub _meta_fields {

@@ -1,15 +1,16 @@
 package HTML::MooForm;
 
-use HTML::MooForm::Meta;
+use Moo;
+with 'HTML::MooForm::Meta';
 
 has 'name' => ( is => 'rw', builder => 'build_name');
 sub build_name {
     my $self = shift;
-    my $class = ref $self;
+    return ref $self;
 }
-has 'http_method'   => ( isa => 'Str',  is  => 'ro', default => 'post' );
+has 'http_method'   => ( is  => 'ro', default => 'post' );
 has 'action' => ( is => 'rw' );
-has 'submitted' => ( is => 'rw', default => 0 )
+has 'submitted' => ( is => 'rw', default => 0 );
 has 'params' => ( is => 'rw' );
 has 'fields' => (
     is => 'rw',
@@ -25,6 +26,8 @@ sub BUILD {
 
 sub build_fields {
     my $self = shift;
+    my $meta_fields = $self->_meta_fields;
+
 }
 
 sub process {
