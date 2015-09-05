@@ -1,4 +1,4 @@
-package HTML::MooForm::Meta;
+package HTML::MuForm::Meta;
 
 use Moo::Role;
 use Moo::_Utils;
@@ -8,8 +8,8 @@ sub import {
     my $target = caller;
     my $class = shift;
 
-   _install_coderef "${target}::has_field" => "HTML::MooForm::Meta::has_field" => \&has_field;
-   _install_coderef "${target}::_meta_fields" => "HTML::MooForm::Meta::_meta_fields" => \&_meta_fields;
+   _install_coderef "${target}::has_field" => "HTML::MuForm::Meta::has_field" => \&has_field;
+   _install_coderef "${target}::_meta_fields" => "HTML::MuForm::Meta::_meta_fields" => \&_meta_fields;
 }
 
 our @_meta_fields;

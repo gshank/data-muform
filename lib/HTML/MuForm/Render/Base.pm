@@ -1,4 +1,4 @@
-package HTML::MooForm::Render::Base;
+package HTML::MuForm::Render::Base;
 use Moo;
 
 sub render {

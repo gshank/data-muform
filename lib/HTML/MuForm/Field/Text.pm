@@ -1,6 +1,6 @@
-package HTML::MooForm::Field::Text;
+package HTML::MuForm::Field::Text;
 use Moo;
-extends 'HTML::MooForm::Field';
+extends 'HTML::MuForm::Field';
 
 has 'size' => ( is => 'rw', default => 0 );
 

@@ -1,6 +1,6 @@
-package HTML::MooForm::Field::Submit;
+package HTML::MuForm::Field::Submit;
 use Moo;
-extends 'HTML::MooForm::Field';
+extends 'HTML::MuForm::Field';
 
 has 'value' => ( is => 'rw', default => 'Save' );
 

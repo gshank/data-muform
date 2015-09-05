@@ -1,4 +1,4 @@
-package HTML::MooForm::Render::Field::Base;
+package HTML::MuForm::Render::Field::Base;
 use Moose;
 
 sub render {

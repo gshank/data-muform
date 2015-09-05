@@ -3,9 +3,9 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 
-use_ok(' HTML::MooForm::Field' );
+use_ok(' HTML::MuForm::Field' );
 
-my $field = HTML::MooForm::Field->new( name => 'Foo' );
+my $field = HTML::MuForm::Field->new( name => 'Foo' );
 
 ok($field, 'field built');
 
@@ -13,7 +13,7 @@ ok($field, 'field built');
 {
     package Test::Form::Field::Text;
     use Moo;
-    extends 'HTML::MooForm::Field';
+    extends 'HTML::MuForm::Field';
 
     has 'cols' => ( is => 'rw' );
     has 'rows' => ( is => 'rw' );

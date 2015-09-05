@@ -1,4 +1,4 @@
-package HTML::MooForm::Field;
+package HTML::MuForm::Field;
 use Moo;
 
 has 'name' => ( is => 'rw', required => 1 );
@@ -14,7 +14,18 @@ sub has_value {
     my $self = shift;
     return defined( $self->value);
 }
+has 'accessor' => ( is => 'rw', lazy => 1, builder => 'build_accessor' );
+sub build_accessor {
+    my $self     = shift;
+    my $accessor = $self->name;
+    $accessor =~ s/^(.*)\.//g if ( $accessor =~ /\./ );
+    return $accessor;
+}
+
 has 'active' => ( is => 'rw', default => 1 );
+has 'disabled' => ( is => 'rw', default => 0 );
+has 'noupdate' => ( is => 'rw', default => 0 );
+
 
 sub fif {
     my $self = shift;
