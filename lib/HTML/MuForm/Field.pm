@@ -209,7 +209,7 @@ sub validate_field {
 
 sub _apply_actions {
     my $self = shift;
-
+$DB::single=1;
     my $error_message;
     local $SIG{__WARN__} = sub {
         my $error = shift;
