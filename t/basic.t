@@ -73,6 +73,15 @@ ok( $form->validated, 'Good data' );
 
 is( $form->field('somename')->value, undef, 'no value for somename' );
 ok( !$form->field('somename')->has_value, 'predicate no value' );
+my $fif = {
+   reqname     => 'hello',
+   optname     => 'not req',
+   fruit       => 2,
+   must_select => 1,
+};
+is_deeply( $form->fif, $fif, 'fif is correct with missing field' );
+
+
 $good->{somename} = 'testing';
 $form->process($good);
 
