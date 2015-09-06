@@ -12,7 +12,7 @@ use_ok('HTML::MuForm');
    extends 'HTML::MuForm';
 
    has '+name'         => ( default  => 'testform_' );
-   has_field 'optname' => ( temp     => 'First' );
+   has_field 'optname' => ( label     => 'First' );
    has_field 'reqname' => ( required => 1 );
    has_field 'somename';
    has_field 'my_selected' => ( type => 'Checkbox' );
@@ -22,7 +22,7 @@ use_ok('HTML::MuForm');
    {
       return [
          { name => 'fruit', type => 'Select' },
-         { name => 'optname', temp => 'Second' },
+         { name => 'optname', label => 'Second' },
       ];
    }
 
@@ -38,7 +38,7 @@ use_ok('HTML::MuForm');
 
 my $form = My::Form->new;
 
-is( $form->field('optname')->temp, 'Second', 'got second optname field' );
+is( $form->field('optname')->label, 'Second', 'got second optname field' );
 
 ok( !$form->process, 'Empty data' );
 is_deeply( $form->value, {}, 'no values returns hashref');

@@ -106,6 +106,34 @@ sub fields_validate {
     $self->value( \%value_hash );
 }
 
+sub fields_fif {
+    my ( $self, $result, $prefix ) = @_;
+
+    $result ||= $self->result;
+    $prefix ||= '';
+    if ( $self->isa('HTML::MuForm') ) {
+        $prefix = $self->html_prefix . "." if $self->html_prefix;
+    }
+
+    my %params;
+    foreach my $field ( $self->all_sorted_fields ) {
+        next if ( $field->is_inactive || $field->password );
+        my $fif = $field->fif;
+        next if ( !defined $fif || (ref $fif eq 'ARRAY' && ! scalar @{$fif} ) );
+        if ( $field->has_fields ) {
+            my $next_params = $field->fields_fif( $result,  $prefix . $field->name . '.' );
+            next unless $next_params;
+            %params = ( %params, %{$next_params} );
+        }
+        else {
+            $params{ $prefix . $field->name } = $fif;
+        }
+    }
+    return if !%params;
+    return \%params;
+
+}
+
 #====================================================================
 # Build Fields
 #====================================================================

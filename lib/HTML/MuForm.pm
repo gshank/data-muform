@@ -41,6 +41,7 @@ has 'item' => ( is => 'rw' );
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
 has 'init_object' => ( is => 'rw' );
 sub full_name { '' }
+sub fif { shift->fields_fif(@_) }
 has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]}, clearer => 'clear_form_errors' );
 sub all_form_errors { my $self = shift; return @{$self->form_errors}; }
 # TODO

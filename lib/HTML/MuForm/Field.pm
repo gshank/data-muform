@@ -11,6 +11,7 @@ has 'input' => ( is => 'rw', predicate => 'has_input', clearer => 'clear_input' 
 has 'input_without_param' => ( is => 'rw', predicate => 'has_input_without_param' );
 has 'value' => ( is => 'rw', predicate => 'has_value', clearer => 'clear_value' );
 has 'input_param' => ( is => 'rw', isa => Str );
+has 'password' => ( is => 'rw', isa => Bool, default => 0 );
 has 'accessor' => ( is => 'rw', lazy => 1, builder => 'build_accessor' );
 sub build_accessor {
     my $self     = shift;
@@ -18,16 +19,18 @@ sub build_accessor {
     $accessor =~ s/^(.*)\.//g if ( $accessor =~ /\./ );
     return $accessor;
 }
-has 'temp' => ( is => 'rw' );
+has 'custom' => ( is => 'rw' );
 has 'parent' => ( is  => 'rw',   predicate => 'has_parent', weak_ref => 1 );
 has 'errors' => ( is => 'rw', isa => ArrayRef, clearer => 'clear_errors', default => sub {[]} );
 sub has_errors { my $self = shift; return scalar @{$self->errors}; }
 sub all_errors { my $self = shift; return @{$self->errors}; }
 
 has 'active' => ( is => 'rw', default => 1 );
+sub is_inactive { ! $_[0]->active }
 has 'disabled' => ( is => 'rw', default => 0 );
 has 'noupdate' => ( is => 'rw', default => 0 );
 
+sub has_fields { }
 
 sub fif {
     my $self = shift;

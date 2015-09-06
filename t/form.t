@@ -40,6 +40,7 @@ $form->process( params => $params );
 ok( $form->has_params, 'form has_params correct');
 
 ok( $form->validated, 'form validated' );
+is_deeply( $form->fif, { test_field => 'something' }, 'fif correct when valid' );
 
 $params = { test_field => '' };
 
@@ -48,6 +49,8 @@ ok( ! $form->validated, 'form did not validate' );
 is ( $form->num_error_fields, 1, 'one error field' );
 
 is ( $form->num_errors, 1, 'one error');
+
+is_deeply( $form->fif, { test_field => '' }, 'fif correct when error' );
 
 
 done_testing;
