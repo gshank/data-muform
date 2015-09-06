@@ -18,9 +18,9 @@ has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
 has 'action' => ( is => 'rw' );
 has 'submitted' => ( is => 'rw', default => undef );  # three values: 0, 1, undef
 has 'processed' => ( is => 'rw', default => 0 );
-has 'validated' => ( is => 'rw', default => 0 );
+
 has 'ran_validation' => ( is => 'rw', default => 0 );
-has '_params' => ( is => 'rw', isa => HashRef );
+has '_params' => ( is => 'rw', isa => HashRef, default => sub {{}} );
 sub has_params { my $self = shift; return scalar keys %{$self->{_params}}; }
 sub params {
     my ( $self, $params ) = @_;
@@ -30,7 +30,6 @@ sub params {
     }
     return $self->{_params};
 }
-has 'value' => ( is => 'rw' );
 has 'html_prefix' => ( is => 'rw' );
 
 has 'field_name_space' => ( is => 'rw', isa => ArrayRef, builder => 'build_field_name_space' );
@@ -40,9 +39,8 @@ sub add_to_index { my ( $self, $field_name, $field ) = @_; $self->{index}->{$fie
 sub form { shift }
 has 'item' => ( is => 'rw' );
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
-
-
 has 'init_object' => ( is => 'rw' );
+sub full_name { '' }
 
 sub BUILD {
     my $self = shift;
@@ -59,11 +57,15 @@ sub process {
 sub clear {
     my $self = shift;
     $self->params({});
+    $self->clear_result;
     $self->submitted(undef);
     $self->item(undef);
     $self->init_object(undef);
     $self->ctx(undef);
     $self->processed(0);
+
+    # loop through subfields, clearing?
+    $self->clear_error_fields;
 }
 
 sub setup {
@@ -84,42 +86,20 @@ sub setup {
 
     # set the submitted flag
     $self->submitted(1) if ( $self->has_params && ! defined $self->submitted );
+
+    # fill in the input
+    my $params = clone( $self->params );
+    if ( $self->submitted ) {
+        my $result = $self->result;
+        $self->fill_from_input( $result, $params, 1 );
+    }
+
 }
 
 sub update_model {
     my $self = shift;
 }
 
-
-sub field {
-    my ( $self, $name, $die, $f ) = @_;
-
-    my $index;
-    # if this is a full_name for a compound field
-    # walk through the fields to get to it
-    return undef unless ( defined $name );
-    if( $self->form && $self == $self->form &&
-        exists $self->index->{$name} ) {
-        return $self->index->{$name};
-    }
-    if ( $name =~ /\./ ) {
-        my @names = split /\./, $name;
-        $f ||= $self->form || $self;
-        foreach my $fname (@names) {
-            $f = $f->field($fname);
-            return unless $f;
-        }
-        return $f;
-    }
-    else    # not a compound name
-    {
-        for my $field ( $self->all_fields ) {
-            return $field if ( $field->name eq $name );
-        }
-    }
-    return unless $die;
-    die "Field '$name' not found in '$self'";
-}
 
 sub munge_params {
     my ( $self, $params, $attr ) = @_;
@@ -158,6 +138,7 @@ sub validate {1}
 # hook for model validation
 sub validate_model {1}
 
+sub validated { my $self = shift; return $self->ran_validation && ! $self->has_error_fields; }
 
 
 1;

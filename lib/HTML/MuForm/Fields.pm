@@ -13,7 +13,14 @@ HTML::MuForm::Fields
 
 This role holes things that are common to HTML::MuForm and compound fields.
 
+Includes code that was split up into multiple roles in FormHandler: Fields,
+BuildFields, InitResult.
+
 =cut
+
+has 'value' => ( is => 'rw', clearer => 'clear_value' );
+has 'input' => ( is => 'rw', clearer => 'clear_input' );
+has 'result' => ( is => 'rw', isa => HashRef, clearer => 'clear_result', default => sub {{}} );
 
 has 'fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]});
 sub add_field { my ( $self, $field ) = @_; push @{$self->{fields}}, $field; }
@@ -22,7 +29,52 @@ sub all_fields { my $self = shift; return @{$self->{fields}}; }
 sub set_field_at { my ( $self, $index, $field ) = @_; @{$self->{fields}}[$index] = $field; }
 sub num_fields { my $self = shift; return scalar (@{$self->{fields}}); }
 sub has_fields { my $self = shift; return scalar (@{$self->{fields}}); }
-has 'error_fields' => ( is => 'rw', isa => ArrayRef );
+has 'error_fields' => ( is => 'rw', isa => ArrayRef, clearer => 'clear_error_fields', default => sub {[]} );
+sub has_error_fields { my $self = shift; return scalar @{$self->error_fields}; }
+sub add_error_field { my ($self, $field) = @_; push @{$self->error_fields}, $field; }
+
+sub field {
+    my ( $self, $name, $die, $f ) = @_;
+
+    my $index;
+    # if this is a full_name for a compound field
+    # walk through the fields to get to it
+    return undef unless ( defined $name );
+    if( $self->form && $self == $self->form &&
+        exists $self->index->{$name} ) {
+        return $self->index->{$name};
+    }
+    if ( $name =~ /\./ ) {
+        my @names = split /\./, $name;
+        $f ||= $self->form || $self;
+        foreach my $fname (@names) {
+            $f = $f->field($fname);
+            return unless $f;
+        }
+        return $f;
+    }
+    else    # not a compound name
+    {
+        for my $field ( $self->all_fields ) {
+            return $field if ( $field->name eq $name );
+        }
+    }
+    return unless $die;
+    die "Field '$name' not found in '$self'";
+}
+
+sub all_sorted_fields {
+    my $self = shift;
+    my @fields = sort { $a->order <=> $b->order }
+        grep { $_->active } $self->all_fields;
+    return @fields;
+}
+
+sub sorted_fields {
+    my $self = shift;
+    my @fields = $self->all_sorted_fields;
+    return \@fields;
+}
 
 sub field_index {
     my ( $self, $name ) = @_;
@@ -63,6 +115,11 @@ sub build_fields {
         my $field = $self->_make_field($mf);
         $index++;
     }
+
+    # process field_list
+
+    return unless $self->has_fields;
+    $self->_order_fields;
 }
 
 sub _make_field {
@@ -83,6 +140,8 @@ sub _make_field {
     my $parent = $self->_find_parent( $field_attr );
 
     my $field = $self->_update_or_create( $parent, $field_attr, $class, $do_update );
+
+    $self->form->add_to_index( $field->full_name => $field ) if $self->form;
 }
 
 sub _find_field_class {
@@ -188,8 +247,71 @@ sub new_field_with_roles {
     return $field;
 }
 
+sub _order_fields {
+    my $self = shift;
+
+    # get highest order number
+    my $order = 0;
+    foreach my $field ( $self->all_fields ) {
+        $order++ if $field->order > $order;
+    }
+    $order++;
+    # number all unordered fields
+    foreach my $field ( $self->all_fields ) {
+        $field->order($order) unless $field->order;
+        $order++;
+    }
+
+}
+
 #====================================================================
-# End Build Fields
+# Initialize input/value (InitResult)
 #====================================================================
+
+# How to handle repeatables and dynamic arrays of fields?
+# maybe create a 'result' structure that contains 'nodes' of
+# { input => '', value => '', errors => [] }. Hmm....
+# Perhaps have special attribute replacements in Repeatable fields
+# (simple compound fields should be okay)
+# that identify the 'name' (foo.bar), the 'input', the 'value', the 'errors'
+# from a hash:
+#  $instances => {
+#     'foo.bar' => { input => '', value => '', errors => [..] },
+# }
+# couldn't change other attributes, but you can't really do that
+# with the current HFH functionality anyway. There is One Repeatable Field Def
+# Of course, with a deeply nested structure, seems like you'd get into
+# the weeds pretty quickly
+
+# $input here is from the $params passed in on ->process
+sub fill_from_input {
+    my ( $self, $result, $input, $exists ) = @_;
+
+    return unless ( defined $input || $exists || $self->has_fields );
+    $self->input($input);
+    if ( ref $input eq 'HASH' ) {
+        foreach my $field ( $self->all_sorted_fields ) {
+            next if ! $field->active;
+            my $fname = $field->input_param || $field->name;
+            $field->fill_from_input($result, $input->{$fname}, exists $input->{$fname});
+        }
+    }
+    $self->result($result);
+}
+
+sub fill_from_object {
+
+}
+
+sub fill_from_fields {
+}
+
+sub clear_data {
+    my $self = shift;
+    $self->clear_input;
+    $self->clear_active;
+    $_->clear_data for $self->all_fields;
+
+}
 
 1;
