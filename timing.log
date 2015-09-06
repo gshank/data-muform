@@ -1,0 +1,6 @@
+
+Sun Sep 6 13:30:12
+   t/time_hmf.pl
+       HTML::MuForm - Elapsed: 0.40991  ( .004 ms per form )
+   t/time_hfh.pl
+       HTML::FormHandler - Elapsed: 3.731829 ( .037 ms per form )
