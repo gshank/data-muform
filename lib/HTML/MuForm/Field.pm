@@ -65,6 +65,34 @@ has 'order' => ( is => 'rw' );
 
 has 'required' => ( is => 'rw', default => 0 );
 
+sub add_error {
+    my ( $self, @message ) = @_;
+
+    unless ( defined $message[0] ) {
+        @message = ('Field is invalid');
+    }
+    @message = @{$message[0]} if ref $message[0] eq 'ARRAY';
+    my $out;
+    try {
+        $out = $self->_localize(@message);
+    }
+    catch {
+        die "Error occurred localizing error message for " . $self->label . ". Check brackets. $_";
+    };
+    return $self->push_errors($out);;
+}
+
+sub push_errors {
+    my $self = shift;
+    push @{$self->{errors}}, @_;
+    if ( $self->parent ) {
+        $self->parent->propagate_error($self);
+    }
+}
+
+sub localize {
+}
+
 sub validate {1}
 
 sub validate_field {
