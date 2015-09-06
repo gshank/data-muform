@@ -8,6 +8,7 @@ has 'form' => ( is => 'rw' );
 has 'type' => ( is => 'ro', required => 1, default => 'Text' );
 has 'default' => ( is => 'rw' );
 has 'input' => ( is => 'rw', predicate => 'has_input', clearer => 'clear_input' );
+has 'input_without_param' => ( is => 'rw', predicate => 'has_input_without_param' );
 has 'value' => ( is => 'rw', predicate => 'has_value', clearer => 'clear_value' );
 has 'input_param' => ( is => 'rw', isa => Str );
 has 'accessor' => ( is => 'rw', lazy => 1, builder => 'build_accessor' );
@@ -17,6 +18,7 @@ sub build_accessor {
     $accessor =~ s/^(.*)\.//g if ( $accessor =~ /\./ );
     return $accessor;
 }
+has 'temp' => ( is => 'rw' );
 has 'parent' => ( is  => 'rw',   predicate => 'has_parent', weak_ref => 1 );
 has 'errors' => ( is => 'rw', isa => ArrayRef, clearer => 'clear_errors', default => sub {[]} );
 sub has_errors { my $self = shift; return scalar @{$self->errors}; }
@@ -194,6 +196,11 @@ sub fill_from_input {
     if ( $exists ) {
         $result->{$self->name} = $input;
         $self->input($input);
+    }
+    elsif ( $self->disabled ) {
+    }
+    elsif ( $self->input_without_param ) {
+        $self->input($self->input_without_param);
     }
 }
 

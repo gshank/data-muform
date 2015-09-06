@@ -18,10 +18,12 @@ BuildFields, InitResult.
 
 =cut
 
-has 'value' => ( is => 'rw', clearer => 'clear_value' );
+has 'value' => ( is => 'rw', clearer => 'clear_value', default => sub {{}} );
 has 'input' => ( is => 'rw', clearer => 'clear_input' );
 has 'result' => ( is => 'rw', isa => HashRef, clearer => 'clear_result', default => sub {{}} );
 
+has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_field_list' );
+sub build_field_list {[]}
 has 'fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]});
 sub add_field { my ( $self, $field ) = @_; push @{$self->{fields}}, $field; }
 sub clear_fields { my $self = shift; $self->{fields} = undef; }
@@ -110,15 +112,18 @@ sub fields_validate {
 
 sub build_fields {
     my $self = shift;
-    my $meta_fields = clone($self->_meta_fields);
 
-    my $index = 0;
+    # process meta fields
+    my $meta_fields = clone($self->_meta_fields);
     foreach my $mf ( @$meta_fields ) {
         my $field = $self->_make_field($mf);
-        $index++;
     }
 
     # process field_list
+    my $field_list = $self->field_list;
+    foreach my $fl ( @$field_list ) {
+        my $field = $self->_make_field($fl);
+    }
 
     return unless $self->has_fields;
     $self->_order_fields;
