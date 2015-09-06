@@ -25,7 +25,7 @@ has 'errors' => ( is => 'rw', isa => ArrayRef, clearer => 'clear_errors', defaul
 sub has_errors { my $self = shift; return scalar @{$self->errors}; }
 sub all_errors { my $self = shift; return @{$self->errors}; }
 
-has 'active' => ( is => 'rw', default => 1 );
+has 'active' => ( is => 'rw', default => 1, clearer => 'clear_active' );
 sub is_inactive { ! $_[0]->active }
 has 'disabled' => ( is => 'rw', default => 0 );
 has 'noupdate' => ( is => 'rw', default => 0 );
@@ -176,6 +176,8 @@ sub validate {1}
 sub validate_field {
     my $field = shift;
 
+    return unless $field->has_input;
+
     my $continue_validation = 1;
     if ( $field->required && ( ! $field->has_input || ! $field->input_defined )) {
         $field->add_error( '[1] is required', $field->label );
@@ -183,6 +185,16 @@ sub validate_field {
     }
 
     return if !$continue_validation;
+
+    if ( $field->has_fields ) {
+        $field->fields_validate;
+    }
+    # Set value here!
+    else {
+        my $input = $field->input;
+        # TODO: transform here?
+        $field->value($input);
+    }
 
     $field->validate;
 
@@ -193,7 +205,7 @@ sub validate_field {
 # Filling
 #====================================================================
 
-sub fill_from_input {
+sub fill_from_params {
     my ( $self, $result, $input, $exists ) = @_;
 
     if ( $exists ) {
@@ -202,7 +214,7 @@ sub fill_from_input {
     }
     elsif ( $self->disabled ) {
     }
-    elsif ( $self->input_without_param ) {
+    elsif ( $self->has_input_without_param ) {
         $self->input($self->input_without_param);
     }
 }
@@ -211,7 +223,6 @@ sub clear_data {
     my $self = shift;
     $self->clear_input;
     $self->clear_value;
-    $self->clear_active;
 }
 
 

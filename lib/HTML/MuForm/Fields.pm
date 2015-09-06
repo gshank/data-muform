@@ -31,7 +31,8 @@ sub all_fields { my $self = shift; return @{$self->{fields}}; }
 sub set_field_at { my ( $self, $index, $field ) = @_; @{$self->{fields}}[$index] = $field; }
 sub num_fields { my $self = shift; return scalar (@{$self->{fields}}); }
 sub has_fields { my $self = shift; return scalar (@{$self->{fields}}); }
-has 'error_fields' => ( is => 'rw', isa => ArrayRef, clearer => 'clear_error_fields', default => sub {[]} );
+has 'error_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
+sub clear_error_fields { $_[0]->{error_fields} = [] }
 sub has_error_fields { my $self = shift; return scalar @{$self->error_fields}; }
 sub num_error_fields { my $self = shift; return scalar @{$self->error_fields}; }
 sub add_error_field { my ($self, $field) = @_; push @{$self->error_fields}, $field; }
@@ -96,7 +97,7 @@ sub fields_validate {
     return unless $self->has_fields;
     # validate all fields
     my %value_hash;
-    foreach my $field ( $self->all_fields ) {
+    foreach my $field ( $self->all_sorted_fields ) {
         next if ( !$field->active || $field->disabled );
         # Validate each field and "inflate" input -> value.
         $field->validate_field;    # this calls the field's 'validate' routine
@@ -319,7 +320,7 @@ sub _order_fields {
 # the weeds pretty quickly
 
 # $input here is from the $params passed in on ->process
-sub fill_from_input {
+sub fill_from_params {
     my ( $self, $result, $input, $exists ) = @_;
 
     return unless ( defined $input || $exists || $self->has_fields );
@@ -328,10 +329,10 @@ sub fill_from_input {
         foreach my $field ( $self->all_sorted_fields ) {
             next if ! $field->active;
             my $fname = $field->input_param || $field->name;
-            $field->fill_from_input($result, $input->{$fname}, exists $input->{$fname});
+            $field->fill_from_params($result, $input->{$fname}, exists $input->{$fname});
         }
     }
-    $self->result($result);
+    #$self->result($result);
 }
 
 sub fill_from_object {

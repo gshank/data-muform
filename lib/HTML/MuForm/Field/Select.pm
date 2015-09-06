@@ -38,6 +38,10 @@ sub build_value_when_empty {
     return [] if $self->multiple;
     return undef;
 }
+
+=comemnt
+# this doesn't work (two different value attributes combined).
+# TODO: look for better ways to arrayref a multiple value
 before 'value' => sub {
     my $self  = shift;
 
@@ -49,6 +53,7 @@ before 'value' => sub {
         }
     }
 };
+=cut
 
 sub clear_data {
     my $self = shift;

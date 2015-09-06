@@ -40,9 +40,11 @@ sub form { shift }
 has 'item' => ( is => 'rw' );
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
 has 'init_object' => ( is => 'rw' );
+has 'active' => ( is => 'rw', clearer => 'clear_active' );
 sub full_name { '' }
 sub fif { shift->fields_fif(@_) }
-has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]}, clearer => 'clear_form_errors' );
+has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
+sub clear_form_errors { $_[0]->{form_errors} = []; }
 sub all_form_errors { my $self = shift; return @{$self->form_errors}; }
 # TODO
 sub add_form_error { }
@@ -66,6 +68,8 @@ sub process {
     $self->clear if $self->processed;
     $self->setup(@_);
     $self->validate_form if $self->submitted;
+    $self->processed(1);
+    return $self->validated;
 }
 
 sub clear {
@@ -77,6 +81,7 @@ sub clear {
     $self->init_object(undef);
     $self->ctx(undef);
     $self->processed(0);
+    $self->ran_validation(0);
 
     # this will recursively clear field data
     $self->clear_data;
@@ -107,7 +112,7 @@ sub setup {
     my $params = clone( $self->params );
     if ( $self->submitted ) {
         my $result = $self->result;
-        $self->fill_from_input( $result, $params, 1 );
+        $self->fill_from_params( $result, $params, 1 );
     }
 
 }
