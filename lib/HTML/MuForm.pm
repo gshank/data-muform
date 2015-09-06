@@ -1,6 +1,6 @@
 package HTML::MuForm;
 use Moo;
-with 'HTML::MuForm::Meta';
+use HTML::MuForm::Meta;
 
 use Types::Standard -types;
 use Class::Load ('load_optional_class');

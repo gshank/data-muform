@@ -1,6 +1,5 @@
 package HTML::MuForm::Meta;
 
-use Moo::Role;
 use Moo::_Utils;
 use Import::Into;
 
