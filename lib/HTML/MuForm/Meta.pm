@@ -1,7 +1,6 @@
 package HTML::MuForm::Meta;
 
 use Moo::_Utils;
-use Import::Into;
 
 sub import {
     my $target = caller;

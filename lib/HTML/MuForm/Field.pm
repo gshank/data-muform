@@ -2,6 +2,7 @@ package HTML::MuForm::Field;
 use Moo;
 use Types::Standard -types;
 use Try::Tiny;
+use Scalar::Util 'blessed';
 
 has 'name' => ( is => 'rw', required => 1 );
 has 'form' => ( is => 'rw' );
@@ -29,6 +30,10 @@ has 'active' => ( is => 'rw', default => 1, clearer => 'clear_active' );
 sub is_inactive { ! $_[0]->active }
 has 'disabled' => ( is => 'rw', default => 0 );
 has 'noupdate' => ( is => 'rw', default => 0 );
+has 'apply' => ( is => 'rw', default => sub {[]} );
+sub has_apply { return scalar @{$_[0]->{apply}} }
+has 'base_apply' => ( is => 'rw', default => sub {[]} );  # for field classes
+sub has_base_apply { return scalar @{$_[0]->{base_apply}} } # for field definitions
 
 sub has_fields { }
 
@@ -196,11 +201,115 @@ sub validate_field {
         $field->value($input);
     }
 
+    $field->_apply_actions;
     $field->validate;
 
     return ! $field->has_errors;
 }
 
+sub _apply_actions {
+    my $self = shift;
+
+    my $error_message;
+    local $SIG{__WARN__} = sub {
+        my $error = shift;
+        $error_message = $error;
+        return 1;
+    };
+
+    my $is_type = sub {
+        my $class = blessed shift or return;
+        return $class eq 'MooseX::Types::TypeDecorator' || $class->isa('Type::Tiny');
+    };
+
+    my @actions;
+    push @actions, @{ $self->base_apply }, @{ $self->apply };
+    for my $action ( @actions ) {
+        $error_message = undef;
+        # the first time through value == input
+        my $value     = $self->value;
+        my $new_value = $value;
+        # Moose constraints
+        if ( !ref $action || $is_type->($action) ) {
+            $action = { type => $action };
+        }
+        if ( my $when = $action->{when} ) {
+            next unless $self->match_when($when);
+        }
+        if ( exists $action->{type} ) {
+            my $tobj;
+            if ( $is_type->($action->{type}) ) {
+                $tobj = $action->{type};
+            }
+            else {
+                my $type = $action->{type};
+                $tobj = Moose::Util::TypeConstraints::find_type_constraint($type) or
+                    die "Cannot find type constraint $type";
+            }
+            if ( $tobj->has_coercion && $tobj->validate($value) ) {
+                eval { $new_value = $tobj->coerce($value) };
+                if ($@) {
+                    if ( $tobj->has_message ) {
+                        $error_message = $tobj->message->($value);
+                    }
+                    else {
+                        $error_message = $@;
+                    }
+                }
+                else {
+                    $self->_set_value($new_value);
+                }
+
+            }
+            $error_message ||= $tobj->validate($new_value);
+        }
+        # now maybe: http://search.cpan.org/~rgarcia/perl-5.10.0/pod/perlsyn.pod#Smart_matching_in_detail
+        # actions in a hashref
+        elsif ( ref $action->{check} eq 'CODE' ) {
+            if ( !$action->{check}->($value, $self) ) {
+                $error_message = $self->get_message('wrong_value');
+            }
+        }
+        elsif ( ref $action->{check} eq 'Regexp' ) {
+            if ( $value !~ $action->{check} ) {
+                $error_message = [$self->get_message('no_match'), $value];
+            }
+        }
+        elsif ( ref $action->{check} eq 'ARRAY' ) {
+            if ( !grep { $value eq $_ } @{ $action->{check} } ) {
+                $error_message = [$self->get_message('not_allowed'), $value];
+            }
+        }
+        elsif ( ref $action->{transform} eq 'CODE' ) {
+            $new_value = eval {
+                no warnings 'all';
+                $action->{transform}->($value, $self);
+            };
+            if ($@) {
+                $error_message = $@ || $self->get_message('error_occurred');
+            }
+            else {
+                $self->_set_value($new_value);
+            }
+        }
+        if ( defined $error_message ) {
+            my @message = ref $error_message eq 'ARRAY' ? @$error_message : ($error_message);
+            if ( defined $action->{message} ) {
+                my $act_msg = $action->{message};
+                if ( ref $act_msg eq 'CODE' ) {
+                    $act_msg = $act_msg->($value, $self, $error_message);
+                }
+                if ( ref $act_msg eq 'ARRAY' ) {
+                    @message = @{$act_msg};
+                }
+                elsif ( ref \$act_msg eq 'SCALAR' ) {
+                    @message = ($act_msg);
+                }
+            }
+            $self->add_error(@message);
+        }
+    }
+}
 #====================================================================
 # Filling
 #====================================================================
@@ -225,6 +334,9 @@ sub clear_data {
     $self->clear_value;
 }
 
+
+# TODO: figure out messags. Again...
+sub get_message { 'Placeholder message' }
 
 1;
 
