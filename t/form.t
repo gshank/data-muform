@@ -45,5 +45,9 @@ $params = { test_field => '' };
 
 $form->process( params => $params );
 ok( ! $form->validated, 'form did not validate' );
+is ( $form->num_error_fields, 1, 'one error field' );
+
+is ( $form->num_errors, 1, 'one error');
+
 
 done_testing;

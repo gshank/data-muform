@@ -31,7 +31,9 @@ sub num_fields { my $self = shift; return scalar (@{$self->{fields}}); }
 sub has_fields { my $self = shift; return scalar (@{$self->{fields}}); }
 has 'error_fields' => ( is => 'rw', isa => ArrayRef, clearer => 'clear_error_fields', default => sub {[]} );
 sub has_error_fields { my $self = shift; return scalar @{$self->error_fields}; }
+sub num_error_fields { my $self = shift; return scalar @{$self->error_fields}; }
 sub add_error_field { my ($self, $field) = @_; push @{$self->error_fields}, $field; }
+sub all_error_fields { my $self = shift; return @{$self->error_fields}; }
 
 sub field {
     my ( $self, $name, $die, $f ) = @_;

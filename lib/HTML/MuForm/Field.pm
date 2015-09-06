@@ -20,6 +20,7 @@ sub build_accessor {
 has 'parent' => ( is  => 'rw',   predicate => 'has_parent', weak_ref => 1 );
 has 'errors' => ( is => 'rw', isa => ArrayRef, clearer => 'clear_errors', default => sub {[]} );
 sub has_errors { my $self = shift; return scalar @{$self->errors}; }
+sub all_errors { my $self = shift; return @{$self->errors}; }
 
 has 'active' => ( is => 'rw', default => 1 );
 has 'disabled' => ( is => 'rw', default => 0 );

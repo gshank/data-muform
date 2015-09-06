@@ -41,6 +41,19 @@ has 'item' => ( is => 'rw' );
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
 has 'init_object' => ( is => 'rw' );
 sub full_name { '' }
+has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]}, clearer => 'clear_form_errors' );
+sub all_form_errors { my $self = shift; return @{$self->form_errors}; }
+# TODO
+sub add_form_error { }
+
+sub errors {
+    my $self         = shift;
+    my @errors = $self->all_form_errors;
+    push @errors,  map { $_->all_errors } $self->all_error_fields;
+    return \@errors;
+}
+sub all_errors { my $self = shift; return @{$self->errors}; }
+sub num_errors { my $self = shift; return scalar @{$self->errors}; }
 
 sub BUILD {
     my $self = shift;
@@ -64,7 +77,9 @@ sub clear {
     $self->ctx(undef);
     $self->processed(0);
 
-    # loop through subfields, clearing?
+    # this will recursively clear field data
+    $self->clear_data;
+    $self->clear_form_errors;
     $self->clear_error_fields;
 }
 
