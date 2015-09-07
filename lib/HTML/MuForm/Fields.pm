@@ -402,7 +402,7 @@ sub fill_from_fields {
     for my $field ( $self->all_sorted_fields ) {
         next if (!$field->active);
         $field->fill_from_fields($result);
-        $my_value->{ $field->name } = $self->value if $self->has_value;
+        $my_value->{ $field->name } = $field->value if $field->has_value;
     }
     # setting value here to handle disabled compound fields, where we want to
     # preserve the 'value' because the fields aren't submitted...except for the

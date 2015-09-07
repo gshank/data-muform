@@ -30,6 +30,7 @@ has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
 has 'action' => ( is => 'rw' );
 has 'submitted' => ( is => 'rw', default => undef );  # three values: 0, 1, undef
 has 'processed' => ( is => 'rw', default => 0 );
+has 'no_init_process' => ( is => 'rw', default => 0 );
 
 has 'ran_validation' => ( is => 'rw', default => 0 );
 has '_params' => ( is => 'rw', isa => HashRef, default => sub {{}} );
@@ -51,6 +52,7 @@ sub build_field_name_space { [] }
 has 'index' => ( is => 'rw', isa => ArrayRef );
 sub add_to_index { my ( $self, $field_name, $field ) = @_; $self->{index}->{$field_name} = $field; }
 sub form { shift }
+sub is_form {1}
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
 has 'init_object' => ( is => 'rw' );
 has 'active' => ( is => 'rw', clearer => 'clear_active' );
@@ -75,7 +77,7 @@ sub num_errors { my $self = shift; return scalar @{$self->errors}; }
 sub BUILD {
     my $self = shift;
     $self->build_fields;
-    $self->process;
+    $self->process unless $self->no_init_process;
 }
 
 sub process {
