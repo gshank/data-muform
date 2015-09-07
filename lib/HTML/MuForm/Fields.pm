@@ -12,7 +12,7 @@ HTML::MuForm::Fields
 
 =head2 DESCRIPTION
 
-This role holes things that are common to HTML::MuForm and compound fields.
+This role holds things that are common to HTML::MuForm and compound fields.
 
 Includes code that was split up into multiple roles in FormHandler: Fields,
 BuildFields, InitResult.
@@ -22,7 +22,9 @@ BuildFields, InitResult.
 has 'value' => ( is => 'rw', predicate => 'has_value',  clearer => 'clear_value', default => sub {{}} );
 has 'init_value' => ( is => 'rw', clearer => 'clear_init_value' );
 has 'input' => ( is => 'rw', clearer => 'clear_input' );
-has 'result' => ( is => 'rw', isa => HashRef, clearer => 'clear_result', default => sub {{}} );
+has 'result' => ( is => 'rw', isa => HashRef, default => sub {{}} );
+sub clear_result { $_[0]->{result} = {} }
+has 'result_from' => ( is => 'rw', clearer => 'clear_result_from' );
 
 has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_field_list' );
 sub build_field_list {[]}
@@ -121,7 +123,7 @@ sub fields_fif {
 
     my %params;
     foreach my $field ( $self->all_sorted_fields ) {
-        next if ( $field->is_inactive || $field->password );
+        next if ( ! $field->active || $field->password );
         next unless $field->has_input; # for fields that weren't submitted
         my $fif = $field->fif;
         next if ( !defined $fif || (ref $fif eq 'ARRAY' && ! scalar @{$fif} ) );
@@ -333,6 +335,7 @@ sub _order_fields {
 sub fill_from_params {
     my ( $self, $result, $input, $exists ) = @_;
 
+    $self->result_from('params');
     return unless ( defined $input || $exists || $self->has_fields );
     $self->input($input);
     if ( ref $input eq 'HASH' ) {
@@ -342,18 +345,18 @@ sub fill_from_params {
             $field->fill_from_params($result, $input->{$fname}, exists $input->{$fname});
         }
     }
-    #$self->result($result);
+    return;
 }
 
 sub fill_from_object {
-    my ( $self, $self_result, $item ) = @_;
+    my ( $self, $result, $item ) = @_;
 
     return unless ( $item || $self->has_fields );    # empty fields for compounds
+    $self->result_from('object');
     my $my_value;
     my $init_obj = $self->form->init_object;
-    for my $field ( $self->sorted_fields ) {
-        next if ( $field->inactive && !$field->_active );
-        my $result;
+    for my $field ( $self->all_sorted_fields ) {
+        next if ! $field->active;
         if ( (ref $item eq 'HASH' && !exists $item->{ $field->accessor } ) ||
              ( blessed($item) && !$item->can($field->accessor) ) ) {
             my $found = 0;
@@ -364,53 +367,48 @@ sub fill_from_object {
                 my $init_obj_value = $self->find_sub_item( $init_obj, \@names );
                 if ( defined $init_obj_value ) {
                     $found = 1;
-                    $result = $field->fill_from_object( $result, $init_obj_value );
+                    $field->fill_from_object( $result, $init_obj_value );
                 }
             }
             $result = $field->fill_from_fields($result) unless $found;
         }
         else {
            my $value = $self->_get_value( $field, $item ) unless $field->writeonly;
-           $result = $field->fill_from_object( $result, $value );
+           $field->fill_from_object( $result, $value );
         }
-        #$self_result->add_result($result) if $result;
         $my_value->{ $field->name } = $field->value;
     }
-    # $self_result->_set_value($my_value);
     $self->value($my_value);
-    # $self->_set_result($self_result);
-    # $self_result->_set_field_def($self) if $self->DOES('HTML::FormHandler::Field');
-    return $self_result;
+    return;
 }
 
 # for when there are no params and no init_object
 sub fill_from_fields {
-    my ( $self, $self_result ) = @_;
+    my ( $self, $result ) = @_;
 
+    $self->result_from('fields');
     # defaults for compounds, etc.
     if ( my @values = $self->get_default_value ) {
         my $value = @values > 1 ? \@values : shift @values;
         if( ref $value eq 'HASH' || blessed $value ) {
-            return $self->fill_from_object( $self_result, $value );
+            return $self->fill_from_object( $result, $value );
         }
-        $self->init_value($value)   if defined $value;
-        $self->value($value) if defined $value;
+        if ( defined $value ) {
+            $self->init_value($value);
+            $self->value($value);
+        }
     }
     my $my_value;
     for my $field ( $self->all_sorted_fields ) {
         next if (!$field->active);
-        my $result;
-        $result = $field->fill_from_fields($result);
+        $field->fill_from_fields($result);
         $my_value->{ $field->name } = $self->value if $self->has_value;
-        #$self_result->add_result($result) if $result;
     }
     # setting value here to handle disabled compound fields, where we want to
     # preserve the 'value' because the fields aren't submitted...except for the
     # form. Not sure it's the best idea to skip for form, but it maintains previous behavior
     $self->value($my_value) if ( keys %$my_value );
-    #$self->_set_result($self_result);
-    #$self_result->_set_field_def($self) if $self->DOES('HTML::FormHandler::Field');
-    return $self_result;
+    return;
 }
 
 sub find_sub_item {

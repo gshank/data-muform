@@ -14,6 +14,7 @@ Moo conversion of HTML::FormHandler.
 
 with 'HTML::MuForm::Model';
 with 'HTML::MuForm::Fields';
+with 'HTML::MuForm::Common';
 
 use Types::Standard -types;
 use Class::Load ('load_optional_class');
@@ -74,6 +75,7 @@ sub num_errors { my $self = shift; return scalar @{$self->errors}; }
 sub BUILD {
     my $self = shift;
     $self->build_fields;
+    $self->process;
 }
 
 sub process {
@@ -89,6 +91,7 @@ sub clear {
     my $self = shift;
     $self->params({});
     $self->clear_result;
+    $self->clear_result_from;
     $self->submitted(undef);
     $self->item(undef);
     $self->init_object(undef);
@@ -101,6 +104,13 @@ sub clear {
     $self->clear_form_errors;
     $self->clear_error_fields;
 }
+
+=head2 setup
+
+This is where args passed to 'process' are set, and the form is
+filled by params, object, or fields.
+
+=cut
 
 sub setup {
     my ( $self, @args ) = @_;
@@ -121,6 +131,7 @@ sub setup {
     # set the submitted flag
     $self->submitted(1) if ( $self->has_params && ! defined $self->submitted );
 
+    # these fill the 'value' attributes
     if ( my $init_object = $self->use_init_obj_over_item ?
         ($self->init_object || $self->item) : ( $self->item || $self->init_object ) ) {
         $self->fill_from_object( $self->result, $init_object );
@@ -130,9 +141,10 @@ sub setup {
         $self->fill_from_fields( $self->result );
     }
 
-    # fill in the input
+    # fill in the input attribute
     my $params = clone( $self->params );
     if ( $self->submitted ) {
+        $self->clear_result;
         my $result = $self->result;
         $self->fill_from_params( $result, $params, 1 );
     }

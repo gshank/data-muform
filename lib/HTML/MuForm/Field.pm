@@ -4,6 +4,8 @@ use Types::Standard -types;
 use Try::Tiny;
 use Scalar::Util 'blessed';
 
+with 'HTML::MuForm::Common';
+
 =head1 NAME
 
 HTML::MuForm::Field
@@ -55,6 +57,7 @@ has 'active' => ( is => 'rw', default => 1, clearer => 'clear_active' );
 sub is_inactive { ! $_[0]->active }
 has 'disabled' => ( is => 'rw', default => 0 );
 has 'noupdate' => ( is => 'rw', default => 0 );
+has 'writeonly' => ( is => 'rw', default => 0 );
 has 'apply' => ( is => 'rw', default => sub {[]} );
 sub has_apply { return scalar @{$_[0]->{apply}} }
 has 'base_apply' => ( is => 'rw', default => sub {[]} );  # for field classes
@@ -360,13 +363,14 @@ sub fill_from_params {
     elsif ( $self->has_input_without_param ) {
         $self->input($self->input_without_param);
     }
+    return;
 }
 
 sub fill_from_object {
     my ( $self, $result, $value ) = @_;
 
-    # $self->_set_result($result);
     $self->value($value);
+    $result->{$self->name} = $value;
 
     if ( $self->form ) {
         $self->form->init_value( $self, $value );
@@ -377,7 +381,7 @@ sub fill_from_object {
     }
     $self->value(undef) if $self->writeonly;
     # $result->_set_field_def($self);
-    return $result;
+    return;
 }
 
 sub fill_from_fields {
@@ -385,6 +389,7 @@ sub fill_from_fields {
 
     if ( $self->disabled && $self->has_init_value ) {
         $self->value($self->init_value);
+        $result->{$self->name} = $self->init_value;
     }
     elsif ( my @values = $self->get_default_value ) {
         # TODO
@@ -392,12 +397,13 @@ sub fill_from_fields {
         #    @values = $self->inflate_default(@values);
         #}
         my $value = @values > 1 ? \@values : shift @values;
-        $self->init_value($value) if defined $value;
-        $self->value($value) if defined $value;
+        if ( defined $value ) {
+            $self->init_value($value);
+            $self->value($value);
+            $result->{$self->name} = $value;
+        }
     }
-    #$self->_set_result($result);
-    #$result->_set_field_def($self);
-    return $result;
+    return;
 
 }
 
