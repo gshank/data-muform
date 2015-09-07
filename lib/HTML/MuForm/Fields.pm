@@ -4,6 +4,7 @@ use Moo::Role;
 use Types::Standard -types;
 use Data::Clone;
 use Class::Load ('load_optional_class');
+use Scalar::Util 'blessed';
 
 =head2 NAME
 
@@ -18,7 +19,8 @@ BuildFields, InitResult.
 
 =cut
 
-has 'value' => ( is => 'rw', clearer => 'clear_value', default => sub {{}} );
+has 'value' => ( is => 'rw', predicate => 'has_value',  clearer => 'clear_value', default => sub {{}} );
+has 'init_value' => ( is => 'rw', clearer => 'clear_init_value' );
 has 'input' => ( is => 'rw', clearer => 'clear_input' );
 has 'result' => ( is => 'rw', isa => HashRef, clearer => 'clear_result', default => sub {{}} );
 
@@ -248,7 +250,6 @@ sub _find_parent {
 
 }
 
-
 sub _update_or_create {
     my ( $self, $parent, $field_attr, $class, $do_update ) = @_;
 
@@ -286,7 +287,7 @@ sub _update_or_create {
 
 sub new_field_with_roles {
     my ( $self, $class, $field_attr ) = @_;
-    # not handling roles yet
+    # not handling roles
     my $field = $class->new(%$field_attr);
     return $field;
 }
@@ -307,18 +308,6 @@ sub _order_fields {
     }
 
 }
-
-=head2 _install_methods
-
-Install form level methods
-
-   options_<field_name>
-   validate_<field_name>
-   default_<field_name>
-
-=cut
-
-
 
 
 #====================================================================
@@ -357,10 +346,126 @@ sub fill_from_params {
 }
 
 sub fill_from_object {
+    my ( $self, $self_result, $item ) = @_;
 
+    return unless ( $item || $self->has_fields );    # empty fields for compounds
+    my $my_value;
+    my $init_obj = $self->form->init_object;
+    for my $field ( $self->sorted_fields ) {
+        next if ( $field->inactive && !$field->_active );
+        my $result;
+        if ( (ref $item eq 'HASH' && !exists $item->{ $field->accessor } ) ||
+             ( blessed($item) && !$item->can($field->accessor) ) ) {
+            my $found = 0;
+            if (1) {  # do by default for now
+                # if we're using an item, look for accessor not found in item
+                # in the init_object
+                my @names = split( /\./, $field->full_name );
+                my $init_obj_value = $self->find_sub_item( $init_obj, \@names );
+                if ( defined $init_obj_value ) {
+                    $found = 1;
+                    $result = $field->fill_from_object( $result, $init_obj_value );
+                }
+            }
+            $result = $field->fill_from_fields($result) unless $found;
+        }
+        else {
+           my $value = $self->_get_value( $field, $item ) unless $field->writeonly;
+           $result = $field->fill_from_object( $result, $value );
+        }
+        #$self_result->add_result($result) if $result;
+        $my_value->{ $field->name } = $field->value;
+    }
+    # $self_result->_set_value($my_value);
+    $self->value($my_value);
+    # $self->_set_result($self_result);
+    # $self_result->_set_field_def($self) if $self->DOES('HTML::FormHandler::Field');
+    return $self_result;
 }
 
+# for when there are no params and no init_object
 sub fill_from_fields {
+    my ( $self, $self_result ) = @_;
+
+    # defaults for compounds, etc.
+    if ( my @values = $self->get_default_value ) {
+        my $value = @values > 1 ? \@values : shift @values;
+        if( ref $value eq 'HASH' || blessed $value ) {
+            return $self->fill_from_object( $self_result, $value );
+        }
+        $self->init_value($value)   if defined $value;
+        $self->value($value) if defined $value;
+    }
+    my $my_value;
+    for my $field ( $self->all_sorted_fields ) {
+        next if (!$field->active);
+        my $result;
+        $result = $field->fill_from_fields($result);
+        $my_value->{ $field->name } = $self->value if $self->has_value;
+        #$self_result->add_result($result) if $result;
+    }
+    # setting value here to handle disabled compound fields, where we want to
+    # preserve the 'value' because the fields aren't submitted...except for the
+    # form. Not sure it's the best idea to skip for form, but it maintains previous behavior
+    $self->value($my_value) if ( keys %$my_value );
+    #$self->_set_result($self_result);
+    #$self_result->_set_field_def($self) if $self->DOES('HTML::FormHandler::Field');
+    return $self_result;
+}
+
+sub find_sub_item {
+    my ( $self, $item, $field_name_array ) = @_;
+    my $this_fname = shift @$field_name_array;;
+    my $field = $self->field($this_fname);
+    my $new_item = $self->_get_value( $field, $item );
+    if ( scalar @$field_name_array ) {
+        $new_item = $field->find_sub_item( $new_item, $field_name_array );
+    }
+    return $new_item;
+}
+
+
+
+sub _get_value {
+    my ( $self, $field, $item ) = @_;
+
+    my $accessor = $field->accessor;
+    my @values;
+    if( $field->form && $field->form->use_defaults_over_obj && ( @values = $field->get_default_value )  ) {
+    }
+    elsif ( blessed($item) && $item->can($accessor) ) {
+        # this must be an array, so that DBIx::Class relations are arrays not resultsets
+        @values = $item->$accessor;
+        # for non-DBIC blessed object where access returns arrayref
+        if ( scalar @values == 1 && ref $values[0] eq 'ARRAY' && $field->has_flag('multiple') ) {
+            @values = @{$values[0]};
+        }
+    }
+    elsif ( exists $item->{$accessor} ) {
+        my $v = $item->{$accessor};
+        if($field->has_flag('multiple') && ref($v) eq 'ARRAY'){
+            @values = @$v;
+        } else {
+            @values = $v;
+        }
+    }
+    elsif ( @values = $field->get_default_value ) {
+    }
+    else {
+        return;
+    }
+    # TODO
+#   if( $field->has_inflate_default_method ) {
+#       @values = $field->inflate_default(@values);
+#   }
+    my $value;
+    if( $field->has_flag('multiple')) {
+        $value = scalar @values == 1 && ! defined $values[0] ? [] : \@values;
+    }
+    else {
+        $value = @values > 1 ? \@values : shift @values;
+    }
+    return $value;
 }
 
 sub clear_data {

@@ -1,5 +1,16 @@
 package HTML::MuForm::Meta;
 
+=head1 NAME
+
+HTML::MuForm::Meta
+
+=head1 DESCRIPTION
+
+This file needs to be included in a MuForm package in order
+to use 'has_fields' to define fields.
+
+=cut
+
 use Moo::_Utils;
 
 sub import {

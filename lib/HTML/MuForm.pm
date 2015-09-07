@@ -2,6 +2,16 @@ package HTML::MuForm;
 use Moo;
 use HTML::MuForm::Meta;
 
+=head1 NAME
+
+HTML::MuForm
+
+=head1 DESCRIPTION
+
+Moo conversion of HTML::FormHandler.
+
+=cut
+
 with 'HTML::MuForm::Model';
 with 'HTML::MuForm::Fields';
 
@@ -32,6 +42,8 @@ sub params {
     return $self->{_params};
 }
 has 'html_prefix' => ( is => 'rw' );
+has 'use_defaults_over_obj' => ( is => 'rw', isa => Bool, default => 0 );
+has 'use_init_obj_over_item' => ( is => 'rw', isa => Bool, default => 0 );
 
 has 'field_name_space' => ( is => 'rw', isa => ArrayRef, builder => 'build_field_name_space' );
 sub build_field_name_space { [] }
@@ -109,6 +121,15 @@ sub setup {
     # set the submitted flag
     $self->submitted(1) if ( $self->has_params && ! defined $self->submitted );
 
+    if ( my $init_object = $self->use_init_obj_over_item ?
+        ($self->init_object || $self->item) : ( $self->item || $self->init_object ) ) {
+        $self->fill_from_object( $self->result, $init_object );
+    }
+    elsif ( !$self->submitted ) {
+        # no initial object. empty form must be initialized
+        $self->fill_from_fields( $self->result );
+    }
+
     # fill in the input
     my $params = clone( $self->params );
     if ( $self->submitted ) {
@@ -162,5 +183,6 @@ sub validate_model {1}
 
 sub validated { my $self = shift; return $self->ran_validation && ! $self->has_error_fields; }
 
+sub get_default_value { }
 
 1;

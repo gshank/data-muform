@@ -18,7 +18,7 @@ has 'name' => ( is => 'rw', required => 1 );
 has 'id' => ( is => 'rw', lazy => 1, builder => 'build_id' );
 sub build_id {
    my $self = shift;
-   if ( my $meth = $self->{methods}->{build_id} ) {
+   if ( my $meth = $self->get_method('build_id') ) {
        return $meth->($self, @_);
    }
    return $self->html_name;
@@ -35,6 +35,7 @@ has 'default' => ( is => 'rw' );
 has 'input' => ( is => 'rw', predicate => 'has_input', clearer => 'clear_input' );
 has 'input_without_param' => ( is => 'rw', predicate => 'has_input_without_param' );
 has 'value' => ( is => 'rw', predicate => 'has_value', clearer => 'clear_value' );
+has 'init_value' => ( is => 'rw', predicate => 'has_init_value', clearer => 'clear_init_value' );
 has 'input_param' => ( is => 'rw', isa => Str );
 has 'password' => ( is => 'rw', isa => Bool, default => 0 );
 has 'accessor' => ( is => 'rw', lazy => 1, builder => 'build_accessor' );
@@ -60,6 +61,10 @@ has 'base_apply' => ( is => 'rw', default => sub {[]} );  # for field classes
 sub has_base_apply { return scalar @{$_[0]->{base_apply}} } # for field definitions
 sub has_fields { } # compound fields will override
 has 'methods' => ( is => 'rw', isa => HashRef, default => sub {{}} );
+sub get_method {
+   my ( $self, $meth_name ) = @_;
+   return  $self->{methods}->{$meth_name};
+}
 
 sub BUILD {
     my $self = shift;
@@ -357,10 +362,61 @@ sub fill_from_params {
     }
 }
 
+sub fill_from_object {
+    my ( $self, $result, $value ) = @_;
+
+    # $self->_set_result($result);
+    $self->value($value);
+
+    if ( $self->form ) {
+        $self->form->init_value( $self, $value );
+    }
+    else {
+        $self->init_value($value);
+        #$result->_set_value($value);
+    }
+    $self->value(undef) if $self->writeonly;
+    # $result->_set_field_def($self);
+    return $result;
+}
+
+sub fill_from_fields {
+    my ( $self, $result ) = @_;
+
+    if ( $self->disabled && $self->has_init_value ) {
+        $self->value($self->init_value);
+    }
+    elsif ( my @values = $self->get_default_value ) {
+        # TODO
+        #if ( $self->has_inflate_default_method ) {
+        #    @values = $self->inflate_default(@values);
+        #}
+        my $value = @values > 1 ? \@values : shift @values;
+        $self->init_value($value) if defined $value;
+        $self->value($value) if defined $value;
+    }
+    #$self->_set_result($result);
+    #$result->_set_field_def($self);
+    return $result;
+
+}
+
+
 sub clear_data {
     my $self = shift;
     $self->clear_input;
     $self->clear_value;
+}
+
+sub get_default_value {
+    my $self = shift;
+    if ( my $meth = $self->get_method('default') ) {
+        return $meth->($self);
+    }
+    elsif ( defined $self->default ) {
+        return $self->default;
+    }
+    return;
 }
 
 
