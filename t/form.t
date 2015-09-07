@@ -32,7 +32,7 @@ my $form = Test::Form->new;
 
 ok($form, 'form built');
 
-is ( scalar ( @{$form->_meta_fields} ), 3, 'two meta fields' );
+is ( scalar ( @{$form->saved_meta_fields} ), 3, 'three meta fields' );
 is ( $form->num_fields, 3, 'two fields' );
 
 my $field = $form->field('foo');

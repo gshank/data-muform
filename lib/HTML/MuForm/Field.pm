@@ -4,7 +4,31 @@ use Types::Standard -types;
 use Try::Tiny;
 use Scalar::Util 'blessed';
 
+=head1 NAME
+
+HTML::MuForm::Field
+
+=head1 DESCRIPTION
+
+Base field for MuForm fields.
+
+=cut
+
 has 'name' => ( is => 'rw', required => 1 );
+has 'id' => ( is => 'rw', lazy => 1, builder => 'build_id' );
+sub build_id {
+   my $self = shift;
+   if ( my $meth = $self->{methods}->{build_id} ) {
+       return $meth->($self, @_);
+   }
+   return $self->html_name;
+}
+has 'html_name' => ( isa => Str, is => 'rw', lazy => 1, builder => 'build_html_name');
+sub build_html_name {
+    my $self = shift;
+    my $prefix = ( $self->form && $self->form->html_prefix ) ? $self->form->name . "." : '';
+    return $prefix . $self->full_name;
+}
 has 'form' => ( is => 'rw' );
 has 'type' => ( is => 'ro', required => 1, default => 'Text' );
 has 'default' => ( is => 'rw' );
@@ -34,8 +58,13 @@ has 'apply' => ( is => 'rw', default => sub {[]} );
 sub has_apply { return scalar @{$_[0]->{apply}} }
 has 'base_apply' => ( is => 'rw', default => sub {[]} );  # for field classes
 sub has_base_apply { return scalar @{$_[0]->{base_apply}} } # for field definitions
+sub has_fields { } # compound fields will override
+has 'methods' => ( is => 'rw', isa => HashRef, default => sub {{}} );
 
-sub has_fields { }
+sub BUILD {
+    my $self = shift;
+
+}
 
 sub fif {
     my $self = shift;
@@ -209,7 +238,7 @@ sub validate_field {
 
 sub _apply_actions {
     my $self = shift;
-$DB::single=1;
+
     my $error_message;
     local $SIG{__WARN__} = sub {
         my $error = shift;

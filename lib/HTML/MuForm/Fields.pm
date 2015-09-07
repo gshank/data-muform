@@ -24,6 +24,7 @@ has 'result' => ( is => 'rw', isa => HashRef, clearer => 'clear_result', default
 
 has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_field_list' );
 sub build_field_list {[]}
+has 'saved_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 has 'fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]});
 sub add_field { my ( $self, $field ) = @_; push @{$self->{fields}}, $field; }
 sub clear_fields { my $self = shift; $self->{fields} = undef; }
@@ -144,7 +145,12 @@ sub build_fields {
     my $self = shift;
 
     # process meta fields
-    my $meta_fields = clone($self->_meta_fields);
+    my $orig_meta_fields = $self->_meta_fields;
+    my $meta_fields = clone($orig_meta_fields);
+    if ( $orig_meta_fields ) {
+        $self->saved_meta_fields(clone($orig_meta_fields));
+        $self->_clear_meta_fields;
+    }
     foreach my $mf ( @$meta_fields ) {
         my $field = $self->_make_field($mf);
     }
@@ -157,6 +163,7 @@ sub build_fields {
 
     return unless $self->has_fields;
     $self->_order_fields;
+    $self->_install_methods;
 }
 
 sub _make_field {
@@ -301,6 +308,19 @@ sub _order_fields {
 
 }
 
+=head2 _install_methods
+
+Install form level methods
+
+   options_<field_name>
+   validate_<field_name>
+   default_<field_name>
+
+=cut
+
+
+
+
 #====================================================================
 # Initialize input/value (InitResult)
 #====================================================================
@@ -350,5 +370,31 @@ sub clear_data {
     $_->clear_data for $self->all_fields;
 
 }
+
+sub _install_methods {
+    my $self = shift;
+    foreach my $field ( $self->all_fields ) {
+        my $suffix = convert_full_name($field->full_name);
+        foreach my $prefix ( 'validate', 'default' ) {
+            my $meth_name = "${prefix}_$suffix";
+            if ( my $meth = $self->form->can($meth_name) ) {
+                warn "adding method '$meth_name' to field '" . $field->name . "'";
+                my $wrap_sub = sub {
+                    my $self = shift;
+                    return $self->form->$meth;
+                };
+                $field->{methods}->{$prefix} = $wrap_sub;
+            }
+        }
+    }
+}
+
+sub convert_full_name {
+    my $full_name = shift;
+    $full_name =~ s/\.\d+\./_/g;
+    $full_name =~ s/\./_/g;
+    return $full_name;
+}
+
 
 1;

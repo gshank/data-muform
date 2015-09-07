@@ -10,7 +10,7 @@ use_ok( 'Test::Form' );
 my $form = Test::Form->new;
 ok($form, 'form built');
 
-my $meta_fields = Test::Form->_meta_fields;
+my $meta_fields = $form->saved_meta_fields;
 
 is( scalar @$meta_fields, 5, 'there are 5 meta fields' );
 

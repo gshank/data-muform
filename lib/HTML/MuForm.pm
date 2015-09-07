@@ -2,6 +2,7 @@ package HTML::MuForm;
 use Moo;
 use HTML::MuForm::Meta;
 
+with 'HTML::MuForm::Model';
 with 'HTML::MuForm::Fields';
 
 use Types::Standard -types;
@@ -37,11 +38,11 @@ sub build_field_name_space { [] }
 has 'index' => ( is => 'rw', isa => ArrayRef );
 sub add_to_index { my ( $self, $field_name, $field ) = @_; $self->{index}->{$field_name} = $field; }
 sub form { shift }
-has 'item' => ( is => 'rw' );
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
 has 'init_object' => ( is => 'rw' );
 has 'active' => ( is => 'rw', clearer => 'clear_active' );
 sub full_name { '' }
+sub full_accessor { '' }
 sub fif { shift->fields_fif(@_) }
 has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 sub clear_form_errors { $_[0]->{form_errors} = []; }

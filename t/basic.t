@@ -78,6 +78,7 @@ my $fif = {
    optname     => 'not req',
    fruit       => 2,
    must_select => 1,
+   my_selected => 0,
 };
 is_deeply( $form->fif, $fif, 'fif is correct with missing field' );
 
