@@ -19,7 +19,8 @@ BuildFields, InitResult.
 
 =cut
 
-has 'value' => ( is => 'rw', predicate => 'has_value',  clearer => 'clear_value', default => sub {{}} );
+has 'value' => ( is => 'rw', predicate => 'has_value', default => sub {{}} );
+sub clear_value { $_[0]->{value} = {} }
 has 'init_value' => ( is => 'rw', clearer => 'clear_init_value' );
 has 'input' => ( is => 'rw', clearer => 'clear_input' );
 has 'result' => ( is => 'rw', isa => HashRef, default => sub {{}} );
@@ -469,7 +470,9 @@ sub _get_value {
 sub clear_data {
     my $self = shift;
     $self->clear_input;
+    $self->clear_value;
     $self->clear_active;
+    $self->clear_error_fields;
     $_->clear_data for $self->all_fields;
 
 }

@@ -169,7 +169,7 @@ sub get_class_messages  {
     }
 }
 
-sub _inner_validate_field {
+sub base_validate {
     my ($self) = @_;
 
     my $value = $self->value;
@@ -199,9 +199,6 @@ sub _inner_validate_field {
         else {
             $options{$opt->{value}} = 1;
         }
-    }
-    if( $self->has_many ) {
-        $value = [map { $_->{$self->has_many} } @$value];
     }
     for my $value ( ref $value eq 'ARRAY' ? @$value : ($value) ) {
         unless ( $options{$value} ) {

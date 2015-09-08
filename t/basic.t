@@ -94,6 +94,28 @@ is( $form->field('my_selected')->value, 0,         'correct value for unselected
 ok( !$form->process( {} ), 'empty params no validation second time' );
 is( $form->num_errors, 0, 'form doesn\'t have errors with empty params' );
 
+my $bad_1 = {
+   reqname => '',
+   optname => 'not req',
+   fruit   => 4,
+};
+
+$DB::single=1;
+$form->process($bad_1);
+
+ok( !$form->validated, 'bad 1' );
+ok( $form->field('fruit')->has_errors, 'fruit has error' );
+ok( $form->field('reqname')->has_errors, 'reqname has error' );
+ok( $form->field('must_select')->has_errors, 'must_select has error' );
+ok( !$form->field('optname')->has_errors, 'optname has no error' );
+is( $form->field('fruit')->id,    "fruit", 'field has id' );
+is( $form->field('fruit')->label, 'Fruit', 'field label' );
+
+ok( !$form->process( {} ), 'no leftover params' );
+is( $form->num_errors, 0, 'no leftover errors' );
+ok( !$form->field('reqname')->has_errors, 'no leftover error in field' );
+ok( !$form->field('optname')->fif, 'no lefover fif values' );
+
 
 
 done_testing;

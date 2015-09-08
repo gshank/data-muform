@@ -31,7 +31,7 @@ sub build_html_name {
     my $prefix = ( $self->form && $self->form->html_prefix ) ? $self->form->name . "." : '';
     return $prefix . $self->full_name;
 }
-has 'form' => ( is => 'rw' );
+has 'form' => ( is => 'rw', weak_ref => 1, predicate => 'has_form' );
 has 'type' => ( is => 'ro', required => 1, default => 'Text' );
 has 'default' => ( is => 'rw' );
 has 'input' => ( is => 'rw', predicate => 'has_input', clearer => 'clear_input' );
@@ -49,9 +49,10 @@ sub build_accessor {
 }
 has 'custom' => ( is => 'rw' );
 has 'parent' => ( is  => 'rw',   predicate => 'has_parent', weak_ref => 1 );
-has 'errors' => ( is => 'rw', isa => ArrayRef, clearer => 'clear_errors', default => sub {[]} );
+has 'errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 sub has_errors { my $self = shift; return scalar @{$self->errors}; }
 sub all_errors { my $self = shift; return @{$self->errors}; }
+sub clear_errors { $_[0]->{errors} = [] }
 
 has 'active' => ( is => 'rw', default => 1, clearer => 'clear_active' );
 sub is_inactive { ! $_[0]->active }
@@ -256,13 +257,16 @@ sub validate_field {
         $field->value($input);
     }
 
-    $field->_apply_actions;
+    $field->base_validate; # why? also transforms? split out into a 'base_transform' and move the validation?
+    $field->apply_actions;
     $field->validate;
 
     return ! $field->has_errors;
 }
 
-sub _apply_actions {
+sub base_validate { }
+
+sub apply_actions {
     my $self = shift;
 
     my $error_message;
@@ -428,8 +432,10 @@ sub fill_from_fields {
 
 sub clear_data {
     my $self = shift;
+
     $self->clear_input;
     $self->clear_value;
+    $self->clear_errors;
 }
 
 sub get_default_value {
