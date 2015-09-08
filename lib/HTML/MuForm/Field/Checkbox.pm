@@ -13,7 +13,7 @@ sub element_type { 'checkbox' }
 
 sub validate {
     my $self = shift;
-    $self->add_error('You must select this', $self->label) if( $self->required && !$self->value );
+    $self->add_error($self->get_message('required'), $self->loc_label) if( $self->required && !$self->value );
 }
 
 1;

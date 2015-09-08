@@ -33,8 +33,6 @@ sub build_instance_id {
     my $self = shift;
     return $self->name . int(rand 1000);
 }
-has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
-has 'action' => ( is => 'rw' );
 has 'submitted' => ( is => 'rw', default => undef );  # three values: 0, 1, undef
 has 'processed' => ( is => 'rw', default => 0 );
 has 'no_init_process' => ( is => 'rw', default => 0 );
@@ -67,7 +65,9 @@ sub full_name { '' }
 sub full_accessor { '' }
 sub fif { shift->fields_fif(@_) }
 
-
+#========= Rendering ==========
+has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
+has 'action' => ( is => 'rw' );
 #========= Errors ==========
 has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 sub clear_form_errors { $_[0]->{form_errors} = []; }
@@ -109,6 +109,7 @@ sub all_messages {
 sub BUILD {
     my $self = shift;
     $self->build_fields;
+    $self->after_build_fields;
     $self->process unless $self->no_init_process;
 }
 
@@ -116,6 +117,7 @@ sub process {
     my $self = shift;
     $self->clear if $self->processed;
     $self->setup(@_);
+    $self->after_setup;
     $self->validate_form if $self->submitted;
     $self->processed(1);
     return $self->validated;
@@ -160,6 +162,7 @@ sub setup {
         }
     }
     # set_active
+    $self->in_setup;
     # update_fields
 
     # set the submitted flag
@@ -184,6 +187,10 @@ sub setup {
     }
 
 }
+
+sub in_setup { }
+sub after_setup { }
+sub after_build_fields { }
 
 sub update_model {
     my $self = shift;

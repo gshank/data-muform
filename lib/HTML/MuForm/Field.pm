@@ -126,6 +126,24 @@ sub full_accessor {
 has 'label' => ( is => 'rw', lazy => 1, builder => 'build_label' );
 sub build_label {
     my $self = shift;
+    if ( my $meth = $self->get_method('build_label' ) ) {
+        return $meth->($self);
+    }
+    my $label = $self->name;
+    $label =~ s/_/ /g;
+    $label = ucfirst($label);
+    return $label;
+}
+sub loc_label {
+    my $self = shift;
+    return $self->_localize($self->label);
+}
+
+# stub
+sub _localize {
+   my ( $self, @message ) = @_;
+   # TODO
+   return $message[0];
 }
 
 has 'element_type' => ( is => 'rw', lazy => 1, builder => 'build_element_type' );
