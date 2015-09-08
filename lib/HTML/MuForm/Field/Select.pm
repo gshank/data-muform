@@ -2,7 +2,7 @@ package HTML::MuForm::Field::Select;
 use Moo;
 extends 'HTML::MuForm::Field';
 use Types::Standard -types;
-
+use HTML::Entities;
 
 sub element_type { 'select' }
 
@@ -154,6 +154,63 @@ sub convert_full_name {
     $full_name =~ s/\.\d+\./_/g;
     $full_name =~ s/\./_/g;
     return $full_name;
+}
+
+our $class_messages = {
+    'select_not_multiple' => 'This field does not take multiple values',
+    'select_invalid_value' => '\'[_1]\' is not a valid value',
+};
+
+sub get_class_messages  {
+    my $self = shift;
+    return {
+        %{ $self->next::method },
+        %$class_messages,
+    }
+}
+
+sub _inner_validate_field {
+    my ($self) = @_;
+
+    my $value = $self->value;
+    return unless defined $value;    # nothing to check
+
+    if ( ref $value eq 'ARRAY' &&
+        !( $self->can('multiple') && $self->multiple ) )
+    {
+        $self->add_error( $self->get_message('select_not_multiple') );
+        return;
+    }
+    elsif ( ref $value ne 'ARRAY' && $self->multiple ) {
+        $value = [$value];
+        $self->_set_value($value);
+    }
+
+    return if $self->no_option_validation;
+
+    # create a lookup hash
+    my %options;
+    foreach my $opt ( @{ $self->options } ) {
+        if ( exists $opt->{group} ) {
+            foreach my $group_opt ( @{ $opt->{options} } ) {
+                $options{$group_opt->{value}} = 1;
+            }
+        }
+        else {
+            $options{$opt->{value}} = 1;
+        }
+    }
+    if( $self->has_many ) {
+        $value = [map { $_->{$self->has_many} } @$value];
+    }
+    for my $value ( ref $value eq 'ARRAY' ? @$value : ($value) ) {
+        unless ( $options{$value} ) {
+            my $opt_value = encode_entities($value);
+            $self->add_error($self->get_message('select_invalid_value'), $opt_value);
+            return;
+        }
+    }
+    return 1;
 }
 
 

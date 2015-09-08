@@ -426,8 +426,55 @@ sub get_default_value {
 }
 
 
-# TODO: figure out messags. Again...
-sub get_message { 'Placeholder message' }
+#====================================================================
+# Messages
+#====================================================================
+
+has 'messages' => ( is => 'rw', isa => HashRef, default => sub {{}} );
+sub _get_field_message { my ($self, $msg) = @_; return $self->{messages}->{$msg}; }
+sub _has_field_message { my ($self, $msg) = @_; exists $self->{messages}->{$msg}; }
+sub set_message { my ($self, $msg, $value) = @_; $self->{messages}->{$msg} = $value; }
+
+
+our $class_messages = {
+    'field_invalid'   => 'field is invalid',
+    'range_too_low'   => 'Value must be greater than or equal to [_1]',
+    'range_too_high'  => 'Value must be less than or equal to [_1]',
+    'range_incorrect' => 'Value must be between [_1] and [_2]',
+    'wrong_value'     => 'Wrong value',
+    'no_match'        => '[_1] does not match',
+    'not_allowed'     => '[_1] not allowed',
+    'error_occurred'  => 'error occurred',
+    'required'        => '[_1] field is required',
+    'unique'          => 'Duplicate value for [_1]',
+};
+
+sub get_class_messages  {
+    my $self = shift;
+    my $messages = { %$class_messages };
+    return $messages;
+}
+
+sub get_message {
+    my ( $self, $msg ) = @_;
+
+    # first look in messages set on individual field
+    return $self->_get_field_message($msg)
+       if $self->_has_field_message($msg);
+    # then look at form messages
+    return $self->form->_get_form_message($msg)
+       if $self->has_form && $self->form->_has_form_message($msg);
+    # then look for messages up through inherited field classes
+    return $self->get_class_messages->{$msg};
+}
+sub all_messages {
+    my $self = shift;
+    my $form_messages = $self->has_form ? $self->form->messages : {};
+    my $field_messages = $self->messages || {};
+    my $lclass_messages = $self->my_class_messages || {};
+    return {%{$lclass_messages}, %{$form_messages}, %{$field_messages}};
+}
+
 
 1;
 

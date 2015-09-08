@@ -21,10 +21,17 @@ use Class::Load ('load_optional_class');
 use Data::Clone;
 use HTML::MuForm::Params;
 
-has 'name' => ( is => 'rw', isa => Str, builder => 'build_name');
+has 'name' => ( is => 'ro', isa => Str, builder => 'build_name');
 sub build_name {
     my $self = shift;
-    return ref $self;
+    my $class = ref $self;
+    my  ( $name ) = ( $class =~ /.*::(.*)$/ );
+    return $name;
+}
+has 'instance_id' => ( is => 'ro', lazy => 1, builder => 'build_instance_id' );
+sub build_instance_id {
+    my $self = shift;
+    return $self->name . int(rand 1000);
 }
 has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
 has 'action' => ( is => 'rw' );
@@ -59,6 +66,9 @@ has 'active' => ( is => 'rw', clearer => 'clear_active' );
 sub full_name { '' }
 sub full_accessor { '' }
 sub fif { shift->fields_fif(@_) }
+
+
+#========= Errors ==========
 has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 sub clear_form_errors { $_[0]->{form_errors} = []; }
 sub all_form_errors { my $self = shift; return @{$self->form_errors}; }
@@ -74,6 +84,28 @@ sub errors {
 sub all_errors { my $self = shift; return @{$self->errors}; }
 sub num_errors { my $self = shift; return scalar @{$self->errors}; }
 
+#========= Messages ==========
+has 'messages' => ( is => 'rw', isa => HashRef, builder => 'build_messages' );
+sub build_messages {{}}
+sub _get_form_message { my ($self, $msgname) = @_; return $self->messages->{$msgname}; }
+sub _has_form_message { my ($self, $msgname) = @_; return exists $self->messages->{$msgname}; }
+sub set_message { my ( $self, $msgname, $msg) = @_; $self->messages->{$msgname} = $msg; }
+my $class_messages = {};
+sub get_class_messages  {
+    return $class_messages;
+}
+sub get_message {
+    my ( $self, $msg ) = @_;
+    return $self->_get_form_message($msg) if $self->_has_form_message($msg);
+    return $self->get_class_messages->{$msg};
+}
+sub all_messages {
+    my $self = shift;
+    return { %{$self->get_class_messages}, %{$self->messages} };
+}
+
+
+#========= Methods ==========
 sub BUILD {
     my $self = shift;
     $self->build_fields;
@@ -198,5 +230,6 @@ sub validate_model {1}
 sub validated { my $self = shift; return $self->ran_validation && ! $self->has_error_fields; }
 
 sub get_default_value { }
+
 
 1;
