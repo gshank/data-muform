@@ -1,41 +1,55 @@
 package HTML::MuForm::Meta;
 
-=head1 NAME
-
-HTML::MuForm::Meta
-
-=head1 DESCRIPTION
-
-This file needs to be included in a MuForm package in order
-to use 'has_fields' to define fields.
-
-=cut
-
 use Moo::_Utils;
 
 sub import {
-    my $target = caller;
     my $class = shift;
 
-   _install_coderef "${target}::has_field" => "HTML::MuForm::Meta::has_field" => \&has_field;
-   _install_coderef "${target}::_meta_fields" => "HTML::MuForm::Meta::_meta_fields" => \&_meta_fields;
-   _install_coderef "${target}::_clear_meta_fields" => "HTML::MuForm::Meta::_clear_meta_fields" => \&_clear_meta_fields;
-}
+    # the package into which we're importing
+    my $target = caller;
 
-our @_meta_fields;
+    # local meta_fields to package, closed over by the 'around' methods
+    my @_meta_fields;
 
-sub has_field {
-    my ( $name, @options ) = @_;
-    return unless $name;
-    push @_meta_fields, { name => $name, @options };
-}
+    # has_field function which puts the field definitions into the local @_meta_fields
+    my $has_field = sub {
+        my ( $name, @options ) = @_;
+        return unless $name;
+        push @_meta_fields, { name => $name, @options };
+    };
 
-sub _meta_fields {
-    return \@_meta_fields;
-}
+    # function to insert 'around' modifiers into the calling package
+    # install 'has_field' function into the calling package
+    _install_coderef "${target}::has_field" => "MuMeta::has_field" => $has_field;
 
-sub _clear_meta_fields {
-    @_meta_fields = ();
+    # eval the basic functions into the caller package. It does not work to do these
+    # with '_install_coderef' - C3 gets confused, and they could get cleaned away
+    # 'maybe::next::method' necessary to get it to walk the tree
+    eval "package ${target};
+        sub _meta_fields { shift->maybe::next::method(\@_) }
+        sub _field_packages { shift->maybe::next::method(\@_) }";
+
+    # get the 'around' function from the caller
+    my $around = $target->can('around');
+    # function to create the 'around' functions. Closes around @_meta_fields.
+    my $apply_modifiers = sub {
+        $around->(
+            _meta_fields => sub {
+                my ($orig, $self) = (shift, shift);
+                return ($self->$orig(), @_meta_fields);
+            }
+        );
+        $around->(
+            _field_packages => sub {
+                my ($orig, $self) = (shift, shift);
+                my $package = $target;
+                return ($self->$orig(), $package);
+            }
+        );
+    };
+    # actually install the around modifiers in the caller
+    $apply_modifiers->();
+
 }
 
 1;

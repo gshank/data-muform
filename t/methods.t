@@ -7,11 +7,11 @@ use HTML::MuForm;
 {
     package MyApp::Form::Test;
     use Moo;
-    use HTML::MuForm::Meta;
     extends 'HTML::MuForm';
-    use Types::Standard ':all';
+    use HTML::MuForm::Meta;
+#   use Types::Standard ':all';
 
-    has '+name' => ( default => 'test' );
+#   has '+name' => ( default => 'test' );
     has_field 'foo' => (
         methods => { build_id => sub { my $self = shift; return $self->name . "-id"; } }
     );
@@ -29,6 +29,8 @@ use HTML::MuForm;
     }
 
 }
+
+my @classes = MyApp::Form::Test->meta->linearized_isa;
 
 my $form = MyApp::Form::Test->new;
 ok( $form );

@@ -28,11 +28,6 @@ sub build_name {
     my  ( $name ) = ( $class =~ /.*::(.*)$/ );
     return $name;
 }
-has 'instance_id' => ( is => 'ro', lazy => 1, builder => 'build_instance_id' );
-sub build_instance_id {
-    my $self = shift;
-    return $self->name . int(rand 1000);
-}
 has 'submitted' => ( is => 'rw', default => undef );  # three values: 0, 1, undef
 has 'processed' => ( is => 'rw', default => 0 );
 has 'no_init_process' => ( is => 'rw', default => 0 );
@@ -52,6 +47,8 @@ has 'html_prefix' => ( is => 'rw' );
 has 'use_defaults_over_obj' => ( is => 'rw', isa => Bool, default => 0 );
 has 'use_init_obj_over_item' => ( is => 'rw', isa => Bool, default => 0 );
 
+
+has 'form_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 has 'field_name_space' => ( is => 'rw', isa => ArrayRef, builder => 'build_field_name_space' );
 sub build_field_name_space { [] }
 has 'index' => ( is => 'rw', isa => ArrayRef );

@@ -23,8 +23,6 @@ my $options = $form->field('bar')->options;
 my $expected_options = [{ value => 1 => label => 'One' }, { value => 2, label => 'Two' }];
 is_deeply( $options, $expected_options, 'got right options' );
 
-diag("done with first form");
-
 {
     package MyApp::Form::Test2;
     use Moo;
@@ -43,7 +41,7 @@ diag("done with first form");
 $form = MyApp::Form::Test2->new;
 ok( $form, 'form built' );
 is( $form->num_fields, 2, 'right number of fields' );
-my $meta_fields = $form->saved_meta_fields;
+my $meta_fields = $form->meta_fields;
 #diag(Dumper($meta_fields));
 is( scalar @$meta_fields, 2, 'two meta fields' );
 $form->process;

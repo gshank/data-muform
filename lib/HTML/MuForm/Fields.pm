@@ -27,9 +27,10 @@ has 'result' => ( is => 'rw', isa => HashRef, default => sub {{}} );
 sub clear_result { $_[0]->{result} = {} }
 has 'result_from' => ( is => 'rw', clearer => 'clear_result_from' );
 
+has 'meta_fields' => ( is => 'rw' );
 has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_field_list' );
 sub build_field_list {[]}
-has 'saved_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
+#has 'saved_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 has 'fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]});
 sub add_field { my ( $self, $field ) = @_; push @{$self->{fields}}, $field; }
 sub clear_fields { my $self = shift; $self->{fields} = undef; }
@@ -150,12 +151,9 @@ sub build_fields {
     my $self = shift;
 
     # process meta fields
-    my $orig_meta_fields = $self->_meta_fields;
-    my $meta_fields = clone($orig_meta_fields);
-    if ( $orig_meta_fields ) {
-        $self->saved_meta_fields(clone($orig_meta_fields));
-        $self->_clear_meta_fields;
-    }
+    my @meta_fields = $self->_meta_fields;
+    $self->meta_fields(\@meta_fields);
+    my $meta_fields = clone(\@meta_fields);
     foreach my $mf ( @$meta_fields ) {
         my $field = $self->_make_field($mf);
     }
