@@ -316,7 +316,7 @@ sub apply_actions {
                     }
                 }
                 else {
-                    $self->_set_value($new_value);
+                    $self->value($new_value);
                 }
 
             }
