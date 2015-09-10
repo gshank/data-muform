@@ -63,6 +63,22 @@ has 'apply' => ( is => 'rw', default => sub {[]} );
 sub has_apply { return scalar @{$_[0]->{apply}} }
 has 'base_apply' => ( is => 'rw', default => sub {[]} );  # for field classes
 sub has_base_apply { return scalar @{$_[0]->{base_apply}} } # for field definitions
+has 'trim' => (
+    is      => 'rw',
+    default => sub { { transform => \&default_trim } }
+);
+
+sub default_trim {
+    my $value = shift;
+    return unless defined $value;
+    my @values = ref $value eq 'ARRAY' ? @$value : ($value);
+    for (@values) {
+        next if ref $_ or !defined;
+        s/^\s+//;
+        s/\s+$//;
+    }
+    return ref $value eq 'ARRAY' ? \@values : $values[0];
+}
 sub has_fields { } # compound fields will override
 has 'methods' => ( is => 'rw', isa => HashRef, default => sub {{}} );
 sub get_method {
@@ -282,6 +298,7 @@ sub apply_actions {
     };
 
     my @actions;
+    push @actions, $self->trim if $self->trim;
     push @actions, @{ $self->base_apply }, @{ $self->apply };
     for my $action ( @actions ) {
         $error_message = undef;
@@ -348,7 +365,7 @@ sub apply_actions {
                 $error_message = $@ || $self->get_message('error_occurred');
             }
             else {
-                $self->_set_value($new_value);
+                $self->value($new_value);
             }
         }
         if ( defined $error_message ) {
