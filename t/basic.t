@@ -110,7 +110,6 @@ my $bad_1 = {
    fruit   => 4,
 };
 
-$DB::single=1;
 $form->process($bad_1);
 
 ok( !$form->validated, 'bad 1' );
@@ -156,6 +155,50 @@ my $expected_fif = {
 
 $fif = $form->fif;
 is_deeply( $fif, $expected_fif, 'get right fif with init_object' );
+
+# make sure that checkbox is 0 in values
+my $params = {
+   reqname => 'Starting Perl',
+   optname => 'Over Again',
+   must_select => 1,
+};
+
+ok( $form->process($params), 'form validates with params' );
+#my %init_obj_value = (%$init_object, fruit => undef );
+#is_deeply( $form->value, \%init_obj_value, 'value init obj' );
+
+my $expected_value = {
+   reqname => 'Starting Perl',
+   optname => 'Over Again',
+   must_select => 1,
+   my_selected => 0,
+};
+
+is_deeply( $form->value, $expected_value, 'value init obj' );
+$fif->{must_select} = 1;
+$fif->{my_selected} = 0;
+is_deeply( $form->fif, $fif, 'get right fif with init_object' );
+
+
+if ( !$form->process( params => { bar => 1, } ) )
+{
+$DB::single=1;
+   # On some versions, the above process() returned false, but
+   # error_fields did not return anything.
+   my @fields = $form->all_error_fields;
+   if ( is( scalar @fields, 1, "there is an error field" ) )
+   {
+      my @errors = $fields[0]->all_errors;
+      is( scalar @errors, 1, "there is an error" );
+
+      is( $errors[0], $fields[0]->label . " field is required", "error messages match" );
+   }
+   else
+   {
+      fail("there is an error");
+      fail("error messages match");
+   }
+}
 
 
 done_testing;

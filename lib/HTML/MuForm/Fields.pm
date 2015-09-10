@@ -121,7 +121,7 @@ sub fields_fif {
     $prefix ||= '';
     $prefix = $prefix . "."
         if ( $self->isa('HTML::MuForm') && $self->html_prefix );
-$DB::single=1;
+
     my %params;
     foreach my $field ( $self->all_sorted_fields ) {
         next if ( ! $field->active || $field->password );
