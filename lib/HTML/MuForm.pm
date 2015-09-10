@@ -34,6 +34,7 @@ has 'no_init_process' => ( is => 'rw', default => 0 );
 
 has 'ran_validation' => ( is => 'rw', default => 0 );
 has '_params' => ( is => 'rw', isa => HashRef, default => sub {{}} );
+sub clear_params { $_[0]->{_params} = {} }
 sub has_params { my $self = shift; return scalar keys %{$self->{_params}}; }
 sub params {
     my ( $self, $params ) = @_;
@@ -56,7 +57,9 @@ sub add_to_index { my ( $self, $field_name, $field ) = @_; $self->{index}->{$fie
 sub form { shift }
 sub is_form {1}
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
-has 'init_object' => ( is => 'rw' );
+has 'init_object' => ( is => 'rw', isa => HashRef, default => sub {{}} );
+sub clear_init_object { $_[0]->{init_object} = {} }
+sub has_init_object { scalar keys %{$_[0]->{init_object}} }
 has 'active' => ( is => 'rw', clearer => 'clear_active' );
 sub full_name { '' }
 sub full_accessor { '' }
@@ -122,12 +125,12 @@ sub process {
 
 sub clear {
     my $self = shift;
-    $self->params({});
+    $self->clear_params;
     $self->clear_result;
     $self->clear_result_from;
     $self->submitted(undef);
     $self->item(undef);
-    $self->init_object(undef);
+    $self->clear_init_object;
     $self->ctx(undef);
     $self->processed(0);
     $self->ran_validation(0);

@@ -119,14 +119,13 @@ sub fields_fif {
 
     $result ||= $self->result;
     $prefix ||= '';
-    if ( $self->isa('HTML::MuForm') ) {
-        $prefix = $self->html_prefix . "." if $self->html_prefix;
-    }
-
+    $prefix = $prefix . "."
+        if ( $self->isa('HTML::MuForm') && $self->html_prefix );
+$DB::single=1;
     my %params;
     foreach my $field ( $self->all_sorted_fields ) {
         next if ( ! $field->active || $field->password );
-        next unless $field->has_input; # for fields that weren't submitted
+        next unless $field->has_input || $field->has_value;
         my $fif = $field->fif;
         next if ( !defined $fif || (ref $fif eq 'ARRAY' && ! scalar @{$fif} ) );
         if ( $field->has_fields ) {

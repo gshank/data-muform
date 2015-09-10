@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Data::Dumper;
 
 use_ok('HTML::MuForm');
 
@@ -39,14 +40,22 @@ use_ok('HTML::MuForm');
 
 my $form = My::Form->new;
 
-=comment
 is( $form->num_fields, 6, 'got six fields' );
 is( $form->field('optname')->label, 'Second', 'got second optname field' );
 
 # process with empty params
 ok( !$form->process, 'Empty data' );
 
-is_deeply( $form->value, {}, 'no values returns hashref');
+my $expected_values = {
+   'fruit' => undef,
+   'must_select' => undef,
+   'my_selected' => undef,
+   'optname' => undef,
+   'reqname' => undef,
+   'somename' => undef,
+};
+
+is_deeply( $form->value, $expected_values, 'empty values hashref');
 ok( ! $form->validated, 'form did not validate' );
 is( $form->ran_validation, 0, 'ran_validation correct' );
 
@@ -117,8 +126,6 @@ is( $form->num_errors, 0, 'no leftover errors' );
 ok( !$form->field('reqname')->has_errors, 'no leftover error in field' );
 ok( !$form->field('optname')->fif, 'no lefover fif values' );
 
-=cut
-
 my $init_object = {
    reqname => 'Starting Perl',
    optname => 'Over Again'
@@ -126,26 +133,29 @@ my $init_object = {
 
 $form = My::Form->new( init_object => $init_object );
 is( $form->field('optname')->value, 'Over Again', 'value with init_obj' );
+ok( $form->has_init_object );
+
 # non-posted params
-$form->process( params => {} );
+$form->process( init_object => $init_object, params => {} );
 ok( !$form->validated, 'form did not validate' );
-is_deeply ( $form->value, {}, 'empty value, no params' );
-is( $form->field('optname')->value, 'Over Again', 'value with init_obj after empty process' );
 
-# FH test used to check that there was a correct ->value hash after ->new.
-# This doesn't work because of doing ->process in BUILD. It's an edge case
-# and I'm thinking I don't want to support it
+my $init_obj_plus_defaults = {
+   'fruit' => undef,
+   'must_select' => undef,
+   'my_selected' => undef,
+   'optname' => 'Over Again',
+   'reqname' => 'Starting Perl',
+   'somename' => undef,
+};
+is_deeply( $form->value, $init_obj_plus_defaults, 'value with empty params' );
 
-my $fif = {
-    fruit => '',
-    my_selected => '',
-    must_select => '',
-    somename => '',
-    fruit => '',
+my $expected_fif = {
     reqname => 'Starting Perl',
     optname => 'Over Again',
 };
-is_deeply( $form->fif, $fif, 'get right fif with init_object' );
+
+$fif = $form->fif;
+is_deeply( $fif, $expected_fif, 'get right fif with init_object' );
 
 
 done_testing;
