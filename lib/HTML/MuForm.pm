@@ -50,8 +50,6 @@ has 'use_init_obj_over_item' => ( is => 'rw', isa => Bool, default => 0 );
 
 
 has 'form_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
-has 'field_name_space' => ( is => 'rw', isa => ArrayRef, builder => 'build_field_name_space' );
-sub build_field_name_space { [] }
 has 'index' => ( is => 'rw', isa => ArrayRef );
 sub add_to_index { my ( $self, $field_name, $field ) = @_; $self->{index}->{$field_name} = $field; }
 sub form { shift }

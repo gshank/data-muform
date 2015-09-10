@@ -44,6 +44,8 @@ sub has_error_fields { my $self = shift; return scalar @{$self->error_fields}; }
 sub num_error_fields { my $self = shift; return scalar @{$self->error_fields}; }
 sub add_error_field { my ($self, $field) = @_; push @{$self->error_fields}, $field; }
 sub all_error_fields { my $self = shift; return @{$self->error_fields}; }
+has 'field_name_space' => ( is => 'rw', isa => ArrayRef, builder => 'build_field_name_space' );
+sub build_field_name_space { [] }
 
 sub field {
     my ( $self, $name, $die, $f ) = @_;
