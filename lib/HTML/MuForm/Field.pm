@@ -38,6 +38,7 @@ has 'input' => ( is => 'rw', predicate => 'has_input', clearer => 'clear_input' 
 has 'input_without_param' => ( is => 'rw', predicate => 'has_input_without_param' );
 has 'value' => ( is => 'rw', predicate => 'has_value', clearer => 'clear_value' );
 has 'init_value' => ( is => 'rw', predicate => 'has_init_value', clearer => 'clear_init_value' );
+has 'no_value_if_empty' => ( is => 'rw', isa => Bool );
 has 'input_param' => ( is => 'rw', isa => Str );
 has 'password' => ( is => 'rw', isa => Bool, default => 0 );
 has 'accessor' => ( is => 'rw', lazy => 1, builder => 'build_accessor' );
