@@ -14,8 +14,10 @@ use Data::Dumper;
 
 }
 
-my $form = MyApp::Form::Test->new;
+my $form = MyApp::Form::Test->new( no_init_process => 1 );
 ok( $form );
+
+$form->process( params => {} );
 
 # process has already been done by BUILD
 is( $form->result_from, 'fields', 'looking at field result' );

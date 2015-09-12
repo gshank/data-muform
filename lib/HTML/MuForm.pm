@@ -56,9 +56,16 @@ sub add_to_index { my ( $self, $field_name, $field ) = @_; $self->{index}->{$fie
 sub form { shift }
 sub is_form {1}
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
-has 'init_object' => ( is => 'rw', isa => HashRef, default => sub {{}} );
-sub clear_init_object { $_[0]->{init_object} = {} }
-sub has_init_object { scalar keys %{$_[0]->{init_object}} }
+# init_object can be a blessed object or a hashref
+has 'init_object' => ( is => 'rw', isa => HashRef );
+sub clear_init_object { $_[0]->{init_object} = undef }
+sub has_init_object {
+    my $self = shift;
+    my $init_obj = $self->init_object;
+    return 0 unless defined $init_obj;
+    return 0 if ref $init_obj eq 'HASH' and ! scalar keys %$init_obj;
+    return 1;
+}
 #has 'active' => ( is => 'rw', clearer => 'clear_active' );
 sub full_name { '' }
 sub full_accessor { '' }
@@ -72,6 +79,7 @@ has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 sub clear_form_errors { $_[0]->{form_errors} = []; }
 sub all_form_errors { return @{$_[0]->form_errors}; }
 sub has_form_errors { scalar @{$_[0]->form_errors} }
+sub num_form_errors { scalar @{$_[0]->form_errors} }
 # TODO
 sub add_form_error { }
 sub has_errors {

@@ -46,16 +46,7 @@ is( $form->field('optname')->label, 'Second', 'got second optname field' );
 # process with empty params
 ok( !$form->process, 'Empty data' );
 
-my $expected_values = {
-   'fruit' => undef,
-   'must_select' => undef,
-   'my_selected' => undef,
-   'optname' => undef,
-   'reqname' => undef,
-   'somename' => undef,
-};
-
-is_deeply( $form->value, $expected_values, 'empty values hashref');
+is_deeply( $form->value, {}, 'empty values hashref');
 ok( ! $form->validated, 'form did not validate' );
 is( $form->ran_validation, 0, 'ran_validation correct' );
 
@@ -188,15 +179,18 @@ $DB::single=1;
    my @fields = $form->all_error_fields;
    if ( is( scalar @fields, 1, "there is an error field" ) )
    {
-      my @errors = $fields[0]->all_errors;
-      is( scalar @errors, 1, "there is an error" );
+        my @errors = $fields[0]->all_errors;
+        is( scalar @errors, 1, "there is an error" );
 
-      is( $errors[0], $fields[0]->label . " field is required", "error messages match" );
+        TODO: {
+            local $TODO = 'localization';
+            is( $errors[0], $fields[0]->label . " field is required", "error messages match" );
+        };
    }
    else
    {
-      fail("there is an error");
-      fail("error messages match");
+        fail("there is an error");
+        fail("error messages match");
    }
 }
 
