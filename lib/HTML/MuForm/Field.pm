@@ -54,15 +54,15 @@ sub has_errors { my $self = shift; return scalar @{$self->errors}; }
 sub all_errors { my $self = shift; return @{$self->errors}; }
 sub clear_errors { $_[0]->{errors} = [] }
 
-has 'active' => ( is => 'rw', default => 1, clearer => 'clear_active' );
+has 'active' => ( is => 'rw', default => 1 );
 sub is_inactive { ! $_[0]->active }
 has 'disabled' => ( is => 'rw', default => 0 );
 has 'noupdate' => ( is => 'rw', default => 0 );
 has 'writeonly' => ( is => 'rw', default => 0 );
-has 'apply' => ( is => 'rw', default => sub {[]} );
+has 'apply' => ( is => 'rw', default => sub {[]} ); # for field defnitions
 sub has_apply { return scalar @{$_[0]->{apply}} }
 has 'base_apply' => ( is => 'rw', default => sub {[]} );  # for field classes
-sub has_base_apply { return scalar @{$_[0]->{base_apply}} } # for field definitions
+sub has_base_apply { return scalar @{$_[0]->{base_apply}} }
 has 'trim' => (
     is      => 'rw',
     default => sub { { transform => \&default_trim } }
@@ -449,7 +449,6 @@ sub fill_from_fields {
 
 sub clear_data {
     my $self = shift;
-
     $self->clear_input;
     $self->clear_value;
     $self->clear_errors;

@@ -26,6 +26,7 @@ sub build_name {
     my $self = shift;
     my $class = ref $self;
     my  ( $name ) = ( $class =~ /.*::(.*)$/ );
+    $name ||= $class;
     return $name;
 }
 has 'submitted' => ( is => 'rw', default => undef );  # three values: 0, 1, undef
@@ -58,7 +59,7 @@ has 'ctx' => ( is => 'rw', weak_ref => 1 );
 has 'init_object' => ( is => 'rw', isa => HashRef, default => sub {{}} );
 sub clear_init_object { $_[0]->{init_object} = {} }
 sub has_init_object { scalar keys %{$_[0]->{init_object}} }
-has 'active' => ( is => 'rw', clearer => 'clear_active' );
+#has 'active' => ( is => 'rw', clearer => 'clear_active' );
 sub full_name { '' }
 sub full_accessor { '' }
 sub fif { shift->fields_fif(@_) }
@@ -69,9 +70,20 @@ has 'action' => ( is => 'rw' );
 #========= Errors ==========
 has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 sub clear_form_errors { $_[0]->{form_errors} = []; }
-sub all_form_errors { my $self = shift; return @{$self->form_errors}; }
+sub all_form_errors { return @{$_[0]->form_errors}; }
+sub has_form_errors { scalar @{$_[0]->form_errors} }
 # TODO
 sub add_form_error { }
+sub has_errors {
+    my $self = shift;
+    return $self->has_error_fields || $self->has_form_errors;
+}
+sub num_errors {
+    my $self = shift;
+    return $self->num_error_fields + $self->num_form_errors;
+}
+sub get_errors { shift->errors }
+
 
 sub errors {
     my $self         = shift;
@@ -79,8 +91,7 @@ sub errors {
     push @errors,  map { $_->all_errors } $self->all_error_fields;
     return \@errors;
 }
-sub all_errors { my $self = shift; return @{$self->errors}; }
-sub num_errors { my $self = shift; return scalar @{$self->errors}; }
+sub all_errors { @{$_[0]->errors} }
 
 #========= Messages ==========
 has 'messages' => ( is => 'rw', isa => HashRef, builder => 'build_messages' );

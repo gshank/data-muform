@@ -21,6 +21,7 @@ BuildFields, InitResult.
 
 has 'value' => ( is => 'rw', predicate => 'has_value', default => sub {{}} );
 sub clear_value { $_[0]->{value} = {} }
+sub values { $_[0]->value }
 has 'init_value' => ( is => 'rw', clearer => 'clear_init_value' );
 has 'input' => ( is => 'rw', clearer => 'clear_input' );
 has 'result' => ( is => 'rw', isa => HashRef, default => sub {{}} );
@@ -155,19 +156,33 @@ sub build_fields {
     my @meta_fields = $self->_meta_fields;
     $self->meta_fields(\@meta_fields);
     my $meta_fields = clone(\@meta_fields);
-    foreach my $mf ( @$meta_fields ) {
-        my $field = $self->_make_field($mf);
-    }
+    $self->process_field_array( $meta_fields );
 
     # process field_list
     my $field_list = $self->field_list;
-    foreach my $fl ( @$field_list ) {
-        my $field = $self->_make_field($fl);
-    }
+    $self->process_field_array ( $field_list );
 
     return unless $self->has_fields;
     $self->_order_fields;
     $self->_install_methods;
+}
+
+sub process_field_array {
+    my ( $self, $fields ) = @_;
+
+    # TODO: there's got to be a better way of doing this
+    my $num_fields   = scalar @$fields;
+    my $num_dots     = 0;
+    my $count_fields = 0;
+    while ( $count_fields < $num_fields ) {
+        foreach my $field (@$fields) {
+            my $count = ( $field->{name} =~ tr/\.// );
+            next unless $count == $num_dots;
+            $self->_make_field($field);
+            $count_fields++;
+        }
+        $num_dots++;
+    }
 }
 
 sub _make_field {
@@ -261,8 +276,7 @@ sub _update_or_create {
     my $index = $parent->field_index( $field_attr->{name} );
     my $field;
     if ( defined $index ) {
-        if ($do_update)    # this field started with '+'. Update.
-        {
+        if ($do_update) {  # this field started with '+'. Update.
             $field = $parent->field( $field_attr->{name} );
             die "Field to update for " . $field_attr->{name} . " not found"
                 unless $field;
@@ -273,14 +287,12 @@ sub _update_or_create {
                     if $field->can($key);
             }
         }
-        else               # replace existing field
-        {
+        else { # replace existing field
             $field = $self->new_field_with_roles( $class, $field_attr);
             $parent->set_field_at( $index, $field );
         }
     }
-    else                   # new field
-    {
+    else { # new field
         $field = $self->new_field_with_roles( $class, $field_attr);
         $parent->add_field($field);
     }
@@ -470,10 +482,11 @@ sub clear_data {
     my $self = shift;
     $self->clear_input;
     $self->clear_value;
-    $self->clear_active;
+#   $self->clear_activate;
     $self->clear_error_fields;
-    $_->clear_data for $self->all_fields;
-
+    foreach my $field ( $self->all_fields ) {
+        $field->clear_data;
+    }
 }
 
 sub _install_methods {
@@ -483,7 +496,6 @@ sub _install_methods {
         foreach my $prefix ( 'validate', 'default' ) {
             my $meth_name = "${prefix}_$suffix";
             if ( my $meth = $self->form->can($meth_name) ) {
-                warn "adding method '$meth_name' to field '" . $field->name . "'";
                 my $wrap_sub = sub {
                     my $self = shift;
                     return $self->form->$meth;
