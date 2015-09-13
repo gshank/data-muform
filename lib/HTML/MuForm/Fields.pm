@@ -2,7 +2,7 @@ package HTML::MuForm::Fields;
 use Moo::Role;
 
 use Types::Standard -types;
-use Data::Clone;
+use Data::Clone ('data_clone');
 use Class::Load ('load_optional_class');
 use Scalar::Util 'blessed';
 
@@ -33,7 +33,7 @@ has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_
 sub build_field_list {[]}
 #has 'saved_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 has 'fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]});
-sub add_field { my ( $self, $field ) = @_; push @{$self->{fields}}, $field; }
+sub add_field { my ( $self, @fields ) = @_; push @{$self->{fields}}, @fields; }
 sub clear_fields { my $self = shift; $self->{fields} = undef; }
 sub all_fields { my $self = shift; return @{$self->{fields}}; }
 sub set_field_at { my ( $self, $index, $field ) = @_; @{$self->{fields}}[$index] = $field; }
@@ -128,7 +128,7 @@ sub fields_fif {
     my %params;
     foreach my $field ( $self->all_sorted_fields ) {
         next if ( ! $field->active || $field->password );
-        next unless $field->has_input || $field->has_value;
+       #next unless $field->has_input || $field->has_value;
         my $fif = $field->fif;
         next if ( !defined $fif || (ref $fif eq 'ARRAY' && ! scalar @{$fif} ) );
         if ( $field->has_fields ) {
@@ -155,7 +155,7 @@ sub build_fields {
     # process meta fields
     my @meta_fields = $self->_meta_fields;
     $self->meta_fields(\@meta_fields);
-    my $meta_fields = clone(\@meta_fields);
+    my $meta_fields = data_clone(\@meta_fields);
     $self->process_field_array( $meta_fields );
 
     # process field_list

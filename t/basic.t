@@ -81,6 +81,7 @@ my $fif = {
    fruit       => 2,
    must_select => 1,
    my_selected => 0,
+   somename => '',
 };
 is_deeply( $form->fif, $fif, 'fif is correct with missing field' );
 
@@ -142,6 +143,10 @@ is_deeply( $form->value, $init_obj_plus_defaults, 'value with empty params' );
 my $expected_fif = {
     reqname => 'Starting Perl',
     optname => 'Over Again',
+    my_selected => '',
+    fruit => '',
+    must_select => '',
+    somename => '',
 };
 
 $fif = $form->fif;
@@ -173,7 +178,6 @@ is_deeply( $form->fif, $fif, 'get right fif with init_object' );
 
 if ( !$form->process( params => { bar => 1, } ) )
 {
-$DB::single=1;
    # On some versions, the above process() returned false, but
    # error_fields did not return anything.
    my @fields = $form->all_error_fields;

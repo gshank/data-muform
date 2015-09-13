@@ -2,6 +2,7 @@ package HTML::MuForm::Field::Repeatable;
 # ABSTRACT: repeatable (array) field
 
 use Moo;
+use HTML::MuForm::Meta;
 extends 'HTML::MuForm::Field::Compound';
 
 use aliased 'HTML::MuForm::Field::Repeatable::Instance';
@@ -229,7 +230,9 @@ sub create_element {
 sub clone_element {
     my ( $self, $index ) = @_;
 
-    my $field = $self->contains->clone( errors => [], error_fields => [] );
+    my $field = data_clone($self->contains);
+    $field->clear_errors;
+    $field->clear_error_fields;
     $field->name($index);
     $field->parent($self);
     if ( $field->has_fields ) {
@@ -240,10 +243,13 @@ sub clone_element {
 
 sub clone_fields {
     my ( $self, $parent, $fields ) = @_;
+
     my @field_array;
     $parent->fields( [] );
     foreach my $field ( @{$fields} ) {
-        my $new_field = $field->clone( errors => [], error_fields => [] );
+        my $new_field = data_clone($field);
+        $new_field->clear_errors;
+        $new_field->clear_error_fields;
         if ( $new_field->has_fields ) {
             $self->clone_fields( $new_field, [ $new_field->all_fields ] );
         }
@@ -255,7 +261,7 @@ sub clone_fields {
 # params exist and validation will be performed (later)
 sub fill_from_params {
     my ( $self, $result, $input ) = @_;
-
+warn "Repeatable: fill_from_params\n";
     $self->init_state;
 #   $result->_set_input($input);
     $self->input($input);
@@ -308,6 +314,7 @@ sub _setup_for_js {
 sub fill_from_object {
     my ( $self, $result, $values ) = @_;
 
+warn "Repeatable: fill_from_object\n";
     return $self->fill_from_fields($result)
         if ( $self->num_when_empty > 0 && !$values );
     $self->item($values);
@@ -379,7 +386,7 @@ sub add_extra {
 # create an empty field
 sub fill_from_fields {
     my ( $self, $result ) = @_;
-
+warn $self->name . " Repeatable: fill_from_fields\n";
     # check for defaults
     if ( my @values = $self->get_default_value ) {
         return $self->fill_from_object( $result, \@values );

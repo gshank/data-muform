@@ -3,6 +3,7 @@ use Moo;
 use Types::Standard -types;
 use Try::Tiny;
 use Scalar::Util 'blessed';
+use Data::Clone ('data_clone');
 
 with 'HTML::MuForm::Common';
 
@@ -54,6 +55,7 @@ has 'errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 sub has_errors { my $self = shift; return scalar @{$self->errors}; }
 sub all_errors { my $self = shift; return @{$self->errors}; }
 sub clear_errors { $_[0]->{errors} = [] }
+sub clear_error_fields { }
 
 has 'active' => ( is => 'rw', default => 1 );
 sub is_inactive { ! $_[0]->active }
@@ -516,6 +518,10 @@ sub all_messages {
     return {%{$lclass_messages}, %{$form_messages}, %{$field_messages}};
 }
 
+sub clone {
+    my $self = shift;
+    return data_clone($self);
+}
 
 1;
 

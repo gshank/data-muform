@@ -2,6 +2,7 @@ package HTML::MuForm::Field::Repeatable::Instance;
 # ABSTRACT: used internally by repeatable fields
 
 use Moo;
+use HTML::MuForm::Meta;
 extends 'HTML::MuForm::Field::Compound';
 
 =head1 SYNOPSIS

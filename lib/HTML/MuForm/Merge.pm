@@ -1,7 +1,7 @@
 package HTML::MuForm::Merge;
 # ABSTRACT: internal hash merging
 use warnings;
-use Data::Clone;
+use Data::Clone ('data_clone');
 use base 'Exporter';
 
 our @EXPORT_OK = ( 'merge' );
@@ -35,8 +35,8 @@ sub merge {
         ref $right eq 'HASH'  ? 'HASH' :
         ref $right eq 'ARRAY' ? 'ARRAY' :
                                 'SCALAR';
-    $left  = clone($left);
-    $right = clone($right);
+    $left  = data_clone($left);
+    $right = data_clone($right);
     return $matrix->{$lefttype}{$righttype}->( $left, $right );
 }
 
@@ -48,12 +48,12 @@ sub merge_hashes {
             $newhash{$leftkey} = merge( $left->{$leftkey}, $right->{$leftkey} );
         }
         else {
-            $newhash{$leftkey} = clone( $left->{$leftkey} );
+            $newhash{$leftkey} = data_clone( $left->{$leftkey} );
         }
     }
     foreach my $rightkey ( keys %$right ) {
         if ( !exists $left->{$rightkey} ) {
-            $newhash{$rightkey} = clone( $right->{$rightkey} );
+            $newhash{$rightkey} = data_clone( $right->{$rightkey} );
         }
     }
     return \%newhash;

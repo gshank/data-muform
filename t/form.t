@@ -55,7 +55,7 @@ $form->process( params => $params );
 ok( ! $form->validated, 'form did not validate' );
 is ( $form->num_error_fields, 1, 'one error field' );
 is ( $form->num_errors, 1, 'one error');
-is_deeply( $form->fif, { foo => '' }, 'fif correct when error' );
+is_deeply( $form->fif, { foo => '', bar => '' }, 'fif correct when error' );
 
 # check incorrect bar param
 $params = { foo => 'one', bar => 'two' };

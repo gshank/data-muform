@@ -18,7 +18,7 @@ with 'HTML::MuForm::Common';
 
 use Types::Standard -types;
 use Class::Load ('load_optional_class');
-use Data::Clone;
+use Data::Clone ('data_clone');
 use HTML::MuForm::Params;
 
 has 'name' => ( is => 'ro', isa => Str, builder => 'build_name');
@@ -196,7 +196,7 @@ sub setup {
     }
 
     # fill in the input attribute
-    my $params = clone( $self->params );
+    my $params = data_clone( $self->params );
     if ( $self->submitted ) {
         $self->clear_result;
         my $result = $self->result;
