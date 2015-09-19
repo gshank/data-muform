@@ -492,6 +492,20 @@ sub _get_value {
     return $value;
 }
 
+
+sub fields_set_value {
+    my $self = shift;
+    my %value_hash;
+    foreach my $field ( $self->all_fields ) {
+#       next if ( $field->is_inactive || !$field->has_result );
+        next if ! $field->active;
+        $value_hash{ $field->accessor } = $field->value
+            if ( $field->has_value && !$field->noupdate );
+    }
+    $self->value( \%value_hash );
+}
+
+
 sub clear_data {
     my $self = shift;
     $self->clear_input;

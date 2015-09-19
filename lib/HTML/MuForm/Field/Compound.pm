@@ -4,6 +4,7 @@ package HTML::MuForm::Field::Compound;
 use Moo;
 extends 'HTML::MuForm::Field';
 with 'HTML::MuForm::Fields';
+use HTML::MuForm::Meta;
 use Types::Standard ('Bool', 'ArrayRef');
 
 =head1 SYNOPSIS

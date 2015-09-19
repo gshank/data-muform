@@ -230,14 +230,32 @@ sub munge_params {
 # Validation
 #====================================================================
 
+=head2 validate_form
+sub validate_form {
+    my $self   = shift;
+    my $params = $self->params;
+    $self->_set_dependency;    # set required dependencies
+    $self->_fields_validate;
+    $self->validate;           # empty method for users
+    $self->validate_model;     # model specific validation
+    $self->fields_set_value;
+    $self->build_errors;       # move errors to result
+    $self->_clear_dependency;
+    $self->clear_posted;
+    $self->ran_validation(1);
+    $self->dump_validated if $self->verbose;
+    return $self->validated;
+}
+=cut
+
 sub validate_form {
     my $self = shift;
 
     $self->fields_validate;
-
     $self->validate;
-
     $self->validate_model;
+    $self->fields_set_value;
+    # $self->build_errors;
 
     # 'validated' depends on no errors...
 

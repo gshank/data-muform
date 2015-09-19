@@ -263,9 +263,7 @@ sub fill_from_params {
     my ( $self, $result, $input ) = @_;
 warn "Repeatable: fill_from_params\n";
     $self->init_state;
-#   $result->_set_input($input);
     $self->input($input);
-#   $self->_set_result($result);
     # if Repeatable has array input, need to build instances
     $self->fields( [] );
     my $index = 0;
@@ -274,21 +272,13 @@ warn "Repeatable: fill_from_params\n";
         foreach my $element ( @{$input} ) {
             next if not defined $element; # skip empty slots
             my $field  = $self->clone_element($index);
-#           my $result = HTML::MuForm::Field::Result->new(
-#               name   => $index,
-#               parent => $self->result
-#           );
-#           $result = $field->_result_from_input( $result, $element, 1 );
             $field->fill_from_params( $result, $element, 1 );
-#           $self->result->add_result($result);
             $self->add_field($field);
             $index++;
         }
     }
     $self->index($index);
     $self->_setup_for_js if $self->setup_for_js;
-#   $self->result->_set_field_def($self);
-#   return $self->result;
     return;
 }
 
@@ -319,7 +309,6 @@ warn "Repeatable: fill_from_object\n";
         if ( $self->num_when_empty > 0 && !$values );
     $self->item($values);
     $self->init_state;
-#   $self->_set_result($result);
     # Create field instances and fill with values
     my $index = 0;
     my @new_values;
@@ -328,17 +317,12 @@ warn "Repeatable: fill_from_object\n";
     foreach my $element ( @{$values} ) {
         next unless $element;
         my $field = $self->clone_element($index);
-#       my $result =
-#           HTML::MuForm::Field::Result->new( name => $index, parent => $self->result );
-        if( $field->has_inflate_default_method ) {
-            $element = $field->inflate_default($element);
+        if( my $meth = $field->get_method('transform1') ) {
+            $element = $meth->($field, $element);
         }
-#       $result = $field->_result_from_object( $result, $element );
         $field->fill_from_object( $result, $element );
-#       push @new_values, $result->value;
         push @new_values, $field->value;
         $self->add_field($field);
-#       $self->result->add_result( $field->result );
         $index++;
     }
     if( my $num_extra = $self->num_extra ) {
@@ -352,8 +336,6 @@ warn "Repeatable: fill_from_object\n";
     $self->_setup_for_js if $self->setup_for_js;
     $values = \@new_values if scalar @new_values;
     $self->value($values);
-#   $self->result->_set_field_def($self);
-#   return $self->result;
     return;
 }
 
@@ -361,12 +343,8 @@ sub _add_extra {
     my ($self, $index) = @_;
 
     my $field = $self->clone_element($index);
-#   my $result =
-#       HTML::MuForm::Field::Result->new( name => $index, parent => $self->result );
-#   $result = $field->_result_from_fields($result);
     my $result;   # TODO: this is pointless... connect up somehow?
     $field->fill_from_fields($result);
-#   $self->result->add_result($result) if $result;
     $self->add_field($field);
     return $field;
 }
@@ -392,26 +370,19 @@ warn $self->name . " Repeatable: fill_from_fields\n";
         return $self->fill_from_object( $result, \@values );
     }
     $self->init_state;
-#   $self->_set_result($result);
     my $count = $self->num_when_empty;
     my $index = 0;
     # build empty instance
     $self->fields( [] );
     while ( $count > 0 ) {
         my $field = $self->clone_element($index);
-#       my $result =
-#           HTML::MuForm::Field::Result->new( name => $index, parent => $self->result );
-#       $result = $field->_result_from_fields($result);
         $field->fill_from_fields($result);
-#       $self->result->add_result($result) if $result;
         $self->add_field($field);
         $index++;
         $count--;
     }
     $self->index($index);
     $self->_setup_for_js if $self->setup_for_js;
-#   $self->result->_set_field_def($self);
-#   return $result;
     return;
 }
 

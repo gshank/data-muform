@@ -62,6 +62,7 @@ sub is_inactive { ! $_[0]->active }
 has 'disabled' => ( is => 'rw', default => 0 );
 has 'noupdate' => ( is => 'rw', default => 0 );
 has 'writeonly' => ( is => 'rw', default => 0 );
+has 'is_contains' => ( is => 'rw', isa => Bool );
 has 'apply' => ( is => 'rw', default => sub {[]} ); # for field defnitions
 sub has_apply { return scalar @{$_[0]->{apply}} }
 has 'base_apply' => ( is => 'rw', default => sub {[]} );  # for field classes
