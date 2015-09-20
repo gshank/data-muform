@@ -533,8 +533,10 @@ sub get_result {
         id => $self->id,
         label => $self->label,
         render_args => $self->render_args,
+        fif => $self->fif,
     };
     $result->{errors} = $self->errors if $self->has_errors;
+    return $result;
 }
 
 1;

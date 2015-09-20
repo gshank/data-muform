@@ -288,6 +288,8 @@ sub get_result {
     };
     $result->{form_errors} = $self->form_errors if $self->has_form_errors;
     $result->{errors} = $self->errors if $self->has_errors;
+    return $result;
 }
 
+sub results { shift->fields_get_results }
 1;

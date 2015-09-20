@@ -156,6 +156,7 @@ sub fields_get_results {
         push @field_results, $result;
     }
     $result->{fields} = \@field_results;
+    return $result;
 }
 
 #====================================================================
