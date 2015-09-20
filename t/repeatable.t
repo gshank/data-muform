@@ -64,19 +64,6 @@ my $params = {
 $form->process( params => $params );
 ok( $form->validated, 'form validated ok' );
 
-#0  HASH(0x7fc126195b88)
-#  'my_name' => 'Jane'
-#  'my_records' => HASH(0x7fc126f89a08)
-#     0 => HASH(0x7fc12780c9a0)
-#        'one' => 'first, one'
-#        'two' => 'first, two'
-#     1 => HASH(0x7fc127815640)
-#        'one' => 'second, one'
-#        'two' => 'second, two'
-#  'tags' => HASH(0x7fc127815c58)
-#     0 => 'my_category'
-#     1 => 'trouble'
-
 my $value = $form->value;
 my $expected_value = {
     'my_name' => 'Jane',
@@ -88,6 +75,5 @@ my $expected_value = {
 };
 
 is_deeply ( $value, $expected_value, 'got correct value from processed form');
-diag(Dumper($value));
 
 done_testing;

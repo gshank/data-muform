@@ -160,17 +160,17 @@ has 'index'          => ( isa => Int,  is => 'rw', default => 0 );
 has 'is_repeatable'  => ( isa => Bool, is => 'ro', default => 1 );
 #has '+widget'        => ( default => 'Repeatable' );
 
-sub _fields_validate {
+sub fields_validate {
     my $self = shift;
     # loop through array of fields and validate
     my @value_array;
     foreach my $field ( $self->all_fields ) {
-        next if ( $field->is_inactive );
+        next if ( ! $field->active );
         # Validate each field and "inflate" input -> value.
         $field->validate_field;    # this calls the field's 'validate' routine
         push @value_array, $field->value if $field->has_value;
     }
-    $self->_set_value( \@value_array );
+    $self->value( \@value_array );
 }
 
 sub init_state {
@@ -261,7 +261,7 @@ sub clone_fields {
 # params exist and validation will be performed (later)
 sub fill_from_params {
     my ( $self, $result, $input ) = @_;
-warn "Repeatable: fill_from_params\n";
+
     $self->init_state;
     $self->input($input);
     # if Repeatable has array input, need to build instances
@@ -304,7 +304,6 @@ sub _setup_for_js {
 sub fill_from_object {
     my ( $self, $result, $values ) = @_;
 
-warn "Repeatable: fill_from_object\n";
     return $self->fill_from_fields($result)
         if ( $self->num_when_empty > 0 && !$values );
     $self->item($values);
@@ -364,7 +363,7 @@ sub add_extra {
 # create an empty field
 sub fill_from_fields {
     my ( $self, $result ) = @_;
-warn $self->name . " Repeatable: fill_from_fields\n";
+
     # check for defaults
     if ( my @values = $self->get_default_value ) {
         return $self->fill_from_object( $result, \@values );

@@ -101,6 +101,7 @@ sub field_index {
     return;
 }
 
+# Repeatable overrides this
 sub fields_validate {
     my $self = shift;
 
