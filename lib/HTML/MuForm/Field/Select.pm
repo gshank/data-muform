@@ -12,7 +12,9 @@ has 'options' => (
     lazy => 1,
     builder => 'build_options',
     coerce => sub {
-        my @options = @{$_[0] || []};
+        my $options = shift;
+        my @options = @$options;
+        return [] unless scalar @options;
         return \@options if ref $options[0] eq 'HASH';
         die "Options array must contain an even number of elements"
             if @options % 2;
@@ -71,11 +73,12 @@ sub BUILD {
     $self->_load_options unless $self->has_options;
 }
 
-sub fill_from_input {
-    my ( $self, $result, $input, $exists ) = @_;
+sub fill_from_params {
+    my ( $self, $filled, $input, $exists ) = @_;
+
     $input = ref $input eq 'ARRAY' ? $input : [$input]
         if $self->multiple;
-    $result = $self->next::method( $result, $input, $exists );
+    $filled = $self->next::method( $filled, $input, $exists );
     $self->_load_options;
     $self->value($self->default)
         if( defined $self->default && not $self->has_value );
@@ -183,7 +186,7 @@ sub base_validate {
     }
     elsif ( ref $value ne 'ARRAY' && $self->multiple ) {
         $value = [$value];
-        $self->_set_value($value);
+        $self->value($value);
     }
 
     return if $self->no_option_validation;

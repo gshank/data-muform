@@ -71,7 +71,6 @@ has 'trim' => (
     is      => 'rw',
     default => sub { { transform => \&default_trim } }
 );
-
 sub default_trim {
     my $value = shift;
     return unless defined $value;
@@ -89,6 +88,8 @@ sub get_method {
    my ( $self, $meth_name ) = @_;
    return  $self->{methods}->{$meth_name};
 }
+has 'render_args' => ( is => 'rw', isa => HashRef, builder => 'build_render_args' );
+sub build_render_args {{}}
 
 sub BUILD {
     my $self = shift;
@@ -395,10 +396,10 @@ sub apply_actions {
 #====================================================================
 
 sub fill_from_params {
-    my ( $self, $result, $input, $exists ) = @_;
+    my ( $self, $filled, $input, $exists ) = @_;
 
     if ( $exists ) {
-        $result->{$self->name} = $input;
+        $filled->{$self->name} = $input;
         $self->input($input);
     }
     elsif ( $self->disabled ) {
@@ -410,10 +411,10 @@ sub fill_from_params {
 }
 
 sub fill_from_object {
-    my ( $self, $result, $value ) = @_;
+    my ( $self, $filled, $value ) = @_;
 
     $self->value($value);
-    $result->{$self->name} = $value;
+    $filled->{$self->name} = $value;
 
     if ( $self->form ) {
         $self->form->init_value( $self, $value );
@@ -428,11 +429,11 @@ sub fill_from_object {
 }
 
 sub fill_from_fields {
-    my ( $self, $result ) = @_;
+    my ( $self, $filled ) = @_;
 
     if ( $self->disabled && $self->has_init_value ) {
         $self->value($self->init_value);
-        $result->{$self->name} = $self->init_value;
+        $filled->{$self->name} = $self->init_value;
     }
     elsif ( my @values = $self->get_default_value ) {
         # TODO
@@ -443,7 +444,7 @@ sub fill_from_fields {
         if ( defined $value ) {
             $self->init_value($value);
             $self->value($value);
-            $result->{$self->name} = $value;
+            $filled->{$self->name} = $value;
         }
     }
     return;
@@ -522,6 +523,18 @@ sub all_messages {
 sub clone {
     my $self = shift;
     return data_clone($self);
+}
+
+sub get_result {
+    my $self = shift;
+    my $result = {
+        name => $self->name,
+        full_name => $self->full_name,
+        id => $self->id,
+        label => $self->label,
+        render_args => $self->render_args,
+    };
+    $result->{errors} = $self->errors if $self->has_errors;
 }
 
 1;

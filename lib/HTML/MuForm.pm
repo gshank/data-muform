@@ -29,6 +29,8 @@ sub build_name {
     $name ||= $class;
     return $name;
 }
+has 'id' => ( is => 'ro', isa => Str, lazy => 1, builder => 'build_id' );
+sub build_id { $_[0]->name }
 has 'submitted' => ( is => 'rw', default => undef );  # three values: 0, 1, undef
 has 'processed' => ( is => 'rw', default => 0 );
 has 'no_init_process' => ( is => 'rw', default => 0 );
@@ -143,8 +145,9 @@ sub process {
 sub clear {
     my $self = shift;
     $self->clear_params;
-    $self->clear_result;
-    $self->clear_result_from;
+#   $self->clear_result;
+    $self->clear_filled;
+    $self->clear_filled_from;
     $self->submitted(undef);
     $self->item(undef);
     $self->clear_init_object;
@@ -188,19 +191,19 @@ sub setup {
     # these fill the 'value' attributes
     if ( my $init_object = $self->use_init_obj_over_item ?
         ($self->init_object || $self->item) : ( $self->item || $self->init_object ) ) {
-        $self->fill_from_object( $self->result, $init_object );
+        $self->fill_from_object( $self->filled, $init_object );
     }
     elsif ( !$self->submitted ) {
         # no initial object. empty form must be initialized
-        $self->fill_from_fields( $self->result );
+        $self->fill_from_fields( $self->filled );
     }
 
     # fill in the input attribute
     my $params = data_clone( $self->params );
     if ( $self->submitted ) {
-        $self->clear_result;
-        my $result = $self->result;
-        $self->fill_from_params( $result, $params, 1 );
+        $self->clear_filled;
+        my $filled = $self->filled;
+        $self->fill_from_params( $filled, $params, 1 );
     }
 
 }
@@ -273,5 +276,18 @@ sub validated { my $self = shift; return $self->ran_validation && ! $self->has_e
 
 sub get_default_value { }
 
+sub get_result {
+    my $self = shift;
+    my $result = {
+        method => $self->http_method,
+        action => $self->action,
+        name   => $self->name,
+        id     => $self->id,
+        submitted => $self->submitted,
+        validated => $self->validated,
+    };
+    $result->{form_errors} = $self->form_errors if $self->has_form_errors;
+    $result->{errors} = $self->errors if $self->has_errors;
+}
 
 1;

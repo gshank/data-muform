@@ -24,9 +24,9 @@ sub clear_value { $_[0]->{value} = {} }
 sub values { $_[0]->value }
 has 'init_value' => ( is => 'rw', clearer => 'clear_init_value' );
 has 'input' => ( is => 'rw', clearer => 'clear_input' );
-has 'result' => ( is => 'rw', isa => HashRef, default => sub {{}} );
-sub clear_result { $_[0]->{result} = {} }
-has 'result_from' => ( is => 'rw', clearer => 'clear_result_from' );
+has 'filled' => ( is => 'rw', isa => HashRef, default => sub {{}} );
+sub clear_filled { $_[0]->{filled} = {} }
+has 'filled_from' => ( is => 'rw', clearer => 'clear_filled_from' );
 
 has 'meta_fields' => ( is => 'rw' );
 has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_field_list' );
@@ -119,9 +119,8 @@ sub fields_validate {
 }
 
 sub fields_fif {
-    my ( $self, $result, $prefix ) = @_;
+    my ( $self, $prefix ) = @_;
 
-    $result ||= $self->result;
     $prefix ||= '';
     $prefix = $prefix . "."
         if ( $self->isa('HTML::MuForm') && $self->html_prefix );
@@ -133,7 +132,7 @@ sub fields_fif {
         my $fif = $field->fif;
         next if ( !defined $fif || (ref $fif eq 'ARRAY' && ! scalar @{$fif} ) );
         if ( $field->has_fields ) {
-            my $next_params = $field->fields_fif( $result,  $prefix . $field->name . '.' );
+            my $next_params = $field->fields_fif( $prefix . $field->name . '.' );
             next unless $next_params;
             %params = ( %params, %{$next_params} );
         }
@@ -144,6 +143,19 @@ sub fields_fif {
     return if !%params;
     return \%params;
 
+}
+
+sub fields_get_results {
+    my $self = shift;
+
+    my $result = $self->get_result;
+    my @field_results;
+    foreach my $field ( $self->all_sorted_fields ) {
+        next if ! $field->active;
+        my $result = $field->get_result;
+        push @field_results, $result;
+    }
+    $result->{fields} = \@field_results;
 }
 
 #====================================================================
@@ -343,43 +355,28 @@ sub _make_adhoc_field {
 # Initialize input/value (InitResult)
 #====================================================================
 
-# How to handle repeatables and dynamic arrays of fields?
-# maybe create a 'result' structure that contains 'nodes' of
-# { input => '', value => '', errors => [] }. Hmm....
-# Perhaps have special attribute replacements in Repeatable fields
-# (simple compound fields should be okay)
-# that identify the 'name' (foo.bar), the 'input', the 'value', the 'errors'
-# from a hash:
-#  $instances => {
-#     'foo.bar' => { input => '', value => '', errors => [..] },
-# }
-# couldn't change other attributes, but you can't really do that
-# with the current HFH functionality anyway. There is One Repeatable Field Def
-# Of course, with a deeply nested structure, seems like you'd get into
-# the weeds pretty quickly
-
 # $input here is from the $params passed in on ->process
 sub fill_from_params {
-    my ( $self, $result, $input, $exists ) = @_;
+    my ( $self, $filled, $input, $exists ) = @_;
 
-    $self->result_from('params');
+    $self->filled_from('params');
     return unless ( defined $input || $exists || $self->has_fields );
     $self->input($input);
     if ( ref $input eq 'HASH' ) {
         foreach my $field ( $self->all_sorted_fields ) {
             next if ! $field->active;
             my $fname = $field->input_param || $field->name;
-            $field->fill_from_params($result, $input->{$fname}, exists $input->{$fname});
+            $field->fill_from_params($filled, $input->{$fname}, exists $input->{$fname});
         }
     }
     return;
 }
 
 sub fill_from_object {
-    my ( $self, $result, $item ) = @_;
+    my ( $self, $filled, $item ) = @_;
 
     return unless ( $item || $self->has_fields );    # empty fields for compounds
-    $self->result_from('object');
+    $self->filled_from('object');
     my $my_value;
     my $init_obj = $self->form->init_object;
     for my $field ( $self->all_sorted_fields ) {
@@ -394,14 +391,14 @@ sub fill_from_object {
                 my $init_obj_value = $self->find_sub_item( $init_obj, \@names );
                 if ( defined $init_obj_value ) {
                     $found = 1;
-                    $field->fill_from_object( $result, $init_obj_value );
+                    $field->fill_from_object( $filled, $init_obj_value );
                 }
             }
-            $result = $field->fill_from_fields($result) unless $found;
+            $filled = $field->fill_from_fields($filled) unless $found;
         }
         else {
            my $value = $self->_get_value( $field, $item ) unless $field->writeonly;
-           $field->fill_from_object( $result, $value );
+           $field->fill_from_object( $filled, $value );
         }
         $my_value->{ $field->name } = $field->value;
     }
@@ -411,14 +408,14 @@ sub fill_from_object {
 
 # for when there are no params and no init_object
 sub fill_from_fields {
-    my ( $self, $result ) = @_;
+    my ( $self, $filled ) = @_;
 
-    $self->result_from('fields');
+    $self->filled_from('fields');
     # defaults for compounds, etc.
     if ( my @values = $self->get_default_value ) {
         my $value = @values > 1 ? \@values : shift @values;
         if( ref $value eq 'HASH' || blessed $value ) {
-            return $self->fill_from_object( $result, $value );
+            return $self->fill_from_object( $filled, $value );
         }
         if ( defined $value ) {
             $self->init_value($value);
@@ -428,7 +425,7 @@ sub fill_from_fields {
     my $my_value;
     for my $field ( $self->all_sorted_fields ) {
         next if (!$field->active);
-        $field->fill_from_fields($result);
+        $field->fill_from_fields($filled);
         $my_value->{ $field->name } = $field->value if $field->has_value;
     }
     # setting value here to handle disabled compound fields, where we want to

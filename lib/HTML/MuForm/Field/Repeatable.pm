@@ -260,7 +260,7 @@ sub clone_fields {
 
 # params exist and validation will be performed (later)
 sub fill_from_params {
-    my ( $self, $result, $input ) = @_;
+    my ( $self, $filled, $input ) = @_;
 
     $self->init_state;
     $self->input($input);
@@ -272,7 +272,7 @@ sub fill_from_params {
         foreach my $element ( @{$input} ) {
             next if not defined $element; # skip empty slots
             my $field  = $self->clone_element($index);
-            $field->fill_from_params( $result, $element, 1 );
+            $field->fill_from_params( $filled, $element, 1 );
             $self->add_field($field);
             $index++;
         }
@@ -302,9 +302,9 @@ sub _setup_for_js {
 
 # this is called when there is an init_object or a db item with values
 sub fill_from_object {
-    my ( $self, $result, $values ) = @_;
+    my ( $self, $filled, $values ) = @_;
 
-    return $self->fill_from_fields($result)
+    return $self->fill_from_fields($filled)
         if ( $self->num_when_empty > 0 && !$values );
     $self->item($values);
     $self->init_state;
@@ -319,7 +319,7 @@ sub fill_from_object {
         if( my $meth = $field->get_method('transform1') ) {
             $element = $meth->($field, $element);
         }
-        $field->fill_from_object( $result, $element );
+        $field->fill_from_object( $filled, $element );
         push @new_values, $field->value;
         $self->add_field($field);
         $index++;
@@ -342,8 +342,8 @@ sub _add_extra {
     my ($self, $index) = @_;
 
     my $field = $self->clone_element($index);
-    my $result;   # TODO: this is pointless... connect up somehow?
-    $field->fill_from_fields($result);
+    my $filled;   # TODO: this is pointless... connect up somehow?
+    $field->fill_from_fields($filled);
     $self->add_field($field);
     return $field;
 }
@@ -362,11 +362,11 @@ sub add_extra {
 
 # create an empty field
 sub fill_from_fields {
-    my ( $self, $result ) = @_;
+    my ( $self, $filled ) = @_;
 
     # check for defaults
     if ( my @values = $self->get_default_value ) {
-        return $self->fill_from_object( $result, \@values );
+        return $self->fill_from_object( $filled, \@values );
     }
     $self->init_state;
     my $count = $self->num_when_empty;
@@ -375,7 +375,7 @@ sub fill_from_fields {
     $self->fields( [] );
     while ( $count > 0 ) {
         my $field = $self->clone_element($index);
-        $field->fill_from_fields($result);
+        $field->fill_from_fields($filled);
         $self->add_field($field);
         $index++;
         $count--;

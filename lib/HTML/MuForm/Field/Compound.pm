@@ -77,16 +77,16 @@ sub test_validate_field {
     my $self = shift;
     unless( $self->form ) {
         if( $self->has_input ) {
-            $self->_result_from_input( $self->result, $self->input );;
+            $self->fill_from_params( $self->filled, $self->input );;
         }
         else {
-            $self->_result_from_fields( $self->result );
+            $self->fill_from_fields( $self->filled );
         }
     }
     $self->validate_field;
     unless( $self->form ) {
-        foreach my $err_res (@{$self->result->error_results}) {
-            $self->result->_push_errors($err_res->all_errors);
+        foreach my $err_fld (@{$self->error_fields}) {
+            $self->push_errors($err_fld->all_errors);
         }
     }
 }
@@ -94,7 +94,7 @@ sub test_validate_field {
 around 'fill_from_object' => sub {
     my $orig = shift;
     my $self = shift;
-    my ( $self_result, $item ) = @_;
+    my ( $filled, $item ) = @_;
     $self->item($item) if $item;
     $self->$orig(@_);
 };
@@ -107,9 +107,9 @@ after 'clear_data' => sub {
 around 'fill_from_params' => sub {
     my $orig = shift;
     my $self = shift;
-    my ( $self_result, $input, $exists ) = @_;
+    my ( $filled, $input, $exists ) = @_;
     if ( !$input && !$exists ) {
-        return $self->fill_from_fields($self_result);
+        return $self->fill_from_fields($filled);
     }
     else {
         return $self->$orig(@_);

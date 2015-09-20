@@ -1,5 +1,5 @@
 package HTML::MuForm::Render::Field::Base;
-use Moose;
+use Moo;
 
 sub render {
     my $self = shift;
