@@ -9,7 +9,7 @@ has '+input_without_param' => ( default => 0 );
 has 'option_label'         => ( is => 'rw' );
 has 'option_wrapper'       => ( is => 'rw' );
 
-sub element_type { 'checkbox' }
+sub build_form_element { 'checkbox' }
 
 sub validate {
     my $self = shift;

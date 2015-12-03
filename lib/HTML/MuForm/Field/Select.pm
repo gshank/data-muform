@@ -4,7 +4,7 @@ extends 'HTML::MuForm::Field';
 use Types::Standard -types;
 use HTML::Entities;
 
-sub element_type { 'select' }
+sub build_form_element { 'select' }
 
 has 'options' => (
     is => 'rw',

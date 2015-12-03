@@ -5,7 +5,7 @@ extends 'HTML::MuForm::Field';
 has 'value' => ( is => 'rw', default => 'Save' );
 has '+noupdate'  => ( default => 1 );
 
-sub element_type { 'submit' }
+sub build_input_type { 'submit' }
 
 sub fif { }
 

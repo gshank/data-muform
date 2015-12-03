@@ -88,8 +88,21 @@ sub get_method {
    my ( $self, $meth_name ) = @_;
    return  $self->{methods}->{$meth_name};
 }
+
+#=================
+# Rendering
+#=================
 has 'render_args' => ( is => 'rw', isa => HashRef, builder => 'build_render_args' );
 sub build_render_args {{}}
+has 'renderer' => (
+  is => 'rw',
+  builder => 'build_renderer',
+);
+sub build_renderer {
+  my $self = shift;
+  require HTML::MuForm::Renderer::Standard;
+  return HTML::MuForm::Renderer::Standard->new;
+}
 
 sub BUILD {
     my $self = shift;
@@ -168,7 +181,13 @@ sub _localize {
    return $message[0];
 }
 
-has 'element_type' => ( is => 'rw', lazy => 1, builder => 'build_element_type' );
+#====================
+# Rendering
+#====================
+has 'form_element' => ( is => 'rw', lazy => 1, builder => 'build_form_element' );
+sub build_form_element { 'input' }
+has 'input_type' => ( is => 'rw', lazy => 1, builder => 'build_input_type' );
+sub build_input_type { 'text' }
 
 # could have everything in one big "pass to the renderer" hash?
 has 'layout' => ( is => 'rw' );

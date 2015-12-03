@@ -6,7 +6,7 @@ has 'size' => ( is => 'rw', default => 0 );
 has 'maxlength' => ( is => 'rw' );
 has 'minlength' => ( is => 'rw', default => '0' );
 
-sub element_type { 'submit' }
+sub build_input_type { 'text' }
 
 our $class_messages = {
     'text_maxlength' => 'Field should not exceed [quant,_1,character]. You entered [_2]',

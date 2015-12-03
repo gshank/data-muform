@@ -76,6 +76,13 @@ sub fif { shift->fields_fif(@_) }
 #========= Rendering ==========
 has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
 has 'action' => ( is => 'rw' );
+has 'renderer' => ( is => 'rw', builder => 'build_renderer' );
+sub build_renderer {
+    my $self = shift;
+    require HTML::MuForm::Renderer::Standard;
+    my $renderer = HTML::MuForm::Renderer::Standard->new;
+}
+
 #========= Errors ==========
 has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 sub clear_form_errors { $_[0]->{form_errors} = []; }
