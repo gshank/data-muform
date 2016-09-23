@@ -110,6 +110,40 @@ sub errors {
 }
 sub all_errors { @{$_[0]->errors} }
 
+#========= Localization ==========
+# create lexicon
+has 'lexicon_search_dirs' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_lexicon_search_dirs' );
+sub build_lexicon_search_dirs {
+    my $self = shift;
+    my $filename = __FILE__;
+   $filename =~ s/.pm//;
+   return  ["$filename/LocaleData"]
+}
+has 'lexicon_ref' => ( is => 'rw', builder => 'build_lexicon_ref' );
+sub build_lexicon_ref {
+  my $self = shift;
+  require Locale::TextDomain::OO::Lexicon::File::PO;
+  my $lexicon_ref = Locale::TextDomain::OO::Lexicon::File::PO->new->lexicon_ref({
+      search_dirs => $self->lexicon_search_dirs,
+      decode      => 1,
+      data        => [ '*::' => '*/messages.po', ],
+  });
+  return $lexicon_ref;
+}
+has 'language' => ( is => 'rw', builder => 'build_language' );
+sub build_language { 'en' }
+has 'localizer' => ( is => 'rw', lazy => 1, builder => 'build_localizer' );
+sub build_localizer {
+    my $self = shift;
+    require Locale::TextDomain::OO;
+    my $loc = Locale::TextDomain::OO->new(
+        language => $self->language,
+        plugins  => [ 'Expand::Gettext' ],
+    );
+    return $loc;
+}
+
+
 #========= Messages ==========
 has 'messages' => ( is => 'rw', isa => HashRef, builder => 'build_messages' );
 sub build_messages {{}}
@@ -274,10 +308,10 @@ sub validate_form {
 }
 
 # hook for child forms
-sub validate {1}
+sub validate { }
 
 # hook for model validation
-sub validate_model {1}
+sub validate_model { }
 
 sub validated { my $self = shift; return $self->ran_validation && ! $self->has_error_fields; }
 

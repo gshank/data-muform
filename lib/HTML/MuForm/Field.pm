@@ -230,7 +230,7 @@ sub add_error {
         $out = $self->localize(@message);
     }
     catch {
-        die "Error occurred localizing error message for " . $self->label . ". Check brackets. $_";
+        die "Error occurred localizing error message for " . $self->label . ". $_";
     };
     return $self->push_errors($out);;
 }
