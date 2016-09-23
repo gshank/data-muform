@@ -103,6 +103,23 @@ sub build_renderer {
   require HTML::MuForm::Renderer::Standard;
   return HTML::MuForm::Renderer::Standard->new;
 }
+sub get_render_args {
+  my ( $self, %args ) = @_;
+  my $render_args = {
+    %{ $self->render_args },
+    %args,
+    form_element => $self->form_element,
+    input_type => $self->input_type,
+    id => $self->id,
+    label => $self->label,
+    name => $self->html_name,
+  };
+}
+sub render {
+  my ( $self, %args ) = @_;
+  my $render_args = $self->get_render_args(%args);
+  return $self->renderer->render_field($render_args);
+}
 
 sub BUILD {
     my $self = shift;

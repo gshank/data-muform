@@ -1,0 +1,178 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: HTML-MuForm-1\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+# __
+msgid "error_occurred"
+msgstr "error occurred"
+
+msgid "range_incorrect"
+msgstr "Value must be between [_1] and [_2]"
+
+msgid "required"
+msgstr "[_1] field is required"
+
+msgid "range_too_high"
+msgstr "Value must be less than or equal to [_1]"
+
+msgid "range_too_low"
+msgstr "Value must be greater than or equal to [_1]"
+
+msgid "unique"
+msgstr "Duplicate value for [_1]"
+
+msgid "wrong_value"
+msgstr "Wrong value"
+
+msgid "no_match"
+msgstr "[_1] does not match"
+
+msgid "not_allowed"
+msgstr "[_1] not allowed"
+
+msgid "field_invalid"
+msgstr "field is invalid"
+
+msgid "SimpleStr"
+msgstr "Must be a single line of no more than 255 chars"
+
+msgid "NegativeNum"
+msgstr "Must be a negative number"
+
+msgid "Zip"
+msgstr "Zip is not valid"
+
+msgid "Email"
+msgstr "Email is not valid"
+
+msgid "Password"
+msgstr "Must be between 4 and 255 chars"
+
+msgid "NotAllDigits"
+msgstr "Must not be all digits"
+
+msgid "IPAddress"
+msgstr "Not a valid IP address"
+
+msgid "PositiveInt"
+msgstr "Must be a positive integer"
+
+msgid "NonEmptyStr"
+msgstr "Must not be empty"
+
+msgid "State"
+msgstr "Not a valid state"
+
+msgid "StrongPassword"
+msgstr "Must be between 8 and 255 chars, and contain a non-alpha char"
+
+msgid "NoSpaces"
+msgstr "Must not contain spaces"
+
+msgid "NegativeInt"
+msgstr "Must be a negative integer"
+
+msgid "SingleDigit"
+msgstr "Must be a single digit"
+
+msgid "SingleWord"
+msgstr "Field must contain a single word"
+
+msgid "PrintableAndNewline"
+msgstr "Field contains non-printable characters"
+
+msgid "NonEmptySimpleStr"
+msgstr "Must be a non-empty single line of no more than 255 chars"
+
+msgid "Printable"
+msgstr "Field contains non-printable characters"
+
+msgid "WordChars"
+msgstr "Must be made up of letters, digits, and underscores"
+
+msgid "PositiveNum"
+msgstr "Must be a positive number"
+
+msgid "date_late"
+msgstr "Date is too late"
+
+msgid "date_early"
+msgstr "Date is too early"
+
+msgid "datetime_invalid"
+msgstr "Not a valid DateTime"
+
+msgid "duration_invalid"
+msgstr "Invalid value for [_1]: [_2]"
+
+msgid "email_format"
+msgstr "Email should be of the format [_1]"
+
+msgid "float_precision"
+msgstr "May have a maximum of [quant,_1,digit] after the decimal point, but has [_2]"
+
+msgid "float_needed"
+msgstr "Must be a number. May contain numbers, +, - and decimal separator \'[_1]\'"
+
+msgid "float_size"
+msgstr "Total size of number must be less than or equal to [_1], but is [_2]"
+
+msgid "integer_needed"
+msgstr "Value must be an integer"
+
+msgid "money_convert"
+msgstr "Value cannot be converted to money"
+
+msgid "money_real"
+msgstr "Value must be a real number"
+
+msgid "password_ne_username"
+msgstr "Password must not match [_1]"
+
+msgid "required"
+msgstr "Please enter a password in this field"
+
+msgid  "required"
+msgstr "Please enter a password confirmation"
+
+msgid  "pass_conf_not_matched"
+msgstr "The password confirmation does not match the password"
+
+msgid "integer_positive"
+msgstr "Value must be a positive integer"
+
+msgid "select_invalid_value"
+msgstr "\'[_1]\' is not a valid value"
+
+msgid "select_not_multiple"
+msgstr "This field does not take multiple values"
+
+msgid "text_minlength"
+msgstr "Field must be at least [quant,_1,character]. You entered [_2]"
+
+msgid "multiple_values_disallowed"
+msgstr "Field must contain a single value"
+
+msgid "text_maxlength"
+msgstr "Field should not exceed [quant,_1,character]. You entered [_2]"
+
+msgid "upload_file_too_big"
+msgstr "File is too big (> [_1] bytes)"
+
+msgid "upload_file_too_small"
+msgstr "File is too small (< [_1] bytes)"
+
+msgid "upload_file_not_found"
+msgstr "File not found for upload field"
+
+msgid "upload_file_empty"
+msgstr "File uploaded is empty"
+
