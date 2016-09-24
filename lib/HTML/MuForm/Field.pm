@@ -229,7 +229,20 @@ has 'required' => ( is => 'rw', default => 0 );
 has 'required_when' => ( is => 'rw', isa => HashRef, predicate => 'has_required_when' );
 has 'unique' => ( is => 'rw', isa => Bool, predicate => 'has_unique' );
 
+# handles message with and without variables
 sub add_error {
+    my ( $self, @message ) = @_;
+    my $out;
+    if ( $message[0] =~ /{/ ) {
+        $out = $self->localizer->loc->__x(@message);
+    }
+    else {
+      $out = $self->localizer->loc->__($message[0])
+    }
+    return $self->push_errors($out);
+}
+
+sub add_error_ {
     my ( $self, @message ) = @_;
     my $out = $self->localizer->loc->__(@message);
     return $self->push_errors($out);;
@@ -237,16 +250,10 @@ sub add_error {
 
 sub add_error_x {
     my ( $self, @message ) = @_;
-    my $out;
-    if ( $message[0] =~ /{/ ) {
-        $out = $self->localizer->loc->__x(@message);
-    }
-    # user may have set internal message to non-param message
-    else {
-      $out = $self->localizer->loc->__($message[0])
-    }
-    return $self->push_errors($out);
+    my $out = $self->localizer->loc->__x(@message);
+    return $self->push_errors($out);;
 }
+
 
 sub push_errors {
     my $self = shift;
@@ -307,7 +314,7 @@ sub validate_field {
     if ( ( $self->required ||
          ( $self->has_required_when && $self->match_when($self->required_when) ) ) &&
          ( ! $self->has_input || ! $self->input_defined )) {
-        $self->add_error_x( $self->get_message('required'), field_label => $self->label );
+        $self->add_error( $self->get_message('required'), field_label => $self->label );
         $continue_validation = 0;
     }
 
@@ -398,12 +405,12 @@ sub apply_actions {
         }
         elsif ( ref $action->{check} eq 'Regexp' ) {
             if ( $value !~ $action->{check} ) {
-                $error_message = [$self->get_message('no_match'), $value];
+                $error_message = [$self->get_message('no_match'), 'value', $value];
             }
         }
         elsif ( ref $action->{check} eq 'ARRAY' ) {
             if ( !grep { $value eq $_ } @{ $action->{check} } ) {
-                $error_message = [$self->get_message('not_allowed'), $value];
+                $error_message = [$self->get_message('not_allowed'), 'value', $value];
             }
         }
         elsif ( ref $action->{transform} eq 'CODE' ) {
@@ -570,7 +577,7 @@ our $class_messages = {
     'no_match'        => '[_1] does not match',
     'not_allowed'     => '[_1] not allowed',
     'error_occurred'  => 'error occurred',
-    'required'        => q{'{field_label}' field is required},
+    'required'        => "'{field_label}' field is required",
     'unique'          => 'Duplicate value for [_1]',   # this is used in the DBIC model
 };
 

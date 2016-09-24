@@ -55,19 +55,19 @@ sub validate {
     if ( defined $low && defined $high ) {
         return
             $value >= $low && $value <= $high ? 1 :
-              $field->add_error( $field->get_message('range_incorrect'), $low, $high );
+              $field->add_error( $field->get_message('range_incorrect'), low => $low, high => $high );
     }
 
     if ( defined $low ) {
         return
             $value >= $low ? 1 :
-              $field->add_error( $field->get_message('range_too_low'), $low );
+              $field->add_error( $field->get_message('range_too_low'), low => $low );
     }
 
     if ( defined $high ) {
         return
             $value <= $high ? 1 :
-              $field->add_error( $field->get_message('range_too_high'), $high );
+              $field->add_error( $field->get_message('range_too_high'), high => $high );
     }
 
     return 1;

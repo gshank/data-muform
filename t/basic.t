@@ -185,11 +185,7 @@ if ( !$form->process( params => { bar => 1, } ) )
    {
         my @errors = $fields[0]->all_errors;
         is( scalar @errors, 1, "there is an error" );
-
-        TODO: {
-            local $TODO = 'localization';
-            is( $errors[0], $fields[0]->label . " field is required", "error messages match" );
-        };
+        is( $errors[0], "'Must select' field is required", "error messages match" );
    }
    else
    {

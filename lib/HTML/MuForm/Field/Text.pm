@@ -30,7 +30,7 @@ sub validate {
     # Check for max length
     if ( my $maxlength = $field->maxlength ) {
         return $field->add_error( $field->get_message('text_maxlength'),
-            $maxlength, length $value, $field->loc_label )
+            maxlength => $maxlength, length => length $value, field_label =>$field->loc_label )
             if length $value > $maxlength;
     }
 
@@ -38,7 +38,7 @@ sub validate {
     if ( my $minlength = $field->minlength ) {
         return $field->add_error(
             $field->get_message('text_minlength'),
-            $minlength, length $value, $field->loc_label )
+            minlength => $minlength, length => length $value, field_label => $field->loc_label )
             if length $value < $minlength;
     }
     return 1;

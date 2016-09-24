@@ -10,169 +10,223 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-# __
+# "error_occurred"
 msgid "error occurred"
 msgstr "error occurred"
 
-msgid "Value must be between {start} and {end}"
-msgstr "Value must be between {start} and {end}"
+# "range_incorrect"
+msgid "Value must be between {low} and {high}"
+msgstr "Value must be between {low} and {high}"
 
+# "required"
 msgid "'{field_label}' field is required"
 msgstr "'{field_label}' field is required"
 
-msgid "Value must be less than or equal to %d"
-msgstr "Value must be less than or equal to %d"
+# "range_too_high"
+msgid "Value must be less than or equal to {high}"
+msgstr "Value must be less than or equal to {high}"
 
-msgid "Value must be greater than or equal to %d"
-msgstr "Value must be greater than or equal to %d"
+# "range_too_low"
+msgid "Value must be greater than or equal to {low}"
+msgstr "Value must be greater than or equal to {low}"
 
-msgid "Duplicate value for %s"
-msgstr "Duplicate value for %s"
+# "unique"
+msgid "Duplicate value for {column}"
+msgstr "Duplicate value for {column}"
 
-msgid "Wrong Value"
+# "wrong_value"
+msgid "Wrong value"
 msgstr "Wrong value"
 
-msgid "'%s' does not match"
-msgstr "'%s' does not match"
+# "no_match"
+msgid "'{value}' does not match"
+msgstr "'{value}' does not match"
 
-msgid "not_allowed"
-msgstr "[_1] not allowed"
+# "not_allowed"
+msgid "{value} not allowed"
+msgstr "{value} not allowed"
 
-msgid "field_invalid"
+# "field_invalid"
+msgid "field is invalid"
 msgstr "field is invalid"
 
-msgid "SimpleStr"
+# "SimpleStr"
+msgid "Must be a single line of no more than 255 chars"
 msgstr "Must be a single line of no more than 255 chars"
 
-msgid "NegativeNum"
+# "NegativeNum"
+msgid "Must be a negative number"
 msgstr "Must be a negative number"
 
-msgid "Zip"
+# "Zip"
+msgid "Zip is not valid"
 msgstr "Zip is not valid"
 
-msgid "Email"
+# "Email"
+msgid "Email is not valid"
 msgstr "Email is not valid"
 
-msgid "Password"
+# "Password"
+msgid "Must be between 4 and 255 chars"
 msgstr "Must be between 4 and 255 chars"
 
-msgid "NotAllDigits"
+# "NotAllDigits"
+msgid "Must not be all digits"
 msgstr "Must not be all digits"
 
-msgid "IPAddress"
+# "IPAddress"
+msgid "Not a valid IP address"
 msgstr "Not a valid IP address"
 
-msgid "PositiveInt"
+# "PositiveInt"
+msgid "Must be a positive integer"
 msgstr "Must be a positive integer"
 
-msgid "NonEmptyStr"
+# "NonEmptyStr"
+msgid "Must not be empty"
 msgstr "Must not be empty"
 
-msgid "State"
+# "State"
+msgid "Not a valid state"
 msgstr "Not a valid state"
 
-msgid "StrongPassword"
+# "StrongPassword"
+msgid "Must be between 8 and 255 chars, and contain a non-alpha char"
 msgstr "Must be between 8 and 255 chars, and contain a non-alpha char"
 
-msgid "NoSpaces"
+# "NoSpaces"
+msgid "Must not contain spaces"
 msgstr "Must not contain spaces"
 
-msgid "NegativeInt"
+# "NegativeInt"
+msgid "Must be a negative integer"
 msgstr "Must be a negative integer"
 
-msgid "SingleDigit"
+# "SingleDigit"
+msgid "Must be a single digit"
 msgstr "Must be a single digit"
 
-msgid "SingleWord"
+# "SingleWord"
+msgid "Field must contain a single word"
 msgstr "Field must contain a single word"
 
-msgid "PrintableAndNewline"
+# "PrintableAndNewline"
+msgid "Field contains non-printable characters"
 msgstr "Field contains non-printable characters"
 
-msgid "NonEmptySimpleStr"
+# "NonEmptySimpleStr"
+msgid "Must be a non-empty single line of no more than 255 chars"
 msgstr "Must be a non-empty single line of no more than 255 chars"
 
-msgid "Printable"
+# "Printable"
+msgid "Field contains non-printable characters"
 msgstr "Field contains non-printable characters"
 
-msgid "WordChars"
+# "WordChars"
+msgid "Must be made up of letters, digits, and underscores"
 msgstr "Must be made up of letters, digits, and underscores"
 
-msgid "PositiveNum"
+# "PositiveNum"
+msgid "Must be a positive number"
 msgstr "Must be a positive number"
 
-msgid "date_late"
+# "date_late"
+msgid "Date is too late"
 msgstr "Date is too late"
 
-msgid "date_early"
+# "date_early"
+msgid "Date is too early"
 msgstr "Date is too early"
 
-msgid "datetime_invalid"
+# "datetime_invalid"
+msgid "Not a valid DateTime"
 msgstr "Not a valid DateTime"
 
-msgid "duration_invalid"
+# "duration_invalid"
+msgid "Invalid value for [_1]: [_2]"
 msgstr "Invalid value for [_1]: [_2]"
 
-msgid "email_format"
+# "email_format"
+msgid "Email should be of the format [_1]"
 msgstr "Email should be of the format [_1]"
 
-msgid "float_precision"
+# "float_precision"
+msgid "May have a maximum of [quant,_1,digit] after the decimal point, but has [_2]"
 msgstr "May have a maximum of [quant,_1,digit] after the decimal point, but has [_2]"
 
-msgid "float_needed"
+# "float_needed"
+msgid "Must be a number. May contain numbers, +, - and decimal separator \'[_1]\'"
 msgstr "Must be a number. May contain numbers, +, - and decimal separator \'[_1]\'"
 
-msgid "float_size"
+# "float_size"
+msgid "Total size of number must be less than or equal to [_1], but is [_2]"
 msgstr "Total size of number must be less than or equal to [_1], but is [_2]"
 
-msgid "integer_needed"
+# "integer_needed"
+msgid "Value must be an integer"
 msgstr "Value must be an integer"
 
-msgid "money_convert"
+# "money_convert"
+msgid "Value cannot be converted to money"
 msgstr "Value cannot be converted to money"
 
-msgid "money_real"
+# "money_real"
+msgid "Value must be a real number"
 msgstr "Value must be a real number"
 
-msgid "password_ne_username"
+# "password_ne_username"
+msgid "Password must not match [_1]"
 msgstr "Password must not match [_1]"
 
-msgid "required"
+# "required"
+msgid "Please enter a password in this field"
 msgstr "Please enter a password in this field"
 
-msgid  "required"
+#  "required"
+msgid "Please enter a password confirmation"
 msgstr "Please enter a password confirmation"
 
-msgid  "pass_conf_not_matched"
+#  "pass_conf_not_matched"
+msgid "The password confirmation does not match the password"
 msgstr "The password confirmation does not match the password"
 
-msgid "integer_positive"
+# "integer_positive"
+msgid "Value must be a positive integer"
 msgstr "Value must be a positive integer"
 
-msgid "select_invalid_value"
+# "select_invalid_value"
+msgid "\'[_1]\' is not a valid value"
 msgstr "\'[_1]\' is not a valid value"
 
-msgid "select_not_multiple"
+# "select_not_multiple"
+msgid "This field does not take multiple values"
 msgstr "This field does not take multiple values"
 
-msgid "text_minlength"
+# "text_minlength"
+msgid "Field must be at least [quant,_1,character]. You entered [_2]"
 msgstr "Field must be at least [quant,_1,character]. You entered [_2]"
 
-msgid "multiple_values_disallowed"
+# "multiple_values_disallowed"
+msgid "Field must contain a single value"
 msgstr "Field must contain a single value"
 
-msgid "text_maxlength"
+# "text_maxlength"
+msgid "Field should not exceed [quant,_1,character]. You entered [_2]"
 msgstr "Field should not exceed [quant,_1,character]. You entered [_2]"
 
-msgid "upload_file_too_big"
+# "upload_file_too_big"
+msgid "File is too big (> [_1] bytes)"
 msgstr "File is too big (> [_1] bytes)"
 
-msgid "upload_file_too_small"
+# "upload_file_too_small"
+msgid "File is too small (< [_1] bytes)"
 msgstr "File is too small (< [_1] bytes)"
 
-msgid "upload_file_not_found"
+# "upload_file_not_found"
+msgid "File not found for upload field"
 msgstr "File not found for upload field"
 
-msgid "upload_file_empty"
+# "upload_file_empty"
+msgid "File uploaded is empty"
 msgstr "File uploaded is empty"
 

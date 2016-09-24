@@ -13,7 +13,8 @@ sub build_form_element { 'checkbox' }
 
 sub validate {
     my $self = shift;
-    $self->add_error($self->get_message('required'), $self->loc_label) if( $self->required && !$self->value );
+
+    $self->add_error($self->get_message('required'), field_label => $self->loc_label) if( $self->required && !$self->value );
 }
 
 1;

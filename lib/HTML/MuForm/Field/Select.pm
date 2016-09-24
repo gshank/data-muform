@@ -206,7 +206,7 @@ sub base_validate {
     for my $value ( ref $value eq 'ARRAY' ? @$value : ($value) ) {
         unless ( $options{$value} ) {
             my $opt_value = encode_entities($value);
-            $self->add_error($self->get_message('select_invalid_value'), $opt_value);
+            $self->add_error($self->get_message('select_invalid_value'), value => $opt_value);
             return;
         }
     }
