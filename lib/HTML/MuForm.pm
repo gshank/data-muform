@@ -20,6 +20,7 @@ use Types::Standard -types;
 use Class::Load ('load_optional_class');
 use Data::Clone ('data_clone');
 use HTML::MuForm::Params;
+use HTML::MuForm::Localizer;
 
 has 'name' => ( is => 'ro', isa => Str, builder => 'build_name');
 sub build_name {
@@ -102,47 +103,39 @@ sub num_errors {
 sub get_errors { shift->errors }
 
 
-sub errors {
+sub all_errors {
     my $self         = shift;
     my @errors = $self->all_form_errors;
     push @errors,  map { $_->all_errors } $self->all_error_fields;
     return \@errors;
 }
-sub all_errors { @{$_[0]->errors} }
+sub errors { [$_[0]->errors] }
+
+sub errors_by_id {
+    my $self = shift;
+    my %errors;
+    $errors{$_->id} = [$_->all_errors] for $self->error_fields;
+    return \%errors;
+}
+
+sub errors_by_name {
+    my $self = shift;
+    my %errors;
+    $errors{$_->html_name} = [$_->all_errors] for $self->error_fields;
+    return \%errors;
+}
 
 #========= Localization ==========
-# create lexicon
-has 'lexicon_search_dirs' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_lexicon_search_dirs' );
-sub build_lexicon_search_dirs {
-    my $self = shift;
-    my $filename = __FILE__;
-   $filename =~ s/.pm//;
-   return  ["$filename/LocaleData"]
-}
-has 'lexicon_ref' => ( is => 'rw', builder => 'build_lexicon_ref' );
-sub build_lexicon_ref {
-  my $self = shift;
-  require Locale::TextDomain::OO::Lexicon::File::PO;
-  my $lexicon_ref = Locale::TextDomain::OO::Lexicon::File::PO->new->lexicon_ref({
-      search_dirs => $self->lexicon_search_dirs,
-      decode      => 1,
-      data        => [ '*::' => '*/messages.po', ],
-  });
-  return $lexicon_ref;
-}
+
 has 'language' => ( is => 'rw', builder => 'build_language' );
 sub build_language { 'en' }
-has 'localizer' => ( is => 'rw', lazy => 1, builder => 'build_localizer' );
+has 'localizer' => ( is => 'rw', builder => 'build_localizer' );
 sub build_localizer {
     my $self = shift;
-    require Locale::TextDomain::OO;
-    my $loc = Locale::TextDomain::OO->new(
-        language => $self->language,
-        plugins  => [ 'Expand::Gettext' ],
+    return HTML::MuForm::Localizer->new(
+      language => $self->language,
     );
-    return $loc;
 }
-
 
 #========= Messages ==========
 has 'messages' => ( is => 'rw', isa => HashRef, builder => 'build_messages' );

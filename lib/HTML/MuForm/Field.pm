@@ -171,10 +171,29 @@ sub full_accessor {
     return $parent_accessor . '.' . $accessor;
 }
 
-#===================
-#  Rendering
-#===================
 
+#========= Localization ==========
+
+# stub
+sub _localize {
+   my ( $self, @message ) = @_;
+
+   return $self->localizer->loc->__(@message); 
+}
+
+has 'language' => ( is => 'rw', builder => 'build_language' );
+sub build_language { 'en' }
+has 'localizer' => ( is => 'rw', builder => 'build_localizer' );
+sub build_localizer {
+    my $self = shift;
+    return HTML::MuForm::Localizer->new(
+      language => $self->language,
+    );
+}
+
+#====================
+# Rendering
+#====================
 has 'label' => ( is => 'rw', lazy => 1, builder => 'build_label' );
 sub build_label {
     my $self = shift;
@@ -190,17 +209,6 @@ sub loc_label {
     my $self = shift;
     return $self->_localize($self->label);
 }
-
-# stub
-sub _localize {
-   my ( $self, @message ) = @_;
-   # TODO
-   return $message[0];
-}
-
-#====================
-# Rendering
-#====================
 has 'form_element' => ( is => 'rw', lazy => 1, builder => 'build_form_element' );
 sub build_form_element { 'input' }
 has 'input_type' => ( is => 'rw', lazy => 1, builder => 'build_input_type' );
@@ -220,19 +228,27 @@ has 'required' => ( is => 'rw', default => 0 );
 
 sub add_error {
     my ( $self, @message ) = @_;
-
-    unless ( defined $message[0] ) {
-        @message = ('Field is invalid');
-    }
-    @message = @{$message[0]} if ref $message[0] eq 'ARRAY';
     my $out;
     try {
-        $out = $self->localize(@message);
+        $out = $self->localizer->loc->__(@message);
     }
     catch {
         die "Error occurred localizing error message for " . $self->label . ". $_";
     };
     return $self->push_errors($out);;
+}
+
+sub add_error_x {
+    my ( $self, @message ) = @_;
+    my $out;
+    try {
+        $out = $self->localizer->loc->__x(@message);
+    }
+    catch {
+        die "Error occurred localizing error message for " . $self->label . ". $_";
+    };
+    return $self->push_errors($out);;
+
 }
 
 sub push_errors {
@@ -298,7 +314,7 @@ sub validate_field {
 
     my $continue_validation = 1;
     if ( $field->required && ( ! $field->has_input || ! $field->input_defined )) {
-        $field->add_error( '[1] is required', $field->label );
+        $field->add_error_x( $self->get_message('required'), field_label => $field->label );
         $continue_validation = 0;
     }
 
@@ -526,7 +542,7 @@ our $class_messages = {
     'no_match'        => '[_1] does not match',
     'not_allowed'     => '[_1] not allowed',
     'error_occurred'  => 'error occurred',
-    'required'        => '[_1] field is required',
+    'required'        => q{'{field_label}' field is required},
     'unique'          => 'Duplicate value for [_1]',
 };
 

@@ -11,29 +11,29 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 # __
-msgid "error_occurred"
+msgid "error occurred"
 msgstr "error occurred"
 
-msgid "range_incorrect"
-msgstr "Value must be between [_1] and [_2]"
+msgid "Value must be between {start} and {end}"
+msgstr "Value must be between {start} and {end}"
 
-msgid "required"
-msgstr "[_1] field is required"
+msgid "'{field_label}' field is required"
+msgstr "'{field_label}' field is required"
 
-msgid "range_too_high"
-msgstr "Value must be less than or equal to [_1]"
+msgid "Value must be less than or equal to %d"
+msgstr "Value must be less than or equal to %d"
 
-msgid "range_too_low"
-msgstr "Value must be greater than or equal to [_1]"
+msgid "Value must be greater than or equal to %d"
+msgstr "Value must be greater than or equal to %d"
 
-msgid "unique"
-msgstr "Duplicate value for [_1]"
+msgid "Duplicate value for %s"
+msgstr "Duplicate value for %s"
 
-msgid "wrong_value"
+msgid "Wrong Value"
 msgstr "Wrong value"
 
-msgid "no_match"
-msgstr "[_1] does not match"
+msgid "'%s' does not match"
+msgstr "'%s' does not match"
 
 msgid "not_allowed"
 msgstr "[_1] not allowed"
