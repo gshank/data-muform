@@ -177,13 +177,14 @@ sub full_accessor {
 # stub
 sub _localize {
    my ( $self, @message ) = @_;
-
-   return $self->localizer->loc->__(@message); 
+   return $self->localizer->loc->__($message[0]);
 }
 
 has 'language' => ( is => 'rw', builder => 'build_language' );
 sub build_language { 'en' }
-has 'localizer' => ( is => 'rw', builder => 'build_localizer' );
+has 'localizer' => (
+    is => 'rw', builder => 'build_localizer',
+);
 sub build_localizer {
     my $self = shift;
     return HTML::MuForm::Localizer->new(
@@ -225,30 +226,26 @@ has 'order' => ( is => 'rw', isa => Int, default => 0 );
 #===================
 
 has 'required' => ( is => 'rw', default => 0 );
+has 'required_when' => ( is => 'rw', isa => HashRef, predicate => 'has_required_when' );
+has 'unique' => ( is => 'rw', isa => Bool, predicate => 'has_unique' );
 
 sub add_error {
     my ( $self, @message ) = @_;
-    my $out;
-    try {
-        $out = $self->localizer->loc->__(@message);
-    }
-    catch {
-        die "Error occurred localizing error message for " . $self->label . ". $_";
-    };
+    my $out = $self->localizer->loc->__(@message);
     return $self->push_errors($out);;
 }
 
 sub add_error_x {
     my ( $self, @message ) = @_;
     my $out;
-    try {
+    if ( $message[0] =~ /{/ ) {
         $out = $self->localizer->loc->__x(@message);
     }
-    catch {
-        die "Error occurred localizing error message for " . $self->label . ". $_";
-    };
-    return $self->push_errors($out);;
-
+    # user may have set internal message to non-param message
+    else {
+      $out = $self->localizer->loc->__($message[0])
+    }
+    return $self->push_errors($out);
 }
 
 sub push_errors {
@@ -257,12 +254,6 @@ sub push_errors {
     if ( $self->parent ) {
         $self->parent->add_error_field($self);
     }
-}
-
-sub localize {
-    my ( $self, @message ) = @_;
-    # stub out for now
-    return $message[0];
 }
 
 sub clear {
@@ -308,33 +299,35 @@ sub has_some_value {
 sub validate {1}
 
 sub validate_field {
-    my $field = shift;
+    my $self = shift;
 
-    return unless $field->has_input;
+    return unless $self->has_input;
 
     my $continue_validation = 1;
-    if ( $field->required && ( ! $field->has_input || ! $field->input_defined )) {
-        $field->add_error_x( $self->get_message('required'), field_label => $field->label );
+    if ( ( $self->required ||
+         ( $self->has_required_when && $self->match_when($self->required_when) ) ) &&
+         ( ! $self->has_input || ! $self->input_defined )) {
+        $self->add_error_x( $self->get_message('required'), field_label => $self->label );
         $continue_validation = 0;
     }
 
     return if !$continue_validation;
 
-    if ( $field->has_fields ) {
-        $field->fields_validate;
+    if ( $self->has_fields ) {
+        $self->fields_validate;
     }
     # Set value here!
     else {
-        my $input = $field->input;
+        my $input = $self->input;
         # TODO: transform here?
-        $field->value($input);
+        $self->value($input);
     }
 
-    $field->base_validate; # why? also transforms? split out into a 'base_transform' and move the validation?
-    $field->apply_actions;
-    $field->validate;
+    $self->base_validate; # why? also transforms? split out into a 'base_transform' and move the validation?
+    $self->apply_actions;
+    $self->validate;
 
-    return ! $field->has_errors;
+    return ! $self->has_errors;
 }
 
 sub base_validate { }
@@ -443,6 +436,41 @@ sub apply_actions {
         }
     }
 }
+
+sub match_when {
+    my ( $self, $when ) = @_;
+
+    my $matched = 0;
+    foreach my $key ( keys %$when ) {
+        my $check_against = $when->{$key};
+        my $from_form = ( $key =~ /^\+/ );
+        $key =~ s/^\+//;
+        my $field = $from_form ? $self->form->field($key) : $self->parent->subfield( $key );
+        unless ( $field ) {
+            warn "field '$key' not found processing 'when' for '" . $self->full_name . "'";
+            next;
+        }
+        my $field_fif = defined $field->fif ? $field->fif : '';
+        if ( ref $check_against eq 'CODE' ) {
+            $matched++
+                if $check_against->($field_fif, $self);
+        }
+        elsif ( ref $check_against eq 'ARRAY' ) {
+            foreach my $value ( @$check_against ) {
+                $matched++ if ( $value eq $field_fif );
+            }
+        }
+        elsif ( $check_against eq $field_fif ) {
+            $matched++;
+        }
+        else {
+            $matched = 0;
+            last;
+        }
+    }
+    return $matched;
+}
+
 #====================================================================
 # Filling
 #====================================================================
@@ -543,7 +571,7 @@ our $class_messages = {
     'not_allowed'     => '[_1] not allowed',
     'error_occurred'  => 'error occurred',
     'required'        => q{'{field_label}' field is required},
-    'unique'          => 'Duplicate value for [_1]',
+    'unique'          => 'Duplicate value for [_1]',   # this is used in the DBIC model
 };
 
 sub get_class_messages  {
