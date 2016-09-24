@@ -142,10 +142,6 @@ msgstr "Date is too early"
 msgid "Not a valid DateTime"
 msgstr "Not a valid DateTime"
 
-# "duration_invalid"
-msgid "Invalid value for [_1]: [_2]"
-msgstr "Invalid value for [_1]: [_2]"
-
 # "email_format"
 msgid "Email should be of the format [_1]"
 msgstr "Email should be of the format [_1]"

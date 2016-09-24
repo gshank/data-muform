@@ -92,6 +92,7 @@ sub get_method {
 #=================
 # Rendering
 #=================
+has 'html5_type_attr' => ( is => 'rw' );
 has 'render_args' => ( is => 'rw', isa => HashRef, builder => 'build_render_args' );
 sub build_render_args {{}}
 has 'renderer' => (
