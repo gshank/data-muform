@@ -7,8 +7,14 @@ extends 'HTML::MuForm::Field::Text';
 
 has '+size' => ( default => 8 );
 
+has 'range_start' => ( is => 'rw' );
+has 'range_end' => ( is => 'rw' );
+
 our $class_messages = {
     'integer_needed' => 'Value must be an integer',
+    'range_too_low'   => 'Value must be greater than or equal to [_1]',
+    'range_too_high'  => 'Value must be less than or equal to [_1]',
+    'range_incorrect' => 'Value must be between [_1] and [_2]',
 };
 
 sub get_class_messages {
@@ -36,6 +42,37 @@ has '+base_apply' => ( default => sub {[
         }
     ]}
 );
+
+sub validate {
+    my $field = shift;
+
+    my $value = $field->value;
+    return 1 unless defined $value;
+
+    my $low  = $field->range_start;
+    my $high = $field->range_end;
+
+    if ( defined $low && defined $high ) {
+        return
+            $value >= $low && $value <= $high ? 1 :
+              $field->add_error( $field->get_message('range_incorrect'), $low, $high );
+    }
+
+    if ( defined $low ) {
+        return
+            $value >= $low ? 1 :
+              $field->add_error( $field->get_message('range_too_low'), $low );
+    }
+
+    if ( defined $high ) {
+        return
+            $value <= $high ? 1 :
+              $field->add_error( $field->get_message('range_too_high'), $high );
+    }
+
+    return 1;
+}
+
 
 =head1 DESCRIPTION
 
