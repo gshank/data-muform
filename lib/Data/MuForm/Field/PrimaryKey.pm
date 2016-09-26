@@ -1,8 +1,8 @@
-package HTML::MuForm::Field::PrimaryKey;
+package Data::MuForm::Field::PrimaryKey;
 # ABSTRACT: primary key field
 
 use Moo;
-extends 'HTML::MuForm::Field';
+extends 'Data::MuForm::Field';
 use Types::Standard -types;
 
 =head1 SYNOPSIS

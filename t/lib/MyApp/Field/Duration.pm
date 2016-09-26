@@ -1,8 +1,8 @@
 package MyApp::Field::Duration;
 
 use Moo;
-extends 'HTML::MuForm::Field::Compound';
-use HTML::MuForm::Meta;
+extends 'Data::MuForm::Field::Compound';
+use Data::MuForm::Meta;
 use DateTime;
 
 =head1 SubFields

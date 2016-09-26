@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 use Test::More;
-use HTML::MuForm::Field::Text;
+use Data::MuForm::Field::Text;
 
 
 {
    package Test::Form;
    use Moo;
-   use HTML::MuForm::Meta;
-   extends 'HTML::MuForm';
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm';
 
    has '+name' => ( default => 'options_form' );
    has_field 'test_field' => (
@@ -137,8 +137,8 @@ is_deeply( $form->field('vegetables')->fif, [4], 'fif for vegetables correct' );
 {
     package Test::Multiple::InitObject;
     use Moo;
-    use HTML::MuForm::Meta;
-    extends 'HTML::MuForm';
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
 
     has_field 'foo' => ( default => 'my_foo' );
     has_field 'bar' => ( type => 'Multiple' );

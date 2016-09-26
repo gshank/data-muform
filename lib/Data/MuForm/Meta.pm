@@ -1,4 +1,4 @@
-package HTML::MuForm::Meta;
+package Data::MuForm::Meta;
 
 use Moo::_Utils;
 

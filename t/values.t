@@ -5,8 +5,8 @@ use Test::More;
 {
     package MyApp::Form::Test;
     use Moo;
-    use HTML::MuForm::Meta;
-    extends 'HTML::MuForm';
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
 
     has_field 'foo';
     has_field 'bar';

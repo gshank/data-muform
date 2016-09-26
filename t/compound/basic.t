@@ -21,8 +21,8 @@ is_deeply( $field->fif, $input, 'field fif is same');
 {
    package Duration::Form;
    use Moo;
-   use HTML::MuForm::Meta;
-   extends 'HTML::MuForm';
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm';
    has '+field_name_space' => ( default => sub { ['MyApp::Field'] } );
 
    has_field 'name' => ( type => 'Text' );
@@ -63,8 +63,8 @@ TODO: {
 {
    package Field::MyCompound;
    use Moo;
-   use HTML::MuForm::Meta;
-   extends 'HTML::MuForm::Field::Compound';
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm::Field::Compound';
 
    has_field 'aaa';
    has_field 'bbb';
@@ -74,8 +74,8 @@ TODO: {
 {
    package Form::TestValues;
    use Moo;
-   use HTML::MuForm::Meta;
-   extends 'HTML::MuForm';
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm';
 
    has_field 'compound' => ( type => '+Field::MyCompound', apply => [ { check => sub { $_[0]->{aaa} eq 'aaa'}, message => 'Must be "aaa"' } ] );
 }
@@ -100,8 +100,8 @@ TODO: {
 
     package Compound;
     use Moo;
-    use HTML::MuForm::Meta;
-    extends 'HTML::MuForm::Field::Compound';
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm::Field::Compound';
     use Types::Standard ('Int');
 
     has_field 'year' => (
@@ -135,8 +135,8 @@ TODO: {
 
     package Form;
     use Moo;
-    use HTML::MuForm::Meta;
-    extends 'HTML::MuForm';
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
     has_field 'date' => ( type => '+Compound', required => 1 );
     has_field 'foo';
 }

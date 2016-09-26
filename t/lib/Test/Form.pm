@@ -1,7 +1,7 @@
 package Test::Form;
 use Moo;
-use HTML::MuForm::Meta;
-extends 'HTML::MuForm';
+use Data::MuForm::Meta;
+extends 'Data::MuForm';
 with 'Test::FormRole';
 
 has_field 'foo';

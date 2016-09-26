@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use HTML::MuForm;
+use Data::MuForm;
 use Time::HiRes ('gettimeofday', 'tv_interval');
 
 {

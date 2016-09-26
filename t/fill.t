@@ -6,8 +6,8 @@ use Data::Dumper;
 {
     package MyApp::Form::Test;
     use Moo;
-    use HTML::MuForm::Meta;
-    extends 'HTML::MuForm';
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
 
     has_field 'foo' => ( default => 'mine' );
     has_field 'bar' => ( default => 'yours' );

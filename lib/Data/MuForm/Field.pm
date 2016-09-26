@@ -1,16 +1,16 @@
-package HTML::MuForm::Field;
+package Data::MuForm::Field;
 use Moo;
 use Types::Standard -types;
 use Try::Tiny;
 use Scalar::Util 'blessed';
 use Data::Clone ('data_clone');
-use HTML::MuForm::Localizer;
+use Data::MuForm::Localizer;
 
-with 'HTML::MuForm::Common';
+with 'Data::MuForm::Common';
 
 =head1 NAME
 
-HTML::MuForm::Field
+Data::MuForm::Field
 
 =head1 DESCRIPTION
 
@@ -102,8 +102,8 @@ has 'renderer' => (
 );
 sub build_renderer {
   my $self = shift;
-  require HTML::MuForm::Renderer::Standard;
-  return HTML::MuForm::Renderer::Standard->new;
+  require Data::MuForm::Renderer::Standard;
+  return Data::MuForm::Renderer::Standard->new;
 }
 sub get_render_args {
   my ( $self, %args ) = @_;
@@ -189,7 +189,7 @@ has 'localizer' => (
 );
 sub build_localizer {
     my $self = shift;
-    return HTML::MuForm::Localizer->new(
+    return Data::MuForm::Localizer->new(
       language => $self->language,
     );
 }

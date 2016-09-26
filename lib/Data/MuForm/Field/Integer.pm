@@ -1,9 +1,9 @@
-package HTML::MuForm::Field::Integer;
+package Data::MuForm::Field::Integer;
 # ABSTRACT: validate an integer value
 
 use Moo;
-use HTML::MuForm::Meta;
-extends 'HTML::MuForm::Field::Text';
+use Data::MuForm::Meta;
+extends 'Data::MuForm::Field::Text';
 
 has '+size' => ( default => 8 );
 

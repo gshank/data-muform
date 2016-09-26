@@ -1,8 +1,8 @@
-package HTML::MuForm::Field::Boolean;
+package Data::MuForm::Field::Boolean;
 # ABSTRACT: a true or false field
 
 use Moo;
-extends 'HTML::MuForm::Field::Checkbox';
+extends 'Data::MuForm::Field::Checkbox';
 our $VERSION = '0.03';
 
 =head1 DESCRIPTION

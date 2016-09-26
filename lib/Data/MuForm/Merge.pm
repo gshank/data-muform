@@ -1,4 +1,4 @@
-package HTML::MuForm::Merge;
+package Data::MuForm::Merge;
 # ABSTRACT: internal hash merging
 use warnings;
 use Data::Clone ('data_clone');

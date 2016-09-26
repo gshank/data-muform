@@ -3,13 +3,13 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 
-use HTML::MuForm;
+use Data::MuForm;
 
 {
     package MyApp::Form::Test;
     use Moo;
-    use HTML::MuForm::Meta;
-    extends 'HTML::MuForm';
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
 
     has '+name' => ( default => 'test' );
     has_field 'foo';
@@ -26,8 +26,8 @@ is_deeply( $options, $expected_options, 'got right options' );
 {
     package MyApp::Form::Test2;
     use Moo;
-    use HTML::MuForm::Meta;
-    extends 'HTML::MuForm';
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
 
     has '+name' => ( default => 'test' );
     has_field 'foo';

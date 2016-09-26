@@ -2,15 +2,15 @@
 use strict;
 use warnings;
 
-use HTML::MuForm;
+use Data::MuForm;
 use Time::HiRes ('gettimeofday', 'tv_interval');
 
 {
 
    package My::Form;
    use Moo;
-   use HTML::MuForm::Meta;
-   extends 'HTML::MuForm';
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm';
 
    has '+name'         => ( default  => 'testform_' );
 

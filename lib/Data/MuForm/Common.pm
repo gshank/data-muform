@@ -1,4 +1,4 @@
-package HTML::MuForm::Common;
+package Data::MuForm::Common;
 use Moo::Role;
 
 sub has_flag {

@@ -1,6 +1,6 @@
-package HTML::MuForm::Field::Checkbox;
+package Data::MuForm::Field::Checkbox;
 use Moo;
-extends 'HTML::MuForm::Field';
+extends 'Data::MuForm::Field';
 
 has 'size' => ( is => 'rw', default => 0 );
 

@@ -17,8 +17,8 @@ use lib 't/lib';
 
    package My::Form;
    use Moo;
-   use HTML::MuForm::Meta;
-   extends 'HTML::MuForm';
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm';
 
    use Types::Standard ( 'Str', 'Int' );
    use Type::Utils ( 'declare', 'as', 'where', 'inline_as', 'coerce', 'from', 'message', 'via' );

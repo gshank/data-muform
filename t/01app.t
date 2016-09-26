@@ -2,16 +2,16 @@ use strict;
 use warnings;
 use Test::More;
 
-use_ok( 'HTML::MuForm' );
-use_ok( 'HTML::MuForm::Field' );
-use_ok( 'HTML::MuForm::Fields' );
-use_ok( 'HTML::MuForm::Field::Text' );
-use_ok( 'HTML::MuForm::Field::Submit' );
-use_ok( 'HTML::MuForm::Field::Checkbox' );
-use_ok( 'HTML::MuForm::Field::Select' );
-use_ok( 'HTML::MuForm::Field::Compound' );
-use_ok( 'HTML::MuForm::Field::Integer' );
-use_ok( 'HTML::MuForm::Field::PrimaryKey' );
-use_ok( 'HTML::MuForm::Field::Repeatable' );
+use_ok( 'Data::MuForm' );
+use_ok( 'Data::MuForm::Field' );
+use_ok( 'Data::MuForm::Fields' );
+use_ok( 'Data::MuForm::Field::Text' );
+use_ok( 'Data::MuForm::Field::Submit' );
+use_ok( 'Data::MuForm::Field::Checkbox' );
+use_ok( 'Data::MuForm::Field::Select' );
+use_ok( 'Data::MuForm::Field::Compound' );
+use_ok( 'Data::MuForm::Field::Integer' );
+use_ok( 'Data::MuForm::Field::PrimaryKey' );
+use_ok( 'Data::MuForm::Field::Repeatable' );
 
 done_testing;

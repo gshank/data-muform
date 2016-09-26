@@ -1,9 +1,9 @@
-package HTML::MuForm::Field::Repeatable::Instance;
+package Data::MuForm::Field::Repeatable::Instance;
 # ABSTRACT: used internally by repeatable fields
 
 use Moo;
-use HTML::MuForm::Meta;
-extends 'HTML::MuForm::Field::Compound';
+use Data::MuForm::Meta;
+extends 'Data::MuForm::Field::Compound';
 
 =head1 SYNOPSIS
 

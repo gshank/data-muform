@@ -1,4 +1,4 @@
-package  HTML::MuForm::Params;
+package  Data::MuForm::Params;
 # ABSTRACT: params handling
 
 use Moo;

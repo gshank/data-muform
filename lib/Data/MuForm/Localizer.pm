@@ -1,11 +1,11 @@
-package HTML::MuForm::Localizer;
+package Data::MuForm::Localizer;
 use Moo;
 
 use Types::Standard -types;
 
 =head1 NAME
 
-HTML::MuForm
+Data::MuForm
 
 =head1 DESCRIPTION
 

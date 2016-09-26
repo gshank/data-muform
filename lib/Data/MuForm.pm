@@ -1,10 +1,10 @@
-package HTML::MuForm;
+package Data::MuForm;
 use Moo;
-use HTML::MuForm::Meta;
+use Data::MuForm::Meta;
 
 =head1 NAME
 
-HTML::MuForm
+Data::MuForm
 
 =head1 DESCRIPTION
 
@@ -12,15 +12,15 @@ Moo conversion of HTML::FormHandler.
 
 =cut
 
-with 'HTML::MuForm::Model';
-with 'HTML::MuForm::Fields';
-with 'HTML::MuForm::Common';
+with 'Data::MuForm::Model';
+with 'Data::MuForm::Fields';
+with 'Data::MuForm::Common';
 
 use Types::Standard -types;
 use Class::Load ('load_optional_class');
 use Data::Clone ('data_clone');
-use HTML::MuForm::Params;
-use HTML::MuForm::Localizer;
+use Data::MuForm::Params;
+use Data::MuForm::Localizer;
 
 has 'name' => ( is => 'ro', isa => Str, builder => 'build_name');
 sub build_name {
@@ -80,8 +80,8 @@ has 'action' => ( is => 'rw' );
 has 'renderer' => ( is => 'rw', builder => 'build_renderer' );
 sub build_renderer {
     my $self = shift;
-    require HTML::MuForm::Renderer::Standard;
-    my $renderer = HTML::MuForm::Renderer::Standard->new;
+    require Data::MuForm::Renderer::Standard;
+    my $renderer = Data::MuForm::Renderer::Standard->new;
 }
 
 #========= Errors ==========
@@ -132,7 +132,7 @@ sub build_language { 'en' }
 has 'localizer' => ( is => 'rw', builder => 'build_localizer' );
 sub build_localizer {
     my $self = shift;
-    return HTML::MuForm::Localizer->new(
+    return Data::MuForm::Localizer->new(
       language => $self->language,
     );
 }
@@ -254,7 +254,7 @@ sub update_model {
 sub munge_params {
     my ( $self, $params, $attr ) = @_;
 
-    my $_fix_params = HTML::MuForm::Params->new;
+    my $_fix_params = Data::MuForm::Params->new;
     my $new_params = $_fix_params->expand_hash($params);
     if ( $self->html_prefix ) {
         $new_params = $new_params->{ $self->html_prefix };

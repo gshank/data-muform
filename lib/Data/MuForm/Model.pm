@@ -1,4 +1,4 @@
-package HTML::MuForm::Model;
+package Data::MuForm::Model;
 use Moo::Role;
 
 has 'item' => (

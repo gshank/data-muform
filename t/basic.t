@@ -3,14 +3,14 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 
-use_ok('HTML::MuForm');
+use_ok('Data::MuForm');
 
 {
 
    package My::Form;
    use Moo;
-   use HTML::MuForm::Meta;
-   extends 'HTML::MuForm';
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm';
 
    has '+name'         => ( default  => 'testform_' );
 

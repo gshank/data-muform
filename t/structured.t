@@ -53,8 +53,8 @@ my $struct = {
 {
    package Structured::Form;
    use Moo;
-   use HTML::MuForm::Meta;
-   extends 'HTML::MuForm';
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm';
 
    has_field 'username';
    has_field 'occupation';

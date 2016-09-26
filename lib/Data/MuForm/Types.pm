@@ -1,4 +1,4 @@
-package HTML::MuForm::Types;
+package Data::MuForm::Types;
 
 =head1 SYNOPSIS
 
@@ -11,11 +11,11 @@ when they are used:
 To import these types into your forms, you must either specify (':all')
 or list the types you want to use:
 
-   use HTML::MuForm::Types (':all');
+   use Data::MuForm::Types (':all');
 
 or:
 
-   use HTML::MuForm::Types ('Email', 'PositiveInt');
+   use Data::MuForm::Types ('Email', 'PositiveInt');
 
 =head1 DESCRIPTION
 

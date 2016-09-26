@@ -2,13 +2,13 @@ use strict;
 use warnings;
 use Test::More;
 
-use HTML::MuForm;
+use Data::MuForm;
 
 {
     package MyApp::Form::Test;
     use Moo;
-    extends 'HTML::MuForm';
-    use HTML::MuForm::Meta;
+    extends 'Data::MuForm';
+    use Data::MuForm::Meta;
 #   use Types::Standard ':all';
 
 #   has '+name' => ( default => 'test' );

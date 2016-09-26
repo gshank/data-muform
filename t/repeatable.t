@@ -3,13 +3,13 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 
-use_ok('HTML::MuForm::Field::Repeatable');
+use_ok('Data::MuForm::Field::Repeatable');
 
 {
     package Test::Form;
     use Moo;
-    use HTML::MuForm::Meta;
-    extends 'HTML::MuForm';
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
 
     has_field 'my_name';
     has_field 'my_records' => ( type => 'Repeatable', num_when_empty => 2,);

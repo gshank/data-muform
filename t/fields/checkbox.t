@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 # checkbox
-my $class = 'HTML::MuForm::Field::Checkbox';
+my $class = 'Data::MuForm::Field::Checkbox';
 use_ok($class);
 my $field = $class->new( name => 'test', );
 
@@ -35,8 +35,8 @@ ok( $field->has_errors, 'required field fails with 0' );
 {
     package MyApp::Form::Test;
     use Moo;
-    use HTML::MuForm::Meta;
-    extends 'HTML::MuForm';
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
 
     has_field 'foo' => (
         type => 'Checkbox',

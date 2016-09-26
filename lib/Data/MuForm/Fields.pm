@@ -1,4 +1,4 @@
-package HTML::MuForm::Fields;
+package Data::MuForm::Fields;
 use Moo::Role;
 
 use Types::Standard -types;
@@ -8,11 +8,11 @@ use Scalar::Util 'blessed';
 
 =head2 NAME
 
-HTML::MuForm::Fields
+Data::MuForm::Fields
 
 =head2 DESCRIPTION
 
-This role holds things that are common to HTML::MuForm and compound fields.
+This role holds things that are common to Data::MuForm and compound fields.
 
 Includes code that was split up into multiple roles in FormHandler: Fields,
 BuildFields, InitResult.
@@ -123,7 +123,7 @@ sub fields_fif {
 
     $prefix ||= '';
     $prefix = $prefix . "."
-        if ( $self->isa('HTML::MuForm') && $self->html_prefix );
+        if ( $self->isa('Data::MuForm') && $self->html_prefix );
 
     my %params;
     foreach my $field ( $self->all_sorted_fields ) {
@@ -230,7 +230,7 @@ sub _find_field_class {
     if ( $type =~ s/^\+// ) {
         push @classes, $type;
     }
-    foreach my $ns ( @$field_ns, 'HTML::MuForm::Field' ) {
+    foreach my $ns ( @$field_ns, 'Data::MuForm::Field' ) {
         push @classes, $ns . "::" . $type;
     }
     # look for Field in possible namespaces
@@ -260,7 +260,7 @@ sub _find_parent {
         $parent      = $self->field($parent_name, undef, $self);
         if ($parent) {
             die "The parent of field " . $field_attr->{name} . " is not a Compound Field"
-                unless $parent->isa('HTML::MuForm::Field::Compound');
+                unless $parent->isa('Data::MuForm::Field::Compound');
             $field_attr->{name}   = $simple_name;
         }
         else {

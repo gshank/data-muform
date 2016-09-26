@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 use utf8;
-use HTML::MuForm::Localizer;
+use Data::MuForm::Localizer;
 use Test::More;
 
-my $localizer = HTML::MuForm::Localizer->new(
+my $localizer = Data::MuForm::Localizer->new(
   language => 'en',
 );
 

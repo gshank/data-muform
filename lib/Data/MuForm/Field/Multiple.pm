@@ -1,7 +1,7 @@
-package HTML::MuForm::Field::Multiple;
+package Data::MuForm::Field::Multiple;
 # ABSTRACT: multiple select list
 use Moo;
-extends 'HTML::MuForm::Field::Select';
+extends 'Data::MuForm::Field::Select';
 our $VERSION = '0.01';
 
 =head1 DESCRIPTION

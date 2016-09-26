@@ -1,13 +1,13 @@
-package HTML::MuForm::Field::Repeatable;
+package Data::MuForm::Field::Repeatable;
 # ABSTRACT: repeatable (array) field
 
 use Moo;
-use HTML::MuForm::Meta;
-extends 'HTML::MuForm::Field::Compound';
+use Data::MuForm::Meta;
+extends 'Data::MuForm::Field::Compound';
 
-use aliased 'HTML::MuForm::Field::Repeatable::Instance';
-use HTML::MuForm::Field::PrimaryKey;
-use HTML::MuForm::Merge ('merge');
+use aliased 'Data::MuForm::Field::Repeatable::Instance';
+use Data::MuForm::Field::PrimaryKey;
+use Data::MuForm::Merge ('merge');
 use Data::Clone ('data_clone');
 use Types::Standard -types;
 
@@ -141,7 +141,7 @@ L<HTML::FormHandler::Render::RepeatableJs> and L<HTML::FormHandler::Field::AddEl
 =cut
 
 has 'contains' => (
-#   isa       => 'HTML::MuForm::Field',
+#   isa       => 'Data::MuForm::Field',
     is        => 'rw',
     predicate => 'has_contains',
 );
@@ -208,7 +208,7 @@ sub create_element {
     if( $self->form ) {
         $instance_attr->{form} = $self->form;
         $instance = $self->form->_make_adhoc_field(
-            'HTML::MuForm::Field::Repeatable::Instance',
+            'Data::MuForm::Field::Repeatable::Instance',
             $instance_attr );
     }
     else {

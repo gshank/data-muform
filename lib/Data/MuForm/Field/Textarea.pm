@@ -1,8 +1,8 @@
-package HTML::MuForm::Field::Textarea;
+package Data::MuForm::Field::Textarea;
 # ABSTRACT: textarea input
 
 use Moo;
-extends 'HTML::MuForm::Field::Text';
+extends 'Data::MuForm::Field::Text';
 use Types::Standard -types;
 
 sub build_form_element { 'textarea' }

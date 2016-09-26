@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use HTML::MuForm::Types (':assert', ':all');
+use Data::MuForm::Types (':assert', ':all');
 
 isa_ok( PositiveNum, 'Type::Tiny', 'PositiveNum' );
 

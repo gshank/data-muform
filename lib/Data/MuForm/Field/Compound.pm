@@ -1,10 +1,10 @@
-package HTML::MuForm::Field::Compound;
+package Data::MuForm::Field::Compound;
 # ABSTRACT: field consisting of subfields
 
 use Moo;
-extends 'HTML::MuForm::Field';
-with 'HTML::MuForm::Fields';
-use HTML::MuForm::Meta;
+extends 'Data::MuForm::Field';
+with 'Data::MuForm::Fields';
+use Data::MuForm::Meta;
 use Types::Standard ('Bool', 'ArrayRef');
 
 =head1 SYNOPSIS

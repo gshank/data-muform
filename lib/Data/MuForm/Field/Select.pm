@@ -1,6 +1,6 @@
-package HTML::MuForm::Field::Select;
+package Data::MuForm::Field::Select;
 use Moo;
-extends 'HTML::MuForm::Field';
+extends 'Data::MuForm::Field';
 use Types::Standard -types;
 use HTML::Entities;
 

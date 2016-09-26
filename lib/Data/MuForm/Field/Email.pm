@@ -1,8 +1,8 @@
-package HTML::MuForm::Field::Email;
+package Data::MuForm::Field::Email;
 # ABSTRACT: validates email using Email::Valid
 
 use Moo;
-extends 'HTML::MuForm::Field::Text';
+extends 'Data::MuForm::Field::Text';
 use Types::Standard -types;
 
 use Email::Valid;
