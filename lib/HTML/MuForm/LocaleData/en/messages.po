@@ -170,22 +170,6 @@ msgstr "Value cannot be converted to money"
 msgid "Value must be a real number"
 msgstr "Value must be a real number"
 
-# "password_ne_username"
-msgid "Password must not match [_1]"
-msgstr "Password must not match [_1]"
-
-# "required"
-msgid "Please enter a password in this field"
-msgstr "Please enter a password in this field"
-
-#  "required"
-msgid "Please enter a password confirmation"
-msgstr "Please enter a password confirmation"
-
-#  "pass_conf_not_matched"
-msgid "The password confirmation does not match the password"
-msgstr "The password confirmation does not match the password"
-
 # "integer_positive"
 msgid "Value must be a positive integer"
 msgstr "Value must be a positive integer"
@@ -198,17 +182,17 @@ msgstr "\'[_1]\' is not a valid value"
 msgid "This field does not take multiple values"
 msgstr "This field does not take multiple values"
 
-# "text_minlength"
-msgid "Field must be at least [quant,_1,character]. You entered [_2]"
-msgstr "Field must be at least [quant,_1,character]. You entered [_2]"
-
 # "multiple_values_disallowed"
 msgid "Field must contain a single value"
 msgstr "Field must contain a single value"
 
+# "text_minlength"
+msgid "Field must be at least {minlength} characters. You entered {length}"
+msgstr "Field must be at least {minlength} characters. You entered {length}"
+
 # "text_maxlength"
-msgid "Field should not exceed [quant,_1,character]. You entered [_2]"
-msgstr "Field should not exceed [quant,_1,character]. You entered [_2]"
+msgid "Field should not exceed {maxlength} characters. You entered {length}"
+msgstr "Field should not exceed {maxlength} characters. You entered {length}"
 
 # "upload_file_too_big"
 msgid "File is too big (> [_1] bytes)"

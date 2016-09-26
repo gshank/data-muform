@@ -4,6 +4,7 @@ use Types::Standard -types;
 use Try::Tiny;
 use Scalar::Util 'blessed';
 use Data::Clone ('data_clone');
+use HTML::MuForm::Localizer;
 
 with 'HTML::MuForm::Common';
 
