@@ -363,7 +363,7 @@ sub fill_from_params {
 
     $self->filled_from('params');
     return unless ( defined $input || $exists || $self->has_fields );
-    $self->input($input);
+    $self->transform_and_set_input($input);
     if ( ref $input eq 'HASH' ) {
         foreach my $field ( $self->all_sorted_fields ) {
             next if ! $field->active;
@@ -478,10 +478,9 @@ sub _get_value {
     else {
         return;
     }
-    # TODO
-#   if( $field->has_inflate_default_method ) {
-#       @values = $field->inflate_default(@values);
-#   }
+    if( $field->has_transform_default_to_value ) {
+        @values = $field->transform_default_to_value->($field, @values);
+    }
     my $value;
     if( $field->has_flag('multiple')) {
         $value = scalar @values == 1 && ! defined $values[0] ? [] : \@values;

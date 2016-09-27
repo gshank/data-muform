@@ -137,10 +137,9 @@ sub fif {
     my $self = shift;
     return unless $self->active;
     return $self->input if $self->has_input;
-    return $self->value if $self->has_value;
     if ( $self->has_value ) {
-        if ( $self->can_deflate ) {
-            return $self->deflate($self->value);
+        if ( $self->has_transform_value_to_fif ) {
+            return $self->transform_value_to_fif->($self, $self->value);
         }
         return $self->value;
     }
@@ -273,7 +272,10 @@ sub clear { shift->clear_data }
 #  Transforms
 #===================
 
-has 'transform_input' => ( is => 'rw', predicate => 'has_transform_input' );
+# these are all coderefs
+has 'transform_input_to_value' => ( is => 'rw', predicate => 'has_transform_input_to_value' );
+has 'transform_param_to_input' => ( is => 'rw', predicate => 'has_transform_param_to_input' );
+has 'transform_default_to_value' => ( is => 'rw', predicate => 'has_transform_default_to_value' );
 
 #====================================================================
 # Validation
@@ -357,7 +359,7 @@ sub validate_field {
     }
     else {
         my $input = $self->input;
-        $input = $self->transform_input->($self, $input) if $self->has_transform_input;
+        $input = $self->transform_input_to_value->($self, $input) if $self->has_transform_input_to_value;
         $self->value($input);
     }
 
@@ -366,6 +368,12 @@ sub validate_field {
     $self->validate;
 
     return ! $self->has_errors;
+}
+
+sub transform_and_set_input {
+  my ( $self, $input ) = @_;
+  $input = $self->transform_param_to_input->($self, $input) if $self->has_transform_param_to_input;
+  $self->input($input);
 }
 
 sub base_validate { }
@@ -518,12 +526,12 @@ sub fill_from_params {
 
     if ( $exists ) {
         $filled->{$self->name} = $input;
-        $self->input($input);
+        $self->transform_and_set_input($input);
     }
     elsif ( $self->disabled ) {
     }
     elsif ( $self->has_input_without_param ) {
-        $self->input($self->input_without_param);
+        $self->transform_and_set_input($self->input_without_param);
     }
     return;
 }

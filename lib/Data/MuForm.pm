@@ -310,6 +310,8 @@ sub validated { my $self = shift; return $self->ran_validation && ! $self->has_e
 
 sub get_default_value { }
 
+sub transform_and_set_input { shift }
+
 sub get_result {
     my $self = shift;
     my $result = {
