@@ -161,7 +161,7 @@ sub convert_full_name {
 
 our $class_messages = {
     'select_not_multiple' => 'This field does not take multiple values',
-    'select_invalid_value' => '\'[_1]\' is not a valid value',
+    'select_invalid_value' => '\'{value}\' is not a valid value',
 };
 
 sub get_class_messages  {
