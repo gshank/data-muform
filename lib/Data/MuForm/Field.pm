@@ -270,11 +270,7 @@ sub push_errors {
     }
 }
 
-sub clear {
-    my $self = shift;
-    $self->clear_input;
-    $self->clear_value;
-}
+sub clear { shift->clear_data }
 
 #====================================================================
 # Validation
