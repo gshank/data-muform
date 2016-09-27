@@ -24,7 +24,8 @@ has 'options' => (
     },
 );
 sub build_options {[]}
-sub has_options { scalar @{$_[0]->options} }
+sub has_options { shift->num_options }
+sub num_options { scalar @{$_[0]->options} }
 has 'options_from' => ( isa => Str, is => 'rw', default => 'none' );
 has 'do_not_reload' => ( isa => Bool, is => 'ro' );
 has 'no_option_validation' => ( isa => Bool, is => 'rw' );

@@ -3,6 +3,35 @@ use warnings;
 use Test::More;
 use Data::MuForm::Field::Text;
 
+# select
+
+my $class = 'Data::MuForm::Field::Select';
+use_ok( $class );
+my $field = $class->new( name    => 'test_field',);
+
+ok( defined $field,  'new() called' );
+ok( $field->options, 'Test for init_options failure in 0.09' );
+my $options = [
+    { value => 1, label => 'one' },
+    { value => 2, label => 'two' },
+    { value => 3, label => 'three' },
+];
+$field->options($options);
+ok( $field->options, 'Test for set options failure' );
+$field->input( 1 );
+$field->validate_field;
+ok( !$field->has_errors, 'Test for errors 1' );
+is( $field->value, 1, 'Test true == 1' );
+$field->input( [1] );
+$field->validate_field;
+ok( $field->has_errors, 'Test for errors array' );
+$field->input( [1,4] );
+$field->validate_field;
+ok( $field->has_errors, 'Test for errors 4' );
+is( $field->errors->[0], 'This field does not take multiple values', 'Error message' );
+$field = $class->new( name => 'test_prompt', 'empty_select' => "Choose a Number",
+    options => $options, required => 1 );
+is( $field->num_options, 3, 'right number of options');
 
 {
    package Test::Form;
