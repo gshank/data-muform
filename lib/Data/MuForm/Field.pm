@@ -90,6 +90,11 @@ sub get_method {
    return  $self->{methods}->{$meth_name};
 }
 
+has 'validate_when_empty' => ( is => 'rw', isa => Bool );
+has 'not_nullable' => ( is => 'rw', isa => Bool );
+sub is_repeatable {}
+sub is_compound {}
+
 #=================
 # Rendering
 #=================
@@ -317,15 +322,36 @@ sub validate_field {
          ( $self->has_required_when && $self->match_when($self->required_when) ) ) &&
          ( ! $self->has_input || ! $self->input_defined )) {
         $self->add_error( $self->get_message('required'), field_label => $self->label );
+        if( $self->has_input ) {
+            $self->not_nullable ? $self->value($self->input) : $self->value(undef);
+        }
+
         $continue_validation = 0;
     }
+    elsif ( $self->is_repeatable ) { }
+    elsif ( !$self->has_input ) {
+        $continue_validation = 0;
+    }
+    elsif ( !$self->input_defined ) {
+        if ( $self->not_nullable ) {
+            $self->value($self->input);
+            # handles the case where a compound field value needs to have empty subfields
+            $continue_validation = 0 unless $self->is_compound;
+        }
+        elsif ( $self->no_value_if_empty || $self->is_contains ) {
+            $continue_validation = 0;
+        }
+        else {
+            $self->value(undef);
+            $continue_validation = 0;
+        }
+    }
+    return if ( !$continue_validation && !$self->validate_when_empty );
 
-    return if !$continue_validation;
 
     if ( $self->has_fields ) {
         $self->fields_validate;
     }
-    # Set value here!
     else {
         my $input = $self->input;
         # TODO: transform here?

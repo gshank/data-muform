@@ -157,7 +157,7 @@ has 'num_when_empty' => ( isa => Int,  is => 'rw', default => 1 );
 has 'num_extra'      => ( isa => Int,  is => 'rw', default => 0 );
 has 'setup_for_js'   => ( isa => Bool, is => 'rw' );
 has 'index'          => ( isa => Int,  is => 'rw', default => 0 );
-has 'is_repeatable'  => ( isa => Bool, is => 'ro', default => 1 );
+sub is_repeatable {1}
 #has '+widget'        => ( default => 'Repeatable' );
 
 sub fields_validate {
