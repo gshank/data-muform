@@ -230,27 +230,31 @@ has 'order' => ( is => 'rw', isa => Int, default => 0 );
 # handles message with and without variables
 sub add_error {
     my ( $self, @message ) = @_;
-    my $out;
-    if ( $message[0] =~ /{/ ) {
-        $out = $self->localizer->loc->__x(@message);
+    if ( $message[0] !~ /{/ ) {
+        @message = shift @message;
     }
-    else {
-      $out = $self->localizer->loc->__($message[0])
-    }
+    my $out = $self->localizer->loc->__x(@message);
     return $self->push_errors($out);
 }
 
-sub add_error_ {
+sub add_error_px {
     my ( $self, @message ) = @_;
-    my $out = $self->localizer->loc->__(@message);
+    my $out = $self->localizer->loc->__px(@message);
     return $self->push_errors($out);;
 }
 
-sub add_error_x {
+sub add_error_nx {
     my ( $self, @message ) = @_;
-    my $out = $self->localizer->loc->__x(@message);
+    my $out = $self->localizer->loc->__nx(@message);
     return $self->push_errors($out);;
 }
+
+sub add_error_npx {
+    my ( $self, @message ) = @_;
+    my $out = $self->localizer->loc->__npx(@message);
+    return $self->push_errors($out);;
+}
+
 
 
 sub push_errors {
@@ -280,6 +284,7 @@ has 'transform_value_after_validate' => ( is => 'rw', predicate => 'has_transfor
 has 'required' => ( is => 'rw', default => 0 );
 has 'required_when' => ( is => 'rw', isa => HashRef, predicate => 'has_required_when' );
 has 'unique' => ( is => 'rw', isa => Bool, predicate => 'has_unique' );
+sub validated { !$_[0]->has_errors && $_[0]->has_input }
 
 sub input_defined {
     my ($self) = @_;
