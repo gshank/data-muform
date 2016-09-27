@@ -10,7 +10,7 @@ sub build_input_type { 'text' }
 
 our $class_messages = {
     'text_maxlength' => 'Field should not exceed {maxlength} characters. You entered {length}',
-    'text_minlength' => 'Field must be at least {minlength} characterx. You entered {length}',
+    'text_minlength' => 'Field must be at least {minlength} characters. You entered {length}',
 };
 
 sub get_class_messages {

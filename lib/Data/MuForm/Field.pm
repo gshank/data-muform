@@ -179,9 +179,10 @@ sub full_accessor {
 }
 
 
-#========= Localization ==========
+#====================
+# Localization
+#====================
 
-# stub
 sub _localize {
    my ( $self, @message ) = @_;
    return $self->localizer->loc->__($message[0]);
@@ -229,12 +230,8 @@ has 'order' => ( is => 'rw', isa => Int, default => 0 );
 
 
 #===================
-#  Validation
+#  Errors
 #===================
-
-has 'required' => ( is => 'rw', default => 0 );
-has 'required_when' => ( is => 'rw', isa => HashRef, predicate => 'has_required_when' );
-has 'unique' => ( is => 'rw', isa => Bool, predicate => 'has_unique' );
 
 # handles message with and without variables
 sub add_error {
@@ -272,9 +269,19 @@ sub push_errors {
 
 sub clear { shift->clear_data }
 
+#===================
+#  Transforms
+#===================
+
+has 'transform_input' => ( is => 'rw', predicate => 'has_transform_input' );
+
 #====================================================================
 # Validation
 #====================================================================
+
+has 'required' => ( is => 'rw', default => 0 );
+has 'required_when' => ( is => 'rw', isa => HashRef, predicate => 'has_required_when' );
+has 'unique' => ( is => 'rw', isa => Bool, predicate => 'has_unique' );
 
 sub input_defined {
     my ($self) = @_;
@@ -350,7 +357,7 @@ sub validate_field {
     }
     else {
         my $input = $self->input;
-        # TODO: transform here?
+        $input = $self->transform_input->($self, $input) if $self->has_transform_input;
         $self->value($input);
     }
 
