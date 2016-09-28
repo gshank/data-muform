@@ -107,9 +107,9 @@ sub all_errors {
     my $self         = shift;
     my @errors = $self->all_form_errors;
     push @errors,  map { $_->all_errors } $self->all_error_fields;
-    return \@errors;
+    return @errors;
 }
-sub errors { [$_[0]->errors] }
+sub errors { [$_[0]->all_errors] }
 
 sub errors_by_id {
     my $self = shift;

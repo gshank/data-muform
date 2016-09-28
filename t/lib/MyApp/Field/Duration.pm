@@ -22,7 +22,7 @@ Customize error message 'duration_invalid' (default 'Invalid value for [_1]: [_2
 =cut
 
 our $class_messages = {
-    'duration_invalid' => 'Invalid value for [_1]: [_2]',
+    'duration_invalid' => 'Invalid value for {field_label}: {child_label}',
 };
 
 sub get_class_messages  {
@@ -40,7 +40,7 @@ sub validate {
     my @dur_parms;
     foreach my $child ( $self->all_fields ) {
         unless ( $child->has_value && $child->value =~ /^\d+$/ ) {
-            $self->add_error( $self->get_message('duration_invalid'), $self->loc_label, $child->loc_label );
+            $self->add_error( $self->get_message('duration_invalid'), field_label => $self->loc_label, child_label => $child->loc_label );
             next;
         }
         push @dur_parms, ( $child->accessor => $child->value );

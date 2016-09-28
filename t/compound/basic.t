@@ -53,12 +53,7 @@ is( $form->field('duration')->value->hours, 2, 'duration value is correct');
 $form->process( params => { name => 'Testing', 'duration.hours' => 'abc', 'duration.minutes' => 'xyz' } );
 ok( $form->has_errors, 'form does not validate' );
 my @errors = $form->all_errors;
-TODO: {
-    local $TODO = 'localization';
-    is( $errors[0], 'Invalid value for Duration: Hours', 'correct error message' );
-};
-
-
+is( $errors[0], 'Invalid value for Duration: Hours', 'correct error message' );
 
 {
    package Field::MyCompound;
@@ -91,10 +86,7 @@ $form->process( params => $params );
 is_deeply( $form->values, { compound => { aaa => 'aaa', bbb => 'bbb' } }, 'Compound with separate fields - values in hash' );
 is_deeply( $form->fif, $params, 'get fif from compound field' );
 $form->process( params => { 'compound.aaa' => undef } );
-TODO: {
-    local $TODO = 'changed behavior for required compound fields';
-    ok( !$form->field( 'compound' )->has_errors, 'Not required compound with empty sub values is not checked');
-};
+ok( !$form->field( 'compound' )->has_errors, 'Not required compound with empty sub values is not checked');
 
 {
 
