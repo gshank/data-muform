@@ -137,7 +137,11 @@ sub fif {
     my $self = shift;
     return unless $self->active;
     return $self->input if $self->has_input;
-    return $self->value if $self->has_value;
+    if ( $self->has_value ) {
+      my $value = $self->value;
+      $value = $self->transform_value_to_fif->($self, $value) if $self->has_transform_value_to_fif;
+      return $value;
+    }
     return '';
 }
 
@@ -276,6 +280,7 @@ has 'transform_param_to_input' => ( is => 'rw', predicate => 'has_transform_para
 has 'transform_input_to_value' => ( is => 'rw', predicate => 'has_transform_input_to_value' );
 has 'transform_default_to_value' => ( is => 'rw', predicate => 'has_transform_default_to_value' );
 has 'transform_value_after_validate' => ( is => 'rw', predicate => 'has_transform_value_after_validate' );
+has 'transform_value_to_fif' => ( is => 'rw', predicate => 'has_transform_value_to_fif' );
 
 #====================================================================
 # Validation

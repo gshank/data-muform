@@ -29,4 +29,10 @@ $field->input( '12.30' );
 $field->validate_field;
 ok( $field->validated, 'field validated' );
 
+$field->clear;
+$field->decimal_symbol_for_db(',');
+$field->decimal_symbol('.');
+$field->value('456,32');
+is( $field->fif, '456.32', 'converted from db decimal symbol');
+
 done_testing;

@@ -11,8 +11,8 @@ has '+size'                 => ( default => 8 );
 has 'precision'             => ( is => 'rw', default => 2 );
 has 'decimal_symbol'        => ( isa => Str, is => 'rw', default => '.');
 has 'decimal_symbol_for_db' => ( isa => Str, is => 'rw', default => '.');
-has '+transform_input_to_value'  => ( default => sub { *input_to_value } );
-# has '+deflate_method'       => ( default => sub { *deflate_float } );
+has '+transform_input_to_value' => ( default => sub { *input_to_value } );
+has '+transform_value_to_fif'   => ( default => sub { *value_to_fif } );
 
 our $class_messages = {
     'float_needed'      => 'Must be a number. May contain numbers, +, - and decimal separator \'[_1]\'',
@@ -36,8 +36,7 @@ sub input_to_value {
     return $value;
 }
 
-=comment
-sub deflate_float {
+sub value_to_fif {
     my ( $self, $value ) = @_;
     return $value unless defined $value;
     my $symbol      = $self->decimal_symbol;
@@ -45,7 +44,6 @@ sub deflate_float {
     $value =~ s/\Q$symbol_db\E/$symbol/x;
     return $value;
 }
-=cut
 
 sub validate {
     my $field = shift;
@@ -116,6 +114,7 @@ Widget type is 'text'.
 
    float_needed
    float_size
-   float_precision
+   float_precision1
+   float_precision2
 
 =cut
