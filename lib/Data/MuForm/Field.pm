@@ -183,7 +183,7 @@ sub full_accessor {
 
 sub _localize {
    my ( $self, @message ) = @_;
-   return $self->localizer->loc->__($message[0]);
+   return $self->localizer->loc_($message[0]);
 }
 
 has 'language' => ( is => 'rw', builder => 'build_language' );
@@ -234,28 +234,31 @@ has 'order' => ( is => 'rw', isa => Int, default => 0 );
 # handles message with and without variables
 sub add_error {
     my ( $self, @message ) = @_;
+    my $out;
     if ( $message[0] !~ /{/ ) {
-        @message = shift @message;
+        $out = $self->localizer->loc_($message[0]);
     }
-    my $out = $self->localizer->loc->__x(@message);
+    else {
+        $out = $self->localizer->loc_x(@message);
+    }
     return $self->push_errors($out);
 }
 
 sub add_error_px {
     my ( $self, @message ) = @_;
-    my $out = $self->localizer->loc->__px(@message);
+    my $out = $self->localizer->loc_px(@message);
     return $self->push_errors($out);;
 }
 
 sub add_error_nx {
     my ( $self, @message ) = @_;
-    my $out = $self->localizer->loc->__nx(@message);
-    return $self->push_errors($out);;
+    my $out = $self->localizer->loc_nx(@message);
+    return $self->push_errors($out);
 }
 
 sub add_error_npx {
     my ( $self, @message ) = @_;
-    my $out = $self->localizer->loc->__npx(@message);
+    my $out = $self->localizer->loc_npx(@message);
     return $self->push_errors($out);;
 }
 

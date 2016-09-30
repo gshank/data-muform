@@ -146,13 +146,11 @@ msgstr "Not a valid DateTime"
 msgid "Email should be of the format [_1]"
 msgstr "Email should be of the format [_1]"
 
-#  float_precision1
+#  float_precision1, float_precision2
 msgid "May have only one digit after the decimal point, but has {num_digits:num}"
-msgstr "May have only one digit after the decimal point, but has {num_digits:num}"
-
-# "float_precision2"
-msgid "May have only {precision:num} digits after the decimal point, but has {num_digits:num}"
-msgstr "May have a maximum of {precision:num} digits after the decimal point, but has {num_digits:num}"
+msgid_plural "May have only {precision:num} digits after the decimal point, but has {num_digits:num}"
+msgstr[0] "May have only one digit after the decimal point, but has {num_digits:num}"
+msgstr[1] "May have only {precision:num} digits after the decimal point, but has {num_digits:num}"
 
 # "float_needed"
 msgid "Must be a number. May contain numbers, +, - and decimal separator \'[_1]\'"

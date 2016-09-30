@@ -62,6 +62,7 @@ sub validate {
         return $field->add_error( $field->get_message('float_needed'), $symbol );
     }
 
+    # check total float size
     if ( my $allowed_size = $field->size ) {
         my $total_size = length($integer_part) + length($decimal_part);
         return $field->add_error( $field->get_message('float_size'),
@@ -69,11 +70,12 @@ sub validate {
             if $total_size > $allowed_size;
     }
 
+    # check precision
     if ( my $allowed_precision = $field->precision ) {
         return $field->add_error_nx(
             $field->get_message('float_precision1'),
             $field->get_message('float_precision2'),
-            $decimal_part, precision => $allowed_precision, num_digits => length $decimal_part)
+            $allowed_precision, precision => $allowed_precision, num_digits => length($decimal_part))
             if length $decimal_part > $allowed_precision;
     }
 

@@ -12,6 +12,7 @@ ok( defined $field, 'field built' );
 $field->input( '2.0' );
 $field->validate_field;
 ok( !$field->has_errors, 'accepted 2.0 value' );
+
 $field->input( '2.000' );
 $field->validate_field;
 ok( $field->has_errors, 'error for 3 decimal places' );
