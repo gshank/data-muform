@@ -316,8 +316,8 @@ sub fill_from_object {
     foreach my $element ( @{$values} ) {
         next unless $element;
         my $field = $self->clone_element($index);
-        if( my $meth = $field->get_method('transform1') ) {
-            $element = $meth->($field, $element);
+        if( $field->has_transform_default_to_value ) {
+            $element = $field->transform_default_to_value->($field, $element);
         }
         $field->fill_from_object( $filled, $element );
         push @new_values, $field->value;
