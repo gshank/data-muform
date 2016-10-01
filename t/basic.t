@@ -42,6 +42,7 @@ my $form = My::Form->new;
 
 is( $form->num_fields, 6, 'got six fields' );
 is( $form->field('optname')->label, 'Second', 'got second optname field' );
+is( $form->field('fruit')->num_options, 3, 'right number of options' );
 
 # process with empty params
 ok( !$form->process, 'Empty data' );

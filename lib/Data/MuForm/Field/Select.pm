@@ -118,7 +118,7 @@ sub _load_options {
         if ( $self->options_from eq 'build' ||
         ( $self->has_options && $self->do_not_reload ) );
     my @options;
-    if( my $meth = $self->get_method('options') ) {
+    if( my $meth = $self->get_method('build_options') ) {
         @options = $meth->($self);
         $self->options_from('method');
     }
