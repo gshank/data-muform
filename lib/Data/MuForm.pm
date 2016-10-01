@@ -60,7 +60,7 @@ sub form { shift }
 sub is_form {1}
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
 # init_object can be a blessed object or a hashref
-has 'init_object' => ( is => 'rw', isa => HashRef );
+has 'init_object' => ( is => 'rw' );
 sub clear_init_object { $_[0]->{init_object} = undef }
 sub has_init_object {
     my $self = shift;
