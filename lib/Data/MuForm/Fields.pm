@@ -184,6 +184,8 @@ sub build_fields {
 sub process_field_array {
     my ( $self, $fields ) = @_;
 
+    $fields = $self->clean_fields($fields);
+
     # TODO: there's got to be a better way of doing this
     my $num_fields   = scalar @$fields;
     my $num_dots     = 0;
@@ -198,6 +200,27 @@ sub process_field_array {
         $num_dots++;
     }
 }
+
+has 'include' => ( is => 'rw', builder => 'build_include', lazy => 1 );
+sub build_include { [] }
+sub has_include {
+    my $self = shift;
+    my $include = $self->include || [];
+    return scalar @{$include};
+}
+
+sub clean_fields {
+    my ( $self, $fields ) = @_;
+    if( $self->has_include ) {
+        my @fields;
+        my %include = map { $_ => 1 } @{ $self->include };
+        foreach my $fld ( @$fields ) {
+            push @fields, data_clone($fld) if exists $include{$fld->{name}};
+        }
+        return \@fields;
+    }
+    return data_clone( $fields );
+};
 
 sub _make_field {
     my ( $self, $field_attr ) = @_;
@@ -327,9 +350,6 @@ sub _order_fields {
     # get highest order number
     my $order = 0;
     foreach my $field ( $self->all_fields ) {
-if ( ! $field->can('order') ) {
-  $DB::single=1;
-}
         $order++ if $field->order > $order;
     }
     $order++;
@@ -522,6 +542,7 @@ sub clear_data {
 sub _install_methods {
     my $self = shift;
     foreach my $field ( $self->all_fields ) {
+        next unless $field->form;
         my $suffix = convert_full_name($field->full_name);
         foreach my $prefix ( 'validate', 'default' ) {
             my $meth_name = "${prefix}_$suffix";
