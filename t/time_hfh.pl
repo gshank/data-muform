@@ -41,7 +41,8 @@ my $start_run = [gettimeofday];
 my $index = 0;
 while ( $index < 1000 ) {
   my $form = My::Form->new;
-  $form->process( params => {} );
+  my $params = $form->fif;
+  $form->process( params => $params );
   $index++;
 }
 

@@ -327,6 +327,9 @@ sub _order_fields {
     # get highest order number
     my $order = 0;
     foreach my $field ( $self->all_fields ) {
+if ( ! $field->can('order') ) {
+  $DB::single=1;
+}
         $order++ if $field->order > $order;
     }
     $order++;

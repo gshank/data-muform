@@ -1,7 +1,6 @@
 package Data::MuForm::Localizer;
 use Moo;
 
-use Locale::TextDomain ('Data-MuForm');
 use Types::Standard -types;
 
 =head1 NAME
@@ -21,6 +20,8 @@ on creation of the form. It does handle plurals.
 
 has 'language' => ( is => 'rw', builder => 'build_language' );
 sub build_language { 'en' }
+
+has 'messages_directory' => ( is => 'rw' );
 
 sub loc_ {
   my ($self, $msgid) = @_;
