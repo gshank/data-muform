@@ -577,10 +577,9 @@ sub fill_from_fields {
         $filled->{$self->name} = $self->init_value;
     }
     elsif ( my @values = $self->get_default_value ) {
-        # TODO
-        #if ( $self->has_inflate_default_method ) {
-        #    @values = $self->inflate_default(@values);
-        #}
+        if ( $self->has_transform_default_to_value ) {
+            @values = $self->transform_default_to_value->($self, @values);
+        }
         my $value = @values > 1 ? \@values : shift @values;
         if ( defined $value ) {
             $self->init_value($value);

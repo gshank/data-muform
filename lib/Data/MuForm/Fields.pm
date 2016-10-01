@@ -476,6 +476,9 @@ sub find_sub_item {
 sub _get_value {
     my ( $self, $field, $item ) = @_;
 
+if ( $field->name eq 'foo' ) {
+  $DB::single=1;
+}
     my $accessor = $field->accessor;
     my @values;
     if( $field->form && $field->form->use_defaults_over_obj && ( @values = $field->get_default_value )  ) {
