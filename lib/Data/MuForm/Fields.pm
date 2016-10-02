@@ -409,7 +409,10 @@ sub fill_from_object {
         if ( (ref $item eq 'HASH' && !exists $item->{ $field->accessor } ) ||
              ( blessed($item) && !$item->can($field->accessor) ) ) {
             my $found = 0;
-            if (1) {  # do by default for now
+=comment
+# This doesn't work if the 'item' is actually the 'init_object'. Kind of messy to get around that.
+# the "item" might be a lower branch of the init_object too, so it doesn't work to check equality.
+            if ($init_obj && $init_obj != $item) {  # TODO: when should this happen? always?
                 # if we're using an item, look for accessor not found in item
                 # in the init_object
                 my @names = split( /\./, $field->full_name );
@@ -419,6 +422,7 @@ sub fill_from_object {
                     $field->fill_from_object( $filled, $init_obj_value );
                 }
             }
+=cut
             $filled = $field->fill_from_fields($filled) unless $found;
         }
         else {
@@ -476,9 +480,6 @@ sub find_sub_item {
 sub _get_value {
     my ( $self, $field, $item ) = @_;
 
-if ( $field->name eq 'foo' ) {
-  $DB::single=1;
-}
     my $accessor = $field->accessor;
     my @values;
     if( $field->form && $field->form->use_defaults_over_obj && ( @values = $field->get_default_value )  ) {

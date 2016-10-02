@@ -60,7 +60,7 @@ sub BUILD {
     if( $self->options && $self->has_options ) {
         $self->options_from('build');
     }
-    if( $self->form ) {
+    if( $self->form  && ! exists $self->{methods}->{build_options} ) {
         my $suffix = convert_full_name($self->full_name);
         my $meth_name = "options_$suffix";
         if ( my $meth = $self->form->can($meth_name) ) {
@@ -68,7 +68,7 @@ sub BUILD {
                 my $self = shift;
                 return $self->form->$meth;
             };
-            $self->{methods}->{options} = $wrap_sub;
+            $self->{methods}->{build_options} = $wrap_sub;
         }
     }
     $self->_load_options unless $self->has_options;
