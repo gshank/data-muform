@@ -74,6 +74,23 @@ sub full_name { '' }
 sub full_accessor { '' }
 sub fif { shift->fields_fif(@_) }
 
+has '_repeatable_fields' => (
+    is => 'rw',
+    default => sub {[]},
+);
+sub add_repeatable_field {
+  my ( $self, $field ) = @_;
+  push @{$self->_repeatable_fields}, $field;
+}
+sub has_repeatable_fields {
+  my ( $self, $field ) = @_;
+  return scalar @{$self->_repeatable_fields};
+}
+sub all_repeatable_fields {
+  my $self = shift;
+  return @{$self->_repeatable_fields};
+}
+
 #========= Rendering ==========
 has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
 has 'action' => ( is => 'rw' );
@@ -172,6 +189,10 @@ sub process {
     $self->setup(@_);
     $self->after_setup;
     $self->validate_form if $self->submitted;
+
+    $self->update_model       if ( $self->validated );
+    $self->after_update_model if ( $self->validated );
+
     $self->processed(1);
     return $self->validated;
 }
@@ -289,8 +310,8 @@ sub validate_form {
     my $self = shift;
 
     $self->fields_validate;
-    $self->validate;
-    $self->validate_model;
+    $self->validate;       # hook
+    $self->validate_model; # hook
     $self->fields_set_value;
     # $self->build_errors;
 
@@ -328,4 +349,48 @@ sub get_result {
 }
 
 sub results { shift->fields_get_results }
+
+
+sub after_update_model {
+    my $self = shift;
+    # This an attempt to reload the repeatable
+    # relationships after the database is updated, so that we get the
+    # primary keys of the repeatable elements. Otherwise, if a form
+    # is re-presented, repeatable elements without primary keys may
+    # be created again. There is no reliable way to connect up
+    # existing repeatable elements with their db-created primary keys.
+    if ( $self->has_repeatable_fields && $self->item ) {
+        foreach my $field ( $self->all_repeatable_fields ) {
+            next unless $field->active;
+            # Check to see if there are any repeatable subfields with
+            # null primary keys, so we can skip reloading for the case
+            # where all repeatables have primary keys.
+            my $needs_reload = 0;
+            foreach my $sub_field ( $field->all_fields ) {
+                if ( $sub_field->has_flag('is_compound') && $sub_field->has_primary_key ) {
+                    foreach my $pk_field ( @{ $sub_field->primary_key } ) {
+                        $needs_reload++ unless $pk_field->fif;
+                    }
+                    last if $needs_reload;
+                }
+            }
+            next unless $needs_reload;
+            my @names = split( /\./, $field->full_name );
+            my $rep_item = $self->find_sub_item( $self->item, \@names );
+            # $rep_item is a single row or an array of rows or undef
+            # If we found a database item for the repeatable, replace
+            # the existing result with a result derived from the item.
+            if ( ref $rep_item ) {
+                my $parent = $field->parent;
+                $field->init_state;
+                $field->fill_from_object( {}, $rep_item );
+                # find index of existing result
+               #my $index = $parent->result->find_result_index( sub { $_ == $result } );
+                # replace existing result with new result
+               #$parent->result->set_result_at_index( $index, $new_result );
+            }
+        }
+    }
+}
+
 1;

@@ -334,6 +334,9 @@ sub _update_or_create {
         $field = $self->new_field_with_roles( $class, $field_attr);
         $parent->add_field($field);
     }
+    $field->form->add_repeatable_field($field)
+        if ( $field->form && $field->is_repeatable);
+
     return $field;
 }
 
