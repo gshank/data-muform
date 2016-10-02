@@ -5,6 +5,9 @@ use Try::Tiny;
 use Scalar::Util 'blessed';
 use Data::Clone ('data_clone');
 use Data::MuForm::Localizer;
+# causes errors if I use this. Figure out later how
+# to use Moose types
+#use Moose::Util::TypeConstraints;
 
 with 'Data::MuForm::Common';
 
