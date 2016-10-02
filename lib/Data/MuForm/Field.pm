@@ -38,7 +38,15 @@ has 'type' => ( is => 'ro', required => 1, default => 'Text' );
 has 'default' => ( is => 'rw' );
 has 'input' => ( is => 'rw', predicate => 'has_input', clearer => 'clear_input' );
 has 'input_without_param' => ( is => 'rw', predicate => 'has_input_without_param' );
-has 'value' => ( is => 'rw', predicate => 'has_value', clearer => 'clear_value' );
+has 'value' => ( is => 'rw', predicate => '_has_value', clearer => 'clear_value' );
+# TODO: put this in to fix tags, but it didn't help. Is this correct?
+sub has_value {
+  my $self = shift;
+  return 0 unless $self->_has_value;
+  return 0 if ( ref $self->value eq 'ARRAY' && scalar @{$self->value} == 0 );
+  return 0 if ( ref $self->value eq 'HASH' && scalar( keys %{$self->value} ) == 0 );
+  return 1;
+}
 has 'init_value' => ( is => 'rw', predicate => 'has_init_value', clearer => 'clear_init_value' );
 has 'no_value_if_empty' => ( is => 'rw', isa => Bool );
 has 'input_param' => ( is => 'rw', isa => Str );

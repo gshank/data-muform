@@ -429,7 +429,7 @@ sub fill_from_object {
            my $value = $self->_get_value( $field, $item ) unless $field->writeonly;
            $field->fill_from_object( $filled, $value );
         }
-        $my_value->{ $field->name } = $field->value;
+        $my_value->{ $field->name } = $field->value if $field->has_value;
     }
     $self->value($my_value);
     return;
