@@ -69,6 +69,7 @@ sub has_init_object {
     return 0 if ref $init_obj eq 'HASH' and ! scalar keys %$init_obj;
     return 1;
 }
+has 'fill_from_object_source' => ( is => 'rw', );
 #has 'active' => ( is => 'rw', clearer => 'clear_active' );
 sub full_name { '' }
 sub full_accessor { '' }
@@ -206,6 +207,7 @@ sub clear {
     $self->submitted(undef);
     $self->item(undef);
     $self->clear_init_object;
+    $self->fill_from_object_source(undef);
     $self->ctx(undef);
     $self->processed(0);
     $self->ran_validation(0);
@@ -244,9 +246,13 @@ sub setup {
     $self->submitted(1) if ( $self->has_params && ! defined $self->submitted );
 
     # these fill the 'value' attributes
-    if ( my $init_object = $self->use_init_obj_over_item ?
-        ($self->init_object || $self->item) : ( $self->item || $self->init_object ) ) {
-        $self->fill_from_object( $self->filled, $init_object );
+    if ( $self->item ) {
+      $self->fill_from_object_source('item');
+      $self->fill_from_object($self->filled, $self->item);
+    }
+    elsif ( $self->init_object ) {
+        $self->fill_from_object_source('init_object');
+        $self->fill_from_object( $self->filled, $self->init_object );
     }
     elsif ( !$self->submitted ) {
         # no initial object. empty form must be initialized

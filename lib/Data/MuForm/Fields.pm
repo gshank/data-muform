@@ -418,16 +418,16 @@ sub fill_from_object {
     return unless ( $item || $self->has_fields );    # empty fields for compounds
     $self->filled_from('object');
     my $my_value;
-    my $init_obj = $self->form->init_object;
+    my $init_obj;
+    if ( $self->form && $self->form->fill_from_object_source eq 'item' && $self->form->has_init_object ) {
+        $init_obj = $self->form->init_object;
+    }
     for my $field ( $self->all_sorted_fields ) {
         next if ! $field->active;
         if ( (ref $item eq 'HASH' && !exists $item->{ $field->accessor } ) ||
              ( blessed($item) && !$item->can($field->accessor) ) ) {
             my $found = 0;
-=comment
-# This doesn't work if the 'item' is actually the 'init_object'. Kind of messy to get around that.
-# the "item" might be a lower branch of the init_object too, so it doesn't work to check equality.
-            if ($init_obj && $init_obj != $item) {  # TODO: when should this happen? always?
+            if ($init_obj) {  # TODO: when should this happen? always?
                 # if we're using an item, look for accessor not found in item
                 # in the init_object
                 my @names = split( /\./, $field->full_name );
@@ -437,14 +437,15 @@ sub fill_from_object {
                     $field->fill_from_object( $filled, $init_obj_value );
                 }
             }
-=cut
             $filled = $field->fill_from_fields($filled) unless $found;
         }
         else {
            my $value = $self->_get_value( $field, $item ) unless $field->writeonly;
            $field->fill_from_object( $filled, $value );
         }
-        $my_value->{ $field->name } = $field->value if $field->has_value;
+#       TODO: the following doesn't work for 'input_without_param' fields like checkboxes
+#       $my_value->{ $field->name } = $field->value if $field->has_value;
+        $my_value->{ $field->name } = $field->value;
     }
     $self->value($my_value);
     return;
