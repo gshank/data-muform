@@ -57,11 +57,11 @@ has 'item' => ( is => 'rw', clearer => 'clear_item' );
 has 'primary_key' => ( is => 'rw', isa => ArrayRef,
     predicate => 'has_primary_key', );
 
-has '+field_name_space' => (
+has '+field_namespace' => (
     default => sub {
         my $self = shift;
-        return $self->form->field_name_space
-            if $self->form && $self->form->field_name_space;
+        return $self->form->field_namespace
+            if $self->form && $self->form->field_namespace;
         return [];
     },
 );

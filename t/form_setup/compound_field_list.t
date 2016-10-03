@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 
 # tests that fields are built from a field_list sub in a compound field
+# Note: also tests string field_namespace
 {
     package MyApp::Form::Field::MyComp;
     use Moo;
@@ -30,7 +31,7 @@ use Test::More;
     use Data::MuForm::Meta;
     extends 'Data::MuForm';
 
-    has '+field_name_space' => ( default => 'MyApp::Form::Field' );
+    has '+field_namespace' => ( default => 'MyApp::Form::Field' );
     has_field 'mimi';
     has_field 'tutu';
     has_field 'foofoo' => ( type => 'MyComp', state => 1 );

@@ -2,6 +2,7 @@ package Data::MuForm::Fields;
 use Moo::Role;
 
 use Types::Standard -types;
+use Type::Utils;
 use Data::Clone ('data_clone');
 use Class::Load ('load_optional_class');
 use Scalar::Util 'blessed';
@@ -45,8 +46,19 @@ sub has_error_fields { my $self = shift; return scalar @{$self->error_fields}; }
 sub num_error_fields { my $self = shift; return scalar @{$self->error_fields}; }
 sub add_error_field { my ($self, $field) = @_; push @{$self->error_fields}, $field; }
 sub all_error_fields { my $self = shift; return @{$self->error_fields}; }
-has 'field_name_space' => ( is => 'rw', isa => ArrayRef, builder => 'build_field_name_space' );
-sub build_field_name_space { [] }
+has 'field_namespace' => (
+     is => 'rw',
+     isa => ArrayRef,
+     builder => 'build_field_namespace',
+     coerce => sub {
+         my $ns = shift;
+         return [] unless defined $ns;
+         return $ns if ref $ns eq 'ARRAY';
+         return [$ns] if length($ns);
+         return [];
+     },
+);
+sub build_field_namespace { [] }
 
 sub field {
     my ( $self, $name, $die, $f ) = @_;
@@ -247,7 +259,7 @@ sub _make_field {
 sub _find_field_class {
     my ( $self, $type, $name ) = @_;
 
-    my $field_ns = $self->field_name_space;
+    my $field_ns = $self->field_namespace;
     my @classes;
     # '+'-prefixed fields could be full namespaces
     if ( $type =~ s/^\+// ) {

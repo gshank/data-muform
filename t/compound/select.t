@@ -32,7 +32,7 @@ use_ok('Test::Field::MyComp');
     use Data::MuForm::Meta;
     extends 'Data::MuForm';
 
-    has '+field_name_space' => ( default => sub { [ 'Test::Field' ] } );
+    has '+field_namespace' => ( default => sub { [ 'Test::Field' ] } );
     has_field 'floo' => ( type => 'MyComp' );
     has_field 'ploot';
 

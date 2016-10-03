@@ -16,6 +16,9 @@ It requires UTF-8 and handles only .po files. It does not use
 the various LOCALE flags for languages. Language must be set
 on creation of the form. It does handle plurals.
 
+TODO: implement allowing specification of user-provided messages
+file, and merging two
+
 =cut
 
 has 'language' => ( is => 'rw', builder => 'build_language' );

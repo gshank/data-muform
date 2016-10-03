@@ -23,7 +23,7 @@ is_deeply( $field->fif, $input, 'field fif is same');
    use Moo;
    use Data::MuForm::Meta;
    extends 'Data::MuForm';
-   has '+field_name_space' => ( default => sub { ['MyApp::Field'] } );
+   has '+field_namespace' => ( default => sub { ['MyApp::Field'] } );
 
    has_field 'name' => ( type => 'Text' );
    has_field 'duration' => ( type => 'Duration' );
