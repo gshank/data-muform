@@ -199,6 +199,16 @@ sub process {
     return $self->validated;
 }
 
+sub check {
+    my $self = shift;
+    $self->clear if $self->processed;
+    $self->setup(@_);
+    $self->after_setup;
+    $self->validate_form if $self->submitted;
+    $self->processed(1);
+    return $self->validated;
+}
+
 sub clear {
     my $self = shift;
     $self->clear_params;
@@ -334,7 +344,7 @@ sub validated { my $self = shift; return $self->ran_validation && ! $self->has_e
 
 sub get_default_value { }
 
-sub transform_and_set_input { shift }
+sub transform_and_set_input { $_[1] }
 
 sub get_result {
     my $self = shift;
