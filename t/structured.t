@@ -82,7 +82,7 @@ my $struct = {
 # test structured params
 my $form = Structured::Form->new;
 ok( $form, 'form created' );
-$form->process( params => $struct );
+$form->process( data => $struct );
 is( $form->num_fields, 6, 'correct number of fields' );
 ok( $form->validated, 'form validated');
 is_deeply( $form->field('tags')->value, ['Perl', 'programming', 'Moose' ],
@@ -93,7 +93,7 @@ is( $form->field('options.flags.opt_in')->value, 1, 'get opt_in flag');
 # test structured init_object/item
 my $form2 = Structured::Form->new;
 ok( $form2, 'form created' );
-$form2->process( init_object => $struct, params => {} );
+$form2->process( init_object => $struct, data => {} );
 is( $form2->num_fields, 6, 'correct number of fields' );
 ok( !$form2->validated, 'form validated');
 is_deeply( $form2->field('employer')->item, { name => 'TechTronix', country => 'Utopia', }, 'has item');
@@ -136,7 +136,7 @@ is_deeply( $form->values, $struct, 'values round-tripped from fif');
 
 #=========
 # works with item and params
-$form2->process( item => $struct, params => $fif );
+$form2->process( item => $struct, data => $fif );
 ok( $form2->validated, 'form processed from fif' );
 is( $form2->num_fields, 6, 'correct number of fields' );
 is_deeply( $form2->field('employer')->item, { name => 'TechTronix', country => 'Utopia', }, 'has item');

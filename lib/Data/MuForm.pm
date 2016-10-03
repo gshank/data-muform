@@ -21,6 +21,7 @@ use Class::Load ('load_optional_class');
 use Data::Clone ('data_clone');
 use Data::MuForm::Params;
 use Data::MuForm::Localizer;
+use MooX::Aliases;
 
 has 'name' => ( is => 'ro', isa => Str, builder => 'build_name');
 sub build_name {
@@ -37,7 +38,7 @@ has 'processed' => ( is => 'rw', default => 0 );
 has 'no_init_process' => ( is => 'rw', default => 0 );
 
 has 'ran_validation' => ( is => 'rw', default => 0 );
-has '_params' => ( is => 'rw', isa => HashRef, default => sub {{}} );
+has '_params' => ( is => 'rw', isa => HashRef, default => sub {{}}, alias => 'data' );
 sub clear_params { $_[0]->{_params} = {} }
 sub has_params { my $self = shift; return scalar keys %{$self->{_params}}; }
 sub params {
