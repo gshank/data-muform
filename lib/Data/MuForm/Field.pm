@@ -548,10 +548,9 @@ sub match_when {
 #====================================================================
 
 sub fill_from_params {
-    my ( $self, $filled, $input, $exists ) = @_;
+    my ( $self, $input, $exists ) = @_;
 
     if ( $exists ) {
-        $filled->{$self->name} = $input;
         $self->transform_and_set_input($input);
     }
     elsif ( $self->disabled ) {
@@ -563,10 +562,9 @@ sub fill_from_params {
 }
 
 sub fill_from_object {
-    my ( $self, $filled, $value ) = @_;
+    my ( $self, $value ) = @_;
 
     $self->value($value);
-    $filled->{$self->name} = $value;
 
     if ( $self->form ) {
         $self->form->init_value( $self, $value );
@@ -581,11 +579,10 @@ sub fill_from_object {
 }
 
 sub fill_from_fields {
-    my ( $self, $filled ) = @_;
+    my ( $self, ) = @_;
 
     if ( $self->disabled && $self->has_init_value ) {
         $self->value($self->init_value);
-        $filled->{$self->name} = $self->init_value;
     }
     elsif ( my @values = $self->get_default_value ) {
         if ( $self->has_transform_default_to_value ) {
@@ -595,7 +592,6 @@ sub fill_from_fields {
         if ( defined $value ) {
             $self->init_value($value);
             $self->value($value);
-            $filled->{$self->name} = $value;
         }
     }
     return;

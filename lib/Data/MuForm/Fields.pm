@@ -25,14 +25,11 @@ sub clear_value { $_[0]->{value} = {} }
 sub values { $_[0]->value }
 has 'init_value' => ( is => 'rw', clearer => 'clear_init_value' );
 has 'input' => ( is => 'rw', clearer => 'clear_input' );
-has 'filled' => ( is => 'rw', isa => HashRef, default => sub {{}} );
-sub clear_filled { $_[0]->{filled} = {} }
 has 'filled_from' => ( is => 'rw', clearer => 'clear_filled_from' );
 
 has 'meta_fields' => ( is => 'rw' );
 has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_field_list' );
 sub build_field_list {[]}
-#has 'saved_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 has 'fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]});
 sub add_field { my ( $self, @fields ) = @_; push @{$self->{fields}}, @fields; }
 sub clear_fields { my $self = shift; $self->{fields} = undef; }
@@ -397,7 +394,7 @@ sub _make_adhoc_field {
 
 # $input here is from the $params passed in on ->process
 sub fill_from_params {
-    my ( $self, $filled, $input, $exists ) = @_;
+    my ( $self, $input, $exists ) = @_;
 
     $self->filled_from('params');
     return unless ( defined $input || $exists || $self->has_fields );
@@ -406,20 +403,23 @@ sub fill_from_params {
         foreach my $field ( $self->all_sorted_fields ) {
             next if ! $field->active;
             my $fname = $field->input_param || $field->name;
-            $field->fill_from_params($filled, $input->{$fname}, exists $input->{$fname});
+            $field->fill_from_params($input->{$fname}, exists $input->{$fname});
         }
     }
     return;
 }
 
 sub fill_from_object {
-    my ( $self, $filled, $item ) = @_;
+    my ( $self, $item ) = @_;
 
     return unless ( $item || $self->has_fields );    # empty fields for compounds
     $self->filled_from('object');
     my $my_value;
     my $init_obj;
-    if ( $self->form && $self->form->fill_from_object_source eq 'item' && $self->form->has_init_object ) {
+    if ( $self->form &&
+        $self->form->fill_from_object_source &&
+        $self->form->fill_from_object_source eq 'item' &&
+        $self->form->has_init_object ) {
         $init_obj = $self->form->init_object;
     }
     for my $field ( $self->all_sorted_fields ) {
@@ -427,21 +427,21 @@ sub fill_from_object {
         if ( (ref $item eq 'HASH' && !exists $item->{ $field->accessor } ) ||
              ( blessed($item) && !$item->can($field->accessor) ) ) {
             my $found = 0;
-            if ($init_obj) {  # TODO: when should this happen? always?
+            if ($init_obj) {
                 # if we're using an item, look for accessor not found in item
                 # in the init_object
                 my @names = split( /\./, $field->full_name );
                 my $init_obj_value = $self->find_sub_item( $init_obj, \@names );
                 if ( defined $init_obj_value ) {
                     $found = 1;
-                    $field->fill_from_object( $filled, $init_obj_value );
+                    $field->fill_from_object( $init_obj_value );
                 }
             }
-            $filled = $field->fill_from_fields($filled) unless $found;
+            $field->fill_from_fields() unless $found;
         }
         else {
            my $value = $self->_get_value( $field, $item ) unless $field->writeonly;
-           $field->fill_from_object( $filled, $value );
+           $field->fill_from_object( $value );
         }
 #       TODO: the following doesn't work for 'input_without_param' fields like checkboxes
 #       $my_value->{ $field->name } = $field->value if $field->has_value;
@@ -453,14 +453,14 @@ sub fill_from_object {
 
 # for when there are no params and no init_object
 sub fill_from_fields {
-    my ( $self, $filled ) = @_;
+    my ( $self ) = @_;
 
     $self->filled_from('fields');
     # defaults for compounds, etc.
     if ( my @values = $self->get_default_value ) {
         my $value = @values > 1 ? \@values : shift @values;
         if( ref $value eq 'HASH' || blessed $value ) {
-            return $self->fill_from_object( $filled, $value );
+            return $self->fill_from_object( $value );
         }
         if ( defined $value ) {
             $self->init_value($value);
@@ -470,7 +470,7 @@ sub fill_from_fields {
     my $my_value;
     for my $field ( $self->all_sorted_fields ) {
         next if (!$field->active);
-        $field->fill_from_fields($filled);
+        $field->fill_from_fields();
         $my_value->{ $field->name } = $field->value if $field->has_value;
     }
     # setting value here to handle disabled compound fields, where we want to

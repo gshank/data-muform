@@ -202,8 +202,6 @@ sub process {
 sub clear {
     my $self = shift;
     $self->clear_params;
-#   $self->clear_result;
-    $self->clear_filled;
     $self->clear_filled_from;
     $self->submitted(undef);
     $self->item(undef);
@@ -249,23 +247,21 @@ sub setup {
     # these fill the 'value' attributes
     if ( $self->item ) {
       $self->fill_from_object_source('item');
-      $self->fill_from_object($self->filled, $self->item);
+      $self->fill_from_object($self->item);
     }
     elsif ( $self->init_object ) {
         $self->fill_from_object_source('init_object');
-        $self->fill_from_object( $self->filled, $self->init_object );
+        $self->fill_from_object($self->init_object );
     }
     elsif ( !$self->submitted ) {
         # no initial object. empty form must be initialized
-        $self->fill_from_fields( $self->filled );
+        $self->fill_from_fields;
     }
 
     # fill in the input attribute
     my $params = data_clone( $self->params );
     if ( $self->submitted ) {
-        $self->clear_filled;
-        my $filled = $self->filled;
-        $self->fill_from_params( $filled, $params, 1 );
+        $self->fill_from_params($params, 1 );
     }
 
 }
@@ -390,7 +386,7 @@ sub after_update_model {
             if ( ref $rep_item ) {
                 my $parent = $field->parent;
                 $field->init_state;
-                $field->fill_from_object( {}, $rep_item );
+                $field->fill_from_object( $rep_item );
                 # find index of existing result
                #my $index = $parent->result->find_result_index( sub { $_ == $result } );
                 # replace existing result with new result

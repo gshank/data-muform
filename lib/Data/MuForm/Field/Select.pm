@@ -75,11 +75,11 @@ sub BUILD {
 }
 
 sub fill_from_params {
-    my ( $self, $filled, $input, $exists ) = @_;
+    my ( $self, $input, $exists ) = @_;
 
     $input = ref $input eq 'ARRAY' ? $input : [$input]
         if $self->multiple;
-    $filled = $self->next::method( $filled, $input, $exists );
+    $self->next::method( $input, $exists );
     $self->_load_options;
     $self->value($self->default)
         if( defined $self->default && not $self->has_value );
