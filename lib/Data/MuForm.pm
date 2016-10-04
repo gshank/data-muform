@@ -35,7 +35,7 @@ has 'id' => ( is => 'ro', isa => Str, lazy => 1, builder => 'build_id' );
 sub build_id { $_[0]->name }
 has 'submitted' => ( is => 'rw', default => undef );  # three values: 0, 1, undef
 has 'processed' => ( is => 'rw', default => 0 );
-has 'no_init_process' => ( is => 'rw', default => 0 );
+#has 'no_init_process' => ( is => 'rw', default => 0 );
 
 has 'ran_validation' => ( is => 'rw', default => 0 );
 has '_params' => ( is => 'rw', isa => HashRef, default => sub {{}}, alias => 'data' );
@@ -182,7 +182,9 @@ sub BUILD {
     my $self = shift;
     $self->build_fields;
     $self->after_build_fields;
-    $self->process unless $self->no_init_process;
+    # put various defaults into fields. Should this happen?
+    # it will be re-done on the first process call
+    $self->fill_values;
 }
 
 sub process {
@@ -256,6 +258,24 @@ sub setup {
     # set the submitted flag
     $self->submitted(1) if ( $self->has_params && ! defined $self->submitted );
 
+    # fill the 'value' attributes from item, init_object or fields
+    $self->fill_values;
+
+    # fill in the input attribute
+    my $params = data_clone( $self->params );
+    if ( $self->submitted ) {
+        $self->fill_from_params($params, 1 );
+        # if the params submitted don't match fields, it shouldn't count as 'submitted'
+        if ( ! scalar keys %{$self->input} ) {
+            $self->submitted(0);
+        }
+    }
+
+}
+
+sub fill_values {
+    my $self = shift;
+
     # these fill the 'value' attributes
     if ( $self->item ) {
       $self->fill_from_object_source('item');
@@ -269,17 +289,6 @@ sub setup {
         # no initial object. empty form must be initialized
         $self->fill_from_fields;
     }
-
-    # fill in the input attribute
-    my $params = data_clone( $self->params );
-    if ( $self->submitted ) {
-        $self->fill_from_params($params, 1 );
-        # if the params submitted don't match fields, it shouldn't count as 'submitted'
-        if ( ! scalar keys %{$self->input} ) {
-            $self->submitted(0);
-        }
-    }
-
 }
 
 sub in_setup { }

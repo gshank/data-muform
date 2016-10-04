@@ -504,7 +504,9 @@ sub find_sub_item {
 
 sub _get_value {
     my ( $self, $field, $item ) = @_;
-
+if ( $field->name eq 'foo' ) {
+$DB::single=1;
+}
     my $accessor = $field->accessor;
     my @values;
     if ( blessed($item) && $item->can($accessor) ) {
@@ -532,17 +534,31 @@ sub _get_value {
         @values = $field->transform_default_to_value->($field, @values);
     }
     my $value;
-=comment
-# not sure why we were doing this... Removed for t/field_setup/defaults.t,
-# multiple default test. Leaving commented here in case the reason for it shows up.
+    # this is different than FH, I'm unsure why;
+    # there was a problem with a default [1,3] ending up as [[1,3]]
+    # in t/field_setup/default.t because of switching to getting
+    # non-item defaults from init_object
+    # used to be:
+    #     if( $field->has_flag('multiple')) {
+    #         $value = scalar @values == 1 && ! defined $values[0] ? [] : \@values;
+    #     }
+    # maybe because of 'transform_default_to_value'? But defaults have always been
+    # able to be [1,3] for multiples. Accidentally worked before? Well, using
+    # init_object for missing attributes was never tested well.
     if( $field->has_flag('multiple')) {
-        $value = scalar @values == 1 && ! defined $values[0] ? [] : \@values;
+        if ( scalar @values == 1 && ! defined $values[0] ) {
+            $value = [];
+        }
+        elsif ( scalar @values == 1 && ref $values[0] eq 'ARRAY' ) {
+            $value = shift @values;
+        }
+        else {
+            $value = \@values;
+        }
     }
     else {
         $value = @values > 1 ? \@values : shift @values;
     }
-=cut
-    $value = @values > 1 ? \@values : shift @values;
     return $value;
 }
 

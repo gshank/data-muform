@@ -14,7 +14,7 @@ use Data::Dumper;
 
 }
 
-my $form = MyApp::Form::Test->new( no_init_process => 1 );
+my $form = MyApp::Form::Test->new;
 ok( $form );
 
 $form->process( params => {} );
