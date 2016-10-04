@@ -398,14 +398,21 @@ sub fill_from_params {
 
     $self->filled_from('params');
     return unless ( defined $input || $exists || $self->has_fields );
+    # TODO - this will get replaced by setting the actual processed input 14 lines down.
+    # Do we need this? Maybe could be used to transform input before processing?
     $self->transform_and_set_input($input);
+    my $my_input = {};
     if ( ref $input eq 'HASH' ) {
         foreach my $field ( $self->all_sorted_fields ) {
             next if ! $field->active;
             my $fname = $field->input_param || $field->name;
             $field->fill_from_params($input->{$fname}, exists $input->{$fname});
+            $my_input->{$fname} = $field->input if $field->has_input;
         }
     }
+    # save input for this form or compound field. Used to determine whether really 'submitted'
+    # in form. This should not be used for errors or fif or anything like that.
+    $self->input( scalar keys %$my_input ? $my_input : {});
     return;
 }
 

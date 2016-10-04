@@ -187,6 +187,7 @@ sub BUILD {
 
 sub process {
     my $self = shift;
+
     $self->clear if $self->processed;
     $self->setup(@_);
     $self->after_setup;
@@ -236,6 +237,7 @@ filled by params, object, or fields.
 
 sub setup {
     my ( $self, @args ) = @_;
+
     if ( @args == 1 ) {
         $self->params( $args[0] );
     }
@@ -272,6 +274,10 @@ sub setup {
     my $params = data_clone( $self->params );
     if ( $self->submitted ) {
         $self->fill_from_params($params, 1 );
+        # if the params submitted don't match fields, it shouldn't count as 'submitted'
+        if ( ! scalar keys %{$self->input} ) {
+            $self->submitted(0);
+        }
     }
 
 }
@@ -344,7 +350,10 @@ sub validated { my $self = shift; return $self->ran_validation && ! $self->has_e
 
 sub get_default_value { }
 
-sub transform_and_set_input { $_[1] }
+sub transform_and_set_input {
+    my ($self, $input) = @_;
+    $self->input($input);
+}
 
 sub get_result {
     my $self = shift;
