@@ -574,7 +574,7 @@ sub fill_from_object {
         #$result->_set_value($value);
     }
     $self->value(undef) if $self->writeonly;
-    # $result->_set_field_def($self);
+
     return;
 }
 

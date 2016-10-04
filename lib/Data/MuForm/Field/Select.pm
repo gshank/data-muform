@@ -85,7 +85,23 @@ sub fill_from_params {
         if( defined $self->default && not $self->has_value );
 }
 
-=comemnt
+sub fill_from_object {
+    my ( $self, $item ) = @_;
+    $self->next::method( $item );
+    $self->_load_options;
+    $self->value($self->default)
+        if( defined $self->default && not $self->has_value );
+}
+
+sub fill_from_field {
+    my ( $self ) = @_;
+    $self->next::method();
+    $self->_load_options;
+    $self->value($self->default)
+        if( defined $self->default && not $self->has_value );
+}
+
+=comment
 # this doesn't work (two different value attributes combined).
 # TODO: look for better ways to arrayref a multiple value
 before 'value' => sub {

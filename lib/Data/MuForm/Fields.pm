@@ -427,6 +427,7 @@ sub fill_from_object {
         if ( (ref $item eq 'HASH' && !exists $item->{ $field->accessor } ) ||
              ( blessed($item) && !$item->can($field->accessor) ) ) {
             my $found = 0;
+
             if ($init_obj) {
                 # if we're using an item, look for accessor not found in item
                 # in the init_object
@@ -437,6 +438,7 @@ sub fill_from_object {
                     $field->fill_from_object( $init_obj_value );
                 }
             }
+
             $field->fill_from_fields() unless $found;
         }
         else {
@@ -498,9 +500,7 @@ sub _get_value {
 
     my $accessor = $field->accessor;
     my @values;
-    if( $field->form && $field->form->use_defaults_over_obj && ( @values = $field->get_default_value )  ) {
-    }
-    elsif ( blessed($item) && $item->can($accessor) ) {
+    if ( blessed($item) && $item->can($accessor) ) {
         # this must be an array, so that DBIx::Class relations are arrays not resultsets
         @values = $item->$accessor;
         # for non-DBIC blessed object where access returns arrayref
@@ -525,12 +525,17 @@ sub _get_value {
         @values = $field->transform_default_to_value->($field, @values);
     }
     my $value;
+=comment
+# not sure why we were doing this... Removed for t/field_setup/defaults.t,
+# multiple default test. Leaving commented here in case the reason for it shows up.
     if( $field->has_flag('multiple')) {
         $value = scalar @values == 1 && ! defined $values[0] ? [] : \@values;
     }
     else {
         $value = @values > 1 ? \@values : shift @values;
     }
+=cut
+    $value = @values > 1 ? \@values : shift @values;
     return $value;
 }
 

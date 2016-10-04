@@ -50,12 +50,12 @@ sub params {
     return $self->{_params};
 }
 has 'html_prefix' => ( is => 'rw' );
-has 'use_defaults_over_obj' => ( is => 'rw', isa => Bool, default => 0 );
-has 'use_init_obj_over_item' => ( is => 'rw', isa => Bool, default => 0 );
+#has 'use_defaults_over_obj' => ( is => 'rw', isa => Bool, default => 0 );
+#has 'use_init_obj_over_item' => ( is => 'rw', isa => Bool, default => 0 );
 
 
 has 'form_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
-has 'index' => ( is => 'rw', isa => ArrayRef );
+has 'index' => ( is => 'rw', isa => HashRef, default => sub {{}} );
 sub add_to_index { my ( $self, $field_name, $field ) = @_; $self->{index}->{$field_name} = $field; }
 sub form { shift }
 sub is_form {1}
