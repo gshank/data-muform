@@ -139,6 +139,7 @@ sub get_render_args {
     id => $self->id,
     label => $self->label,
     name => $self->html_name,
+    errors => $self->errors,
   };
 }
 sub render {
@@ -150,6 +151,7 @@ sub render {
 around BUILDARGS => sub {
   my ( $orig, $class, %args ) = @_;
 
+  # allow using 'inactive => 1' in a field definition
   if ( exists $args{inactive} ) {
      my $inactive = delete $args{inactive};
      $args{active} = $inactive ? 0 : 1;

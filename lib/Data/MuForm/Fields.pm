@@ -184,7 +184,7 @@ sub build_fields {
     # process field_list
     my $field_list = $self->field_list;
     $field_list = $self->convert_field_list_to_hashes($field_list)
-       if $field_list->[0] && $field_list->[0] ne 'HASH';
+       if $field_list->[0] && ref($field_list->[0]) ne 'HASH';
     $self->process_field_array ( $field_list );
 
     return unless $self->has_fields;
