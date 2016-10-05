@@ -20,11 +20,18 @@ sub render_input {
   $out .= qq{id="$rargs->{id}" };
   $out .= qq{value="$rargs->{fif}" };
   my $attrs = $rargs->{element};
+  my $class = $attrs->{class};
+  $class = [split(' ', $class)] unless ref $class eq 'ARRAY';
+  push @$class, 'error' if scalar @{$rargs->{errors}};
+  my $classes = join(' ', @$class);
+  $out .= qq{class="$classes" };
   foreach my $attr ( keys %$attrs ) {
+    next if $attr eq 'class';
     $out .= qq{$attr="$attrs->{$attr}" };
   }
   $out .= ">";
 }
+
 
 sub render_select {
   my ( $self, $rargs ) = @_;
