@@ -29,22 +29,39 @@ sub render_field {
 
 sub render_input {
   my ( $self, $rargs ) = @_;
+
+  my $input_type = $rargs->{input_type};
+  my $out = qq{input type="$input_type" };
+  $out .= ">";
 }
 
 sub render_select {
   my ( $self, $rargs ) = @_;
+
+  my $out = "<select ";
+  $out .= ">";
 }
 
 sub render_checkbox {
   my ( $self, $rargs ) = @_;
+
+  my $out = "<checkbox ";
+  $out .= ">";
 }
 
 sub render_textarea {
   my ( $self, $rargs ) = @_;
+
+  my $out = "<textarea ";
+  $out .= ">";
 }
 
-sub render_generic {
+sub render_element {
   my ( $self, $rargs ) = @_;
+  my $form_element = $rargs->{form_element};
+  my $meth = "render_$form_element";
+  return $self->$meth($rargs);
 }
+
 
 1;

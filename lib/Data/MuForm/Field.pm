@@ -5,6 +5,7 @@ use Try::Tiny;
 use Scalar::Util 'blessed';
 use Data::Clone ('data_clone');
 use Data::MuForm::Localizer;
+use Data::MuForm::Merge ('merge');
 # causes errors if I use this. Figure out later how
 # to use Moose types
 #use Moose::Util::TypeConstraints;
@@ -118,7 +119,19 @@ sub is_form {0}
 # Rendering
 #=================
 has 'html5_type_attr' => ( is => 'rw' );
-has 'render_args' => ( is => 'rw', isa => HashRef, builder => 'build_render_args' );
+has 'base_render_args' => ( is => 'rw', lazy =>1, isa => HashRef, builder => 'build_base_render_args' );
+sub build_base_render_args {
+  my $self = shift;
+  return {
+    form => $self->form,
+    name => $self->html_name,
+    form_element => $self->form_element,
+    input_type => $self->input_type,
+    id => $self->id,
+    label => $self->loc_label,
+  };
+}
+has 'render_args' => ( is => 'rw', lazy => 1, isa => HashRef, builder => 'build_render_args' );
 sub build_render_args {{}}
 has 'renderer' => (
   is => 'rw',
@@ -132,21 +145,34 @@ sub build_renderer {
 sub get_render_args {
   my ( $self, %args ) = @_;
   my $render_args = {
-    %{ $self->render_args },
-    %args,
-    form_element => $self->form_element,
-    input_type => $self->input_type,
-    id => $self->id,
-    label => $self->label,
-    name => $self->html_name,
     errors => $self->errors,
+    %{ $self->render_args },
   };
+  $render_args = merge( $render_args, \%args );
+  return $render_args;
 }
 sub render {
-  my ( $self, %args ) = @_;
-  my $render_args = $self->get_render_args(%args);
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args(%$rargs);
   return $self->renderer->render_field($render_args);
 }
+sub render_element {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args( element => $rargs );
+  return $self->renderer->render_element($render_args);
+}
+=comment
+sub render_errors {
+  my ( $self, $rargs ) = @_;
+  my $render_args = { %{$self->get_render_args}, %$rargs };
+  return $self->renderer->render_errors($render_args);
+}
+sub render_label {
+  my ( $self, $rargs ) = @_;
+  my $render_args = { %{$self->get_render_args}, %$rargs };
+  return $self->renderer->render_label($render_args);
+}
+=cut
 
 around BUILDARGS => sub {
   my ( $orig, $class, %args ) = @_;
@@ -237,10 +263,10 @@ sub _localize {
    return $self->localizer->loc_($message[0]);
 }
 
-has 'language' => ( is => 'rw', builder => 'build_language' );
+has 'language' => ( is => 'rw', lazy => 1, builder => 'build_language' );
 sub build_language { 'en' }
 has 'localizer' => (
-    is => 'rw', builder => 'build_localizer',
+    is => 'rw', lazy => 1, builder => 'build_localizer',
 );
 sub build_localizer {
     my $self = shift;
