@@ -9,29 +9,20 @@ sub render_field {
   my ( $self, $rargs ) = @_;
 
   my $rendered;
-  my $form_element = $rargs->{form_element};
-  if ( $form_element eq 'input' ) {
-    $rendered = $self->render_input($rargs);
-  }
-  elsif ( $form_element eq 'select' ) {
-    $rendered = $self->render_select($rargs);
-  }
-  elsif ( $form_element eq 'checkbox' ) {
-    $rendered = $self->render_checkbox($rargs);
-  }
-  elsif ( $form_element eq 'textarea' ) {
-    $rendered = $self->render_textarea($rargs);
-  }
-  else {
-    $rendered = $self->render_generic($rargs);
-  }
+  my $form_element = $self->render_element($rargs);
 }
 
 sub render_input {
   my ( $self, $rargs ) = @_;
 
-  my $input_type = $rargs->{input_type};
-  my $out = qq{input type="$input_type" };
+  my $out = qq{<input type="$rargs->{input_type}" };
+  $out .= qq{name="$rargs->{name}" };
+  $out .= qq{id="$rargs->{id}" };
+  $out .= qq{value="$rargs->{fif}" };
+  my $attrs = $rargs->{element};
+  foreach my $attr ( keys %$attrs ) {
+    $out .= qq{$attr="$attrs->{$attr}" };
+  }
   $out .= ">";
 }
 
@@ -58,6 +49,7 @@ sub render_textarea {
 
 sub render_element {
   my ( $self, $rargs ) = @_;
+
   my $form_element = $rargs->{form_element};
   my $meth = "render_$form_element";
   return $self->$meth($rargs);

@@ -145,8 +145,10 @@ sub build_renderer {
 sub get_render_args {
   my ( $self, %args ) = @_;
   my $render_args = {
-    errors => $self->errors,
+    %{ $self->base_render_args },
     %{ $self->render_args },
+    errors => $self->errors,
+    fif => $self->fif,
   };
   $render_args = merge( $render_args, \%args );
   return $render_args;
