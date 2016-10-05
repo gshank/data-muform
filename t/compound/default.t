@@ -41,7 +41,7 @@ use Test::More;
         use Data::MuForm::Meta;
         extends 'Data::MuForm';
 
-        has_field 'comp_foo' => ( type => 'Compound', default_method => \&default_comp_foo );
+        has_field 'comp_foo' => ( type => 'Compound' );
         has_field 'comp_foo.one';
         has_field 'comp_foo.two';
         has_field 'comp_foo.three';

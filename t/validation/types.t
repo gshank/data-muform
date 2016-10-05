@@ -165,7 +165,7 @@ while (my ($name, $type, $trans) = splice @test, 0, 3) {
     has_field 'test_b' => ( apply => [ { type => $NUM } ] );
 }
 
-my $form = Test::Form::Type::Tiny->new;
+$form = Test::Form::Type::Tiny->new;
 
 ok($form, 'get form');
 

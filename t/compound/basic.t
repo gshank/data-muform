@@ -133,7 +133,6 @@ ok( !$form->field( 'compound' )->has_errors, 'Not required compound with empty s
     has_field 'foo';
 }
 
-$DB::single=1;
 my $f = Form->new;
 $f->process( { 'date.day' => '18', 'date.month' => '2', 'date.year' => '2010' } );
 is_deeply( $f->field('date')->value, { year => 2010, month => 2, day => 18 }, 'correct value' );

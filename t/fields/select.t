@@ -138,7 +138,6 @@ my $params = {
    vegetables => [2,4],
    empty => 'test',
 };
-$DB::single=1;
 $form->process( $params );
 ok( $form->validated, 'form validated' );
 is( $form->field('fruit')->value, 2, 'fruit value is correct');

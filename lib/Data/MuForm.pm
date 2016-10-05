@@ -59,6 +59,7 @@ has 'index' => ( is => 'rw', isa => HashRef, default => sub {{}} );
 sub add_to_index { my ( $self, $field_name, $field ) = @_; $self->{index}->{$field_name} = $field; }
 sub form { shift }
 sub is_form {1}
+sub parent { }
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
 # init_object can be a blessed object or a hashref
 has 'init_object' => ( is => 'rw' );

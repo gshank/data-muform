@@ -42,7 +42,7 @@ my $index = 0;
 while ( $index < 1000 ) {
   my $form = My::Form->new;
   my $params = $form->fif;
-  $form->process( params => $params );
+# $form->process( params => $params );
   $index++;
 }
 

@@ -23,8 +23,10 @@ use_ok('Data::MuForm');
    sub field_list
    {
       return [
-         { name => 'fruit', type => 'Select' },
-         { name => 'optname', label => 'Second' },
+         fruit => 'Select',
+         optname => { label => 'Second' }
+#        { name => 'fruit', type => 'Select' },
+#        { name => 'optname', label => 'Second' },
       ];
    }
 

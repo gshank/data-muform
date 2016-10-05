@@ -183,11 +183,28 @@ sub build_fields {
 
     # process field_list
     my $field_list = $self->field_list;
+    $field_list = $self->convert_field_list_to_hashes($field_list)
+       if $field_list->[0] && $field_list->[0] ne 'HASH';
     $self->process_field_array ( $field_list );
 
     return unless $self->has_fields;
     $self->_order_fields;
-#   $self->_install_methods;
+#   $self->_install_methods unless $self->is_form;
+}
+
+sub convert_field_list_to_hashes {
+    my ( $self, $field_list ) = @_;
+
+    my @new_fields;
+    while (@$field_list) {
+        my $name = shift @$field_list;
+        my $attr = shift @$field_list;
+        unless ( ref $attr eq 'HASH' ) {
+            $attr = { type => $attr };
+        }
+        push @new_fields, { name => $name, %$attr };
+    }
+    return \@new_fields;
 }
 
 sub process_field_array {
@@ -504,9 +521,7 @@ sub find_sub_item {
 
 sub _get_value {
     my ( $self, $field, $item ) = @_;
-if ( $field->name eq 'foo' ) {
-$DB::single=1;
-}
+
     my $accessor = $field->accessor;
     my @values;
     if ( blessed($item) && $item->can($accessor) ) {
@@ -607,12 +622,31 @@ sub _install_methods {
 }
 =cut
 
+=comment
 sub convert_full_name {
     my $full_name = shift;
     $full_name =~ s/\.\d+\./_/g;
     $full_name =~ s/\./_/g;
     return $full_name;
 }
+=cut
 
+
+# References to fields with errors are propagated up the tree.
+# All fields with errors should end up being in the form's
+# error_results. Once.
+sub propagate_error {
+    my ( $self, $field ) = @_;
+
+#   my ($found) = grep { $_ == $result } $self->result->all_error_results;
+#   unless ( $found ) {
+        $self->add_error_field($field);
+        if ( $self->parent ) {
+            $self->parent->propagate_error( $field );
+        }
+#   }
+
+
+}
 
 1;
