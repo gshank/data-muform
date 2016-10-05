@@ -90,7 +90,7 @@ sub field {
 sub all_sorted_fields {
     my $self = shift;
     my @fields = sort { $a->order <=> $b->order }
-        grep { $_->active } $self->all_fields;
+        grep { $_->is_active } $self->all_fields;
     return @fields;
 }
 
@@ -118,7 +118,7 @@ sub fields_validate {
     # validate all fields
     my %value_hash;
     foreach my $field ( $self->all_sorted_fields ) {
-        next if ( !$field->active || $field->disabled );
+        next if ( !$field->is_active || $field->disabled );
         # Validate each field and "inflate" input -> value.
         $field->validate_field;    # this calls the field's 'validate' routine
         $value_hash{ $field->accessor } = $field->value
@@ -136,7 +136,7 @@ sub fields_fif {
 
     my %params;
     foreach my $field ( $self->all_sorted_fields ) {
-        next if ( ! $field->active || $field->password );
+        next if ( ! $field->is_active || $field->password );
        #next unless $field->has_input || $field->has_value;
         my $fif = $field->fif;
         next if ( !defined $fif || (ref $fif eq 'ARRAY' && ! scalar @{$fif} ) );
@@ -160,7 +160,7 @@ sub fields_get_results {
     my $result = $self->get_result;
     my @field_results;
     foreach my $field ( $self->all_sorted_fields ) {
-        next if ! $field->active;
+        next if ! $field->is_active;
         my $result = $field->get_result;
         push @field_results, $result;
     }
@@ -404,7 +404,7 @@ sub fill_from_params {
     my $my_input = {};
     if ( ref $input eq 'HASH' ) {
         foreach my $field ( $self->all_sorted_fields ) {
-            next if ! $field->active;
+            next if ! $field->is_active;
             my $fname = $field->input_param || $field->name;
             $field->fill_from_params($input->{$fname}, exists $input->{$fname});
             $my_input->{$fname} = $field->input if $field->has_input;
@@ -430,7 +430,7 @@ sub fill_from_object {
         $init_obj = $self->form->init_object;
     }
     for my $field ( $self->all_sorted_fields ) {
-        next if ! $field->active;
+        next if ! $field->is_active;
         if ( (ref $item eq 'HASH' && !exists $item->{ $field->accessor } ) ||
              ( blessed($item) && !$item->can($field->accessor) ) ) {
             my $found = 0;
@@ -478,7 +478,7 @@ sub fill_from_fields {
     }
     my $my_value;
     for my $field ( $self->all_sorted_fields ) {
-        next if (!$field->active);
+        next if (!$field->is_active);
         $field->fill_from_fields();
         $my_value->{ $field->name } = $field->value if $field->has_value;
     }
@@ -567,8 +567,7 @@ sub fields_set_value {
     my $self = shift;
     my %value_hash;
     foreach my $field ( $self->all_fields ) {
-#       next if ( $field->is_inactive || !$field->has_result );
-        next if ! $field->active;
+        next if ! $field->is_active;
         $value_hash{ $field->accessor } = $field->value
             if ( $field->has_value && !$field->noupdate );
     }
@@ -580,7 +579,8 @@ sub clear_data {
     my $self = shift;
     $self->clear_input;
     $self->clear_value;
-#   $self->clear_activate;
+    # TODO - better way?
+    $self->_clear_active unless $self->is_form;;
     $self->clear_error_fields;
     foreach my $field ( $self->all_fields ) {
         $field->clear_data;

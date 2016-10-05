@@ -69,8 +69,18 @@ sub all_errors { my $self = shift; return @{$self->errors}; }
 sub clear_errors { $_[0]->{errors} = [] }
 sub clear_error_fields { }
 
+# this is a permanent setting of active
 has 'active' => ( is => 'rw', default => 1 );
-sub is_inactive { ! $_[0]->active }
+# this is a temporary active set on the process call, cleared on clear_data
+has '_active' => ( is => 'rw', predicate => '_has_active', clearer => '_clear_active' );
+sub clear_inactive { $_[0]->active(1) }
+sub inactive { return ( shift->active ? 0 : 1 ) }
+sub is_active {
+    my $self = shift;
+    return $self->_active if $self->_has_active;
+    return $self->active;
+}
+sub is_inactive { ! $_[0]->is_active }
 has 'disabled' => ( is => 'rw', default => 0 );
 has 'noupdate' => ( is => 'rw', default => 0 );
 has 'writeonly' => ( is => 'rw', default => 0 );
@@ -105,6 +115,7 @@ has 'validate_when_empty' => ( is => 'rw', isa => Bool );
 has 'not_nullable' => ( is => 'rw', isa => Bool );
 sub is_repeatable {}
 sub is_compound {}
+sub is_form {0}
 
 #=================
 # Rendering
@@ -139,14 +150,23 @@ sub render {
   return $self->renderer->render_field($render_args);
 }
 
+around BUILDARGS => sub {
+  my ( $orig, $class, %args ) = @_;
+
+  if ( exists $args{inactive} ) {
+     my $inactive = delete $args{inactive};
+     $args{active} = $inactive ? 0 : 1;
+  }
+  return $class->$orig(%args);
+};
+
 sub BUILD {
     my $self = shift;
-
 }
 
 sub fif {
     my $self = shift;
-    return unless $self->active;
+    return unless $self->is_active;
     return $self->input if $self->has_input;
     if ( $self->has_value ) {
       my $value = $self->value;
@@ -604,6 +624,7 @@ sub clear_data {
     $self->clear_input;
     $self->clear_value;
     $self->clear_errors;
+    $self->_clear_active;
 }
 
 sub get_default_value {

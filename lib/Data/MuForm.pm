@@ -71,7 +71,8 @@ sub has_init_object {
     return 1;
 }
 has 'fill_from_object_source' => ( is => 'rw', );
-#has 'active' => ( is => 'rw', clearer => 'clear_active' );
+has 'active' => ( is => 'rw', clearer => 'clear_active', predicate => 'has_active' );
+has 'inactive' => ( is => 'rw', clearer => 'clear_inactive', predicate => 'has_inactive' );
 sub full_name { '' }
 sub full_accessor { '' }
 sub fif { shift->fields_fif(@_) }
@@ -252,8 +253,10 @@ sub setup {
         }
     }
     # set_active
+    $self->set_active;
+
+    # customization hook
     $self->in_setup;
-    # update_fields
 
     # set the submitted flag
     $self->submitted(1) if ( $self->has_params && ! defined $self->submitted );
@@ -310,6 +313,34 @@ sub munge_params {
     }
     $new_params = {} if !defined $new_params;
     return $new_params;
+}
+
+sub set_active {
+    my $self = shift;
+    if( $self->has_active ) {
+        foreach my $fname (@{$self->active}) {
+            my $field = $self->field($fname);
+            if ( $field ) {
+                $field->_active(1);
+            }
+            else {
+                warn "field $fname not found to set active";
+            }
+        }
+        $self->clear_active;
+    }
+    if( $self->has_inactive ) {
+        foreach my $fname (@{$self->inactive}) {
+            my $field = $self->field($fname);
+            if ( $field ) {
+                $field->_active(0);
+            }
+            else {
+                warn "field $fname not found to set inactive";
+            }
+        }
+        $self->clear_inactive;
+    }
 }
 
 #====================================================================
@@ -392,7 +423,7 @@ sub after_update_model {
     # existing repeatable elements with their db-created primary keys.
     if ( $self->has_repeatable_fields && $self->item ) {
         foreach my $field ( $self->all_repeatable_fields ) {
-            next unless $field->active;
+            next unless $field->is_active;
             # Check to see if there are any repeatable subfields with
             # null primary keys, so we can skip reloading for the case
             # where all repeatables have primary keys.
