@@ -110,6 +110,7 @@ sub get_method {
    my ( $self, $meth_name ) = @_;
    return  $self->{methods}->{$meth_name};
 }
+has 'validate' => ( is => 'rw', predicate => 'has_validate' );
 
 has 'validate_when_empty' => ( is => 'rw', isa => Bool );
 has 'not_nullable' => ( is => 'rw', isa => Bool );
@@ -162,6 +163,25 @@ around BUILDARGS => sub {
 
 sub BUILD {
     my $self = shift;
+
+    $self->_install_methods;
+}
+
+sub _install_methods {
+    my $self = shift;
+
+    next unless $self->form;
+    my $suffix = $self->convert_full_name($self->full_name);
+    foreach my $prefix ( 'validate', 'default' ) {
+        my $meth_name = "${prefix}_$suffix";
+        if ( my $meth = $self->form->can($meth_name) ) {
+            my $wrap_sub = sub {
+                my $self = shift;
+                return $self->form->$meth;
+            };
+            $self->{methods}->{$prefix} = $wrap_sub;
+        }
+    }
 }
 
 sub fif {
@@ -355,7 +375,8 @@ sub has_some_value {
 
 
 
-sub validate {1}
+sub base_validate { }
+sub field_validate { }
 
 sub validate_field {
     my $self = shift;
@@ -405,7 +426,10 @@ sub validate_field {
 
     $self->base_validate; # why? also transforms? split out into a 'base_transform' and move the validation?
     $self->apply_actions;
+    $self->field_validate;
+
     $self->validate;
+    $self->validate->($self) if $self->has_validate;
 
     if ( $self->has_transform_value_after_validate ) {
         my $value = $self->value;
@@ -422,7 +446,6 @@ sub transform_and_set_input {
   $self->input($input);
 }
 
-sub base_validate { }
 
 sub apply_actions {
     my $self = shift;
@@ -706,6 +729,14 @@ sub get_result {
     $result->{errors} = $self->errors if $self->has_errors;
     return $result;
 }
+
+sub convert_full_name {
+    my ( $self, $full_name ) = @_;
+    $full_name =~ s/\.\d+\./_/g;
+    $full_name =~ s/\./_/g;
+    return $full_name;
+}
+
 
 1;
 

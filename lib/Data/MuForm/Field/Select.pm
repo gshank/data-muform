@@ -61,7 +61,7 @@ sub BUILD {
         $self->options_from('build');
     }
     if( $self->form  && ! exists $self->{methods}->{build_options} ) {
-        my $suffix = convert_full_name($self->full_name);
+        my $suffix = $self->convert_full_name($self->full_name);
         my $meth_name = "options_$suffix";
         if ( my $meth = $self->form->can($meth_name) ) {
             my $wrap_sub = sub {
@@ -123,10 +123,6 @@ sub clear_data {
     $self->reset_options_index;
 }
 
-sub field_validate {
-    my $self = shift;
-}
-
 sub _load_options {
     my $self = shift;
 
@@ -167,13 +163,6 @@ sub _load_options {
         $opts = $self->sort_options($opts) if $self->methods->{sort};
         $self->options($opts);
     }
-}
-
-sub convert_full_name {
-    my $full_name = shift;
-    $full_name =~ s/\.\d+\./_/g;
-    $full_name =~ s/\./_/g;
-    return $full_name;
 }
 
 our $class_messages = {

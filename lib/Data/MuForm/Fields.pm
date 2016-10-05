@@ -187,7 +187,7 @@ sub build_fields {
 
     return unless $self->has_fields;
     $self->_order_fields;
-    $self->_install_methods;
+#   $self->_install_methods;
 }
 
 sub process_field_array {
@@ -587,11 +587,12 @@ sub clear_data {
     }
 }
 
+=comment
 sub _install_methods {
     my $self = shift;
     foreach my $field ( $self->all_fields ) {
         next unless $field->form;
-        my $suffix = convert_full_name($field->full_name);
+        my $suffix = $self->convert_full_name($field->full_name);
         foreach my $prefix ( 'validate', 'default' ) {
             my $meth_name = "${prefix}_$suffix";
             if ( my $meth = $self->form->can($meth_name) ) {
@@ -604,6 +605,7 @@ sub _install_methods {
         }
     }
 }
+=cut
 
 sub convert_full_name {
     my $full_name = shift;
