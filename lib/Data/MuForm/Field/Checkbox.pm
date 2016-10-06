@@ -11,6 +11,14 @@ has 'option_wrapper'       => ( is => 'rw' );
 
 sub build_form_element { 'checkbox' }
 
+sub base_render_args {
+    my $self = shift;
+    my $args = $self->next::method(@_);
+    $args->{checkbox_value} = $self->checkbox_value;
+    return $args;
+}
+
+
 sub validate {
     my $self = shift;
 

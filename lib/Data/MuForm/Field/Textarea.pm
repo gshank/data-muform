@@ -7,8 +7,17 @@ use Types::Standard -types;
 
 sub build_form_element { 'textarea' }
 
-has 'cols'    => ( isa => Int, is => 'rw' );
-has 'rows'    => ( isa => Int, is => 'rw' );
+has 'cols'    => ( isa => Int, is => 'rw', default => 40 );
+has 'rows'    => ( isa => Int, is => 'rw', default => 5 );
+
+sub base_render_args {
+    my $self = shift;
+    my $args = $self->next::method(@_);
+    $args->{element}->{cols} = $self->cols if $self->cols;
+    $args->{element}->{rows} = $self->rows if $self->rows;
+    return $args;
+}
+
 
 =head1 Summary
 

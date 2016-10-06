@@ -13,6 +13,8 @@ Base functionality for renderers, including rendering standard form elements.
 
 has 'localizer' => ( is => 'rw' );
 
+has 'html_filter' => ( is => 'rw', default => sub { *default_html_filter } );
+
 sub localize {
    my ( $self, @message ) = @_;
    return $self->localizer->loc_($message[0]);
@@ -126,10 +128,15 @@ sub render_checkbox {
 
   my $name = $rargs->{name};
   my $id = $rargs->{name};
+  my $checkbox_value = $rargs->{checkbox_value};
+  my $fif = $rargs->{fif};
 
   my $out = qq{<checkbox };
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
+  $out .= qq{value="$checkbox_value" };
+  $out .= qq{checked="checked" } if $fif eq $checkbox_value;
+  $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
   $out .= ">";
   return $out;
 }
@@ -142,12 +149,14 @@ sub render_textarea {
   my ( $self, $rargs ) = @_;
 
   my $name = $rargs->{name};
-  my $id = $rargs->{name};
+  my $id = $rargs->{id};
+  my $fif = $rargs->{fif};
 
   my $out = "<textarea ";
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
-  $out .= ">";
+  $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
+  $out .= ">$fif</textarea>";
   return $out;
 }
 
@@ -190,5 +199,14 @@ sub render_errors {
   }
 }
 
+sub default_html_filter {
+    my $string = shift;
+    return '' if (!defined $string);
+    $string =~ s/&/&amp;/g;
+    $string =~ s/</&lt;/g;
+    $string =~ s/>/&gt;/g;
+    $string =~ s/"/&quot;/g;
+    return $string;
+}
 
 1;
