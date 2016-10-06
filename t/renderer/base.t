@@ -43,6 +43,8 @@ $rendered = $form->field('bar')->render_element({ class => 'select 666' });
 $expected = q{
   <select id="bar" name="bar" class="select 666">
     <option value="">-- Choose --</option>
+    <option value="1">one</option>
+    <option value="2">two</option>
   </select>
 };
 is_html( $rendered, $expected, 'got expected output for select element' );

@@ -30,10 +30,14 @@ sub render_field {
   my $form_element = $self->render_element($rargs);
 }
 
+=head2 render_input
+
+=cut
+
 sub render_input {
   my ( $self, $rargs ) = @_;
 
-  my $out = "<input type=\"$rargs->{input_type}\" ";
+  my $out = qq{<input type="$rargs->{input_type}" };
   $out .= qq{name="$rargs->{name}" };
   $out .= qq{id="$rargs->{id}" };
   $out .= qq{value="$rargs->{fif}" };
@@ -41,6 +45,10 @@ sub render_input {
   $out .= ">";
   return $out;
 }
+
+=head2 _render_attrs
+
+=cut
 
 sub _render_attrs {
   my ($self, $attrs, $has_errors) = @_;
@@ -51,6 +59,10 @@ sub _render_attrs {
   }
   return $out;
 }
+
+=head2 _render_class
+
+=cut
 
 sub _render_class {
   my ( $self, $class, $has_errors ) = @_;
@@ -63,6 +75,9 @@ sub _render_class {
   return $out;
 }
 
+=head2 render_select
+
+=cut
 
 sub render_select {
   my ( $self, $rargs ) = @_;
@@ -71,6 +86,7 @@ sub render_select {
   my $out = qq{<select };
   $out .= qq{name="$rargs->{name}" };
   $out .= qq{id="$rargs->{id}" };
+  $out .= qq{multiple="multiple" } if $rargs->{multiple};
   $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
   $out .= ">";
 
@@ -80,9 +96,20 @@ sub render_select {
     $out .= qq{\n<option value="">$label</option>};
   }
 
+  # render options
+  my $options = $rargs->{options};
+  foreach my $option ( @$options ) {
+    $out .= qq{<option value="$option->{value}">$option->{label}</option>};
+  }
+
   # end of select
   $out .= "</select>\n";
+  return $out;
 }
+
+=head2 render_checkbox
+
+=cut
 
 sub render_checkbox {
   my ( $self, $rargs ) = @_;
@@ -90,9 +117,13 @@ sub render_checkbox {
   my $out = qq{<checkbox };
   $out .= qq{name="$rargs->{name}" };
   $out .= qq{id="$rargs->{id}" };
-  $out .= qq{multiple="multiple" } if $rargs->{multiple};
   $out .= ">";
+  return $out;
 }
+
+=head2 render_textarea
+
+=cut
 
 sub render_textarea {
   my ( $self, $rargs ) = @_;
@@ -101,7 +132,12 @@ sub render_textarea {
   $out .= qq{name="$rargs->{name}" };
   $out .= qq{id="$rargs->{id}" };
   $out .= ">";
+  return $out;
 }
+
+=head2 render_element
+
+=cut
 
 sub render_element {
   my ( $self, $rargs ) = @_;
@@ -109,6 +145,32 @@ sub render_element {
   my $form_element = $rargs->{form_element};
   my $meth = "render_$form_element";
   return $self->$meth($rargs);
+}
+
+=head2 render_label
+
+=cut
+
+sub render_label {
+  my ( $self, $rargs ) = @_;
+
+  my $label = $self->localize($rargs->{label});
+  my $out = qq{<label for="$rargs->{id}">$label</label>};
+  return $out
+}
+
+=head2 render_errors
+
+=cut
+
+sub render_errors {
+  my ( $self, $rargs ) = @_;
+
+  my $errors = $rargs->{errors} || [];
+  my $out = '';
+  foreach my $error (@$errors) {
+    $out .= qq{<span>$error</span>};
+  }
 }
 
 
