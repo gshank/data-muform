@@ -23,6 +23,7 @@ use_ok('Data::MuForm::Renderer::Standard');
     has_field 'jax' => ( type => 'Checkbox', checkbox_value => 'yes' );
     has_field 'sol' => ( type => 'Textarea', cols => 50, rows => 3 );
 
+    has_field 'submitted' => ( type => 'Submit', value => 'Save' );
 }
 
 my $form = MyApp::Form::Test->new;
@@ -69,5 +70,12 @@ $expected = q{
   <textarea id="sol" name="sol" class="the end" cols="50" rows="3">Some text</textarea>
 };
 is_html( $rendered, $expected, 'got expected output for textarea element' );
+
+# submit field
+$rendered = $form->field('submitted')->render_element({ class => ['h23', 'bye' ] });
+$expected = q{
+  <input type="submit" name="submitted" id="submitted" class="h23 bye" value="Save">
+};
+is_html( $rendered, $expected, 'got expected output for submit element' );
 
 done_testing;
