@@ -98,11 +98,13 @@ sub all_repeatable_fields {
 #========= Rendering ==========
 has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
 has 'action' => ( is => 'rw' );
-has 'renderer' => ( is => 'rw', builder => 'build_renderer' );
+has 'renderer' => ( is => 'rw', lazy => 1, builder => 'build_renderer' );
 sub build_renderer {
     my $self = shift;
     require Data::MuForm::Renderer::Standard;
-    my $renderer = Data::MuForm::Renderer::Standard->new;
+    my $renderer = Data::MuForm::Renderer::Standard->new( localizer => $self->localiser );
+$DB::single=1;
+    return $renderer;
 }
 
 #========= Errors ==========
@@ -150,7 +152,7 @@ sub errors_by_name {
 
 has 'language' => ( is => 'rw', builder => 'build_language' );
 sub build_language { 'en' }
-has 'localizer' => ( is => 'rw', builder => 'build_localizer' );
+has 'localizer' => ( is => 'rw', lazy => 1, builder => 'build_localizer' );
 sub build_localizer {
     my $self = shift;
     return Data::MuForm::Localizer->new(

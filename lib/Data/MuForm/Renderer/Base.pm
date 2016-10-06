@@ -1,6 +1,24 @@
 package Data::MuForm::Renderer::Base;
 use Moo;
 
+=head1 NAME
+
+Data::MuForm::Renderer::Base
+
+=head1 DESCRIPTION
+
+Base functionality for renderers, including rendering standard form elements.
+
+=cut
+
+has 'localizer' => ( is => 'rw' );
+
+sub localize {
+   my ( $self, @message ) = @_;
+   return $self->localizer->loc_($message[0]);
+}
+
+
 sub render {
     my $self = shift;
 }
@@ -15,17 +33,23 @@ sub render_field {
 sub render_input {
   my ( $self, $rargs ) = @_;
 
-  my $out = qq{<input type="$rargs->{input_type}" };
+  my $out = "<input type=\"$rargs->{input_type}\" ";
   $out .= qq{name="$rargs->{name}" };
   $out .= qq{id="$rargs->{id}" };
   $out .= qq{value="$rargs->{fif}" };
-  my $attrs = $rargs->{element};
-  $out .= $self->_render_class( $attrs->{class}, scalar @{$rargs->{errors}} );
+  $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
+  $out .= ">";
+  return $out;
+}
+
+sub _render_attrs {
+  my ($self, $attrs, $has_errors) = @_;
+  my $out = $self->_render_class( $attrs->{class}, $has_errors);
   foreach my $attr ( keys %$attrs ) {
     next if $attr eq 'class';  # handled separately
     $out .= qq{$attr="$attrs->{$attr}" };
   }
-  $out .= ">";
+  return $out;
 }
 
 sub _render_class {
@@ -43,18 +67,30 @@ sub _render_class {
 sub render_select {
   my ( $self, $rargs ) = @_;
 
+  # beginning of select
   my $out = qq{<select };
   $out .= qq{name="$rargs->{name}" };
   $out .= qq{id="$rargs->{id}" };
+  $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
   $out .= ">";
+
+  # render empty_select
+  if ( exists $rargs->{empty_select} ) {
+    my $label = $self->localize($rargs->{empty_select});
+    $out .= qq{\n<option value="">$label</option>};
+  }
+
+  # end of select
+  $out .= "</select>\n";
 }
 
 sub render_checkbox {
   my ( $self, $rargs ) = @_;
 
-  my $out = "<checkbox ";
+  my $out = qq{<checkbox };
   $out .= qq{name="$rargs->{name}" };
   $out .= qq{id="$rargs->{id}" };
+  $out .= qq{multiple="multiple" } if $rargs->{multiple};
   $out .= ">";
 }
 

@@ -170,6 +170,16 @@ our $class_messages = {
     'select_invalid_value' => '\'{value}\' is not a valid value',
 };
 
+sub base_render_args {
+    my $self = shift;
+    my $args = $self->next::method(@_);
+    $args->{multiple} = $self->multiple;
+    $args->{options} = $self->options;
+    $args->{empty_select} = $self->empty_select;
+    return $args;
+}
+
+
 sub get_class_messages  {
     my $self = shift;
     return {

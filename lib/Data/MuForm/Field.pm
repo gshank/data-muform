@@ -129,6 +129,8 @@ sub base_render_args {
     id => $self->id,
     label => $self->loc_label,
     required => $self->required,
+    errors => $self->errors || [],
+    fif => $self->fif,
   };
   return $args;
 }
@@ -136,21 +138,19 @@ sub base_render_args {
 has 'render_args' => ( is => 'rw', lazy => 1, isa => HashRef, builder => 'build_render_args' );
 sub build_render_args {{}}
 has 'renderer' => (
-  is => 'rw',
+  is => 'rw', lazy => 1,
   builder => 'build_renderer',
 );
 sub build_renderer {
   my $self = shift;
   require Data::MuForm::Renderer::Standard;
-  return Data::MuForm::Renderer::Standard->new;
+  return Data::MuForm::Renderer::Standard->new( localizer => $self->localizer );
 }
 sub get_render_args {
   my ( $self, %args ) = @_;
   my $render_args = {
     %{ $self->base_render_args },
     %{ $self->render_args },
-    errors => $self->errors,
-    fif => $self->fif,
   };
   $render_args = merge( $render_args, \%args );
   return $render_args;
@@ -262,7 +262,7 @@ sub full_accessor {
 # Localization
 #====================
 
-sub _localize {
+sub localize {
    my ( $self, @message ) = @_;
    return $self->localizer->loc_($message[0]);
 }
@@ -295,7 +295,7 @@ sub build_label {
 }
 sub loc_label {
     my $self = shift;
-    return $self->_localize($self->label);
+    return $self->localize($self->label);
 }
 has 'form_element' => ( is => 'rw', lazy => 1, builder => 'build_form_element' );
 sub build_form_element { 'input' }
