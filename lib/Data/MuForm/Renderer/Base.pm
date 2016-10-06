@@ -20,23 +20,32 @@ sub render_input {
   $out .= qq{id="$rargs->{id}" };
   $out .= qq{value="$rargs->{fif}" };
   my $attrs = $rargs->{element};
-  my $class = $attrs->{class};
-  $class = [split(' ', $class)] unless ref $class eq 'ARRAY';
-  push @$class, 'error' if scalar @{$rargs->{errors}};
-  my $classes = join(' ', @$class);
-  $out .= qq{class="$classes" };
+  $out .= $self->_render_class( $attrs->{class}, scalar @{$rargs->{errors}} );
   foreach my $attr ( keys %$attrs ) {
-    next if $attr eq 'class';
+    next if $attr eq 'class';  # handled separately
     $out .= qq{$attr="$attrs->{$attr}" };
   }
   $out .= ">";
+}
+
+sub _render_class {
+  my ( $self, $class, $has_errors ) = @_;
+
+  $class ||= [];
+  $class = [split(' ', $class)] unless ref $class eq 'ARRAY';
+  push @$class, 'error' if $has_errors;
+  my $classes = join(' ', @$class);
+  my $out = qq{class="$classes" };
+  return $out;
 }
 
 
 sub render_select {
   my ( $self, $rargs ) = @_;
 
-  my $out = "<select ";
+  my $out = qq{<select };
+  $out .= qq{name="$rargs->{name}" };
+  $out .= qq{id="$rargs->{id}" };
   $out .= ">";
 }
 
@@ -44,6 +53,8 @@ sub render_checkbox {
   my ( $self, $rargs ) = @_;
 
   my $out = "<checkbox ";
+  $out .= qq{name="$rargs->{name}" };
+  $out .= qq{id="$rargs->{id}" };
   $out .= ">";
 }
 
@@ -51,6 +62,8 @@ sub render_textarea {
   my ( $self, $rargs ) = @_;
 
   my $out = "<textarea ";
+  $out .= qq{name="$rargs->{name}" };
+  $out .= qq{id="$rargs->{id}" };
   $out .= ">";
 }
 

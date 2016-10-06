@@ -22,6 +22,15 @@ sub get_class_messages {
     return $messages;
 }
 
+sub base_render_args {
+    my $self = shift;
+    my $args = $self->next::method(@_);
+    $args->{element}->{size} = $self->size if $self->size;
+    $args->{element}->{maxlength} = $self->maxlength if $self->maxlength;
+    $args->{element}->{minlength} = $self->minlenght if $self->minlength;
+    return $args;
+}
+
 sub validate {
     my $field = shift;
 

@@ -119,18 +119,20 @@ sub is_form {0}
 # Rendering
 #=================
 has 'html5_type_attr' => ( is => 'rw' );
-has 'base_render_args' => ( is => 'rw', lazy =>1, isa => HashRef, builder => 'build_base_render_args' );
-sub build_base_render_args {
+sub base_render_args {
   my $self = shift;
-  return {
+  my $args = {
     form => $self->form,
     name => $self->html_name,
     form_element => $self->form_element,
     input_type => $self->input_type,
     id => $self->id,
     label => $self->loc_label,
+    required => $self->required,
   };
+  return $args;
 }
+
 has 'render_args' => ( is => 'rw', lazy => 1, isa => HashRef, builder => 'build_render_args' );
 sub build_render_args {{}}
 has 'renderer' => (
