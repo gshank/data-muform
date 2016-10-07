@@ -52,6 +52,9 @@ sub build_value_when_empty {
     return [] if $self->multiple;
     return undef;
 }
+has 'label_column' => ( is => 'rw', default => 'name' );
+has 'active_column' => ( is => 'rw', default => 'active' );
+has 'sort_column' => ( is => 'rw' );
 
 
 sub BUILD {
