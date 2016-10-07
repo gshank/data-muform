@@ -114,6 +114,7 @@ has 'not_nullable' => ( is => 'rw', isa => Bool );
 sub is_repeatable {}
 sub is_compound {}
 sub is_form {0}
+sub no_fif {0}
 
 #=================
 # Rendering

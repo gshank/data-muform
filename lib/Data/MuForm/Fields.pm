@@ -136,7 +136,7 @@ sub fields_fif {
 
     my %params;
     foreach my $field ( $self->all_sorted_fields ) {
-        next if ( ! $field->is_active || $field->password );
+        next if ( ! $field->is_active || $field->password || $field->no_fif );
        #next unless $field->has_input || $field->has_value;
         my $fif = $field->fif;
         next if ( !defined $fif || (ref $fif eq 'ARRAY' && ! scalar @{$fif} ) );

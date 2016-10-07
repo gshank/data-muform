@@ -1,0 +1,76 @@
+package Data::MuForm::Manual::FormHandlerDiff;
+
+=head1 DESCRIPTION
+
+This documents the differences between FormHandler and MuForm, in order to
+assist converting forms or deciding which package to use.
+
+Note: the rendering is entirely different, so much that there's no point in
+documenting the differences here. See the rendering documentation.
+
+Localization now uses a gettext style .po file and a gettext type localizer.
+Users can supply their own localizer as long as it can use the translation
+files.
+
+Added 'check' method for validation, which doesn't do 'update_model'.
+
+Renamed 'field_name_space' to 'field_namespace'
+
+Added 'data' alias for 'params', for better naming when doing simple validation
+
+Standardized returns from attributes to arrayref, instead of array. If an array return
+is available it will be in the 'all_' version. The important ones are 'options' and 'fields'.
+A field 'options' returns an arrayref of options. 'all_options' returns an array. The 'fields'
+attribute returns an arrayref of fields, 'all_fields' returns an array.
+
+The names of the validation methods used in custom fields have changed. Use 'base_validate'
+instead of _inner_validate.
+
+The trim method is a separate coderef and is not added to the apply actions. Needs to
+be defined as a simple coderef instead of an apply-style action.
+
+The active => [] and inactive => [] no longer have a permanent build (on new) effect.
+Do in your own form code if you want this. They still work the same on ->process.
+
+The 'posted' flag has been renamed to 'submitted', because you also need on a 'get'. Also
+a params hashref with no field named keys will not need the submitted flag.
+
+The 'active' and 'inactive' flags are implemented slightly differently, but shouldn't affect
+field definitions.
+
+Removed 'use_fields_for_input_without_param'. Can be implemented in other ways.
+
+Removed flag 'use_init_obj_when_no_accessor_in_item'. This should happen automatically now.
+
+Removed flag 'use_init_obj_over_item'. Just use init_object in your process call instead.
+
+Removed flag 'use_defaults_over_obj'. Use a transform instead.
+
+Removed 'no_update' flag on form. Use 'check' method instead.
+
+Removed 'update_field_list'. Can be implemented easily via user code if needed.
+
+Removed 'defaults' on 'process'. Use init_object instead.
+
+The inflate/deflate transforms have been renamed: 'inflate_method' = 'transform_input_to_value',
+'deflate_method' = 'tranform_value_to_fif', 'inflate_default_method' = 'transform_default_to_value',
+'deflate_value_method' = 'transform_value_after_validate'. Added new transform: 'transform_param_to_input'.
+
+Removed 'deflation'.
+
+Removed 'missing'.
+
+Varous methods that could be set in a field definition have been moved into a 'methods' hashref:
+'build_id', 'build_options', 'build_label', 'validate', 'default'.
+
+TextArea field renamed to Textarea for consistency.
+
+A number of trivial fields are no longer supplied by the distribution. If you need these fields
+it should be pretty easy to create your own. Some fields not supplied: Hour, Minute, Month,
+MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Duration, DateTime,
+Password, PasswordConf, IntRange.
+
+
+=cut
+
+1;

@@ -1,0 +1,69 @@
+package Data::MuForm::Manual;
+
+=head1 DESCRIPTION
+
+This is the Data::MuForm manual.
+
+Data::MuForm performs validation and is a framework for processing
+forms.
+
+=head1 SECTIONS
+
+=head2 L<Data::MuForm::Manual::FormHandlerDiff>
+
+Some of the differences between FormHandler and MuForm.
+
+=head2 L<Data::MuForm::Manual::Intro>
+
+Creating MuForm validators or forms and interfacing them
+with your controllers.
+
+=head2 L<Data::MuForm::Manual::Fields>
+
+Organized list of MuForm fields, with links to specific
+documentation.
+
+=head2 L<Data::MuForm::Manual::Defaults>
+
+Description of the various ways of setting defaults.
+
+=head2 L<Data::MuForm::Manual::Transforms>
+
+Transformation of input and value attributes at various points in
+the validation and update process.
+
+=head2 L<Data::MuForm::Manual::Validation>
+
+Validation of fields
+
+=head2 L<Data::MuForm::Manual::Errors>
+
+Errors: setting them, getting them.
+
+=head2 L<Data::MuForm::Manual::Rendering>
+
+How to render and write your own custom rendering code.
+
+=head2 L<Data::MuForm::Manual::Database>
+
+Issues and setup for database forms.
+
+=head2 L<Data::MuForm::Manual::Tutorial>
+
+Builds on the Catalyst tutorial. Step-by-step guide.
+
+=head2 L<Data::MuForm::Manual::Testing>
+
+Test your forms
+
+=head2 L<Data::MuForm::Manual::Cookbook>
+
+'Howto' recipes
+
+=head2 L<Data::MuForm::Manual::Reference>
+
+Quick reference of MuForm interface
+
+=cut
+
+1;
