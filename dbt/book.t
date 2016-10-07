@@ -57,18 +57,16 @@ is( $num_genres, 2, 'multiple select list updated ok');
 is( $form->field('format')->value, 2, 'get value for format' );
 
 $params->{genres} = 2;
-$DB::single=1;
 ok( $form->process( item => $book, params => $params), 'handle one value for multiple select' );
 is_deeply( $form->field('genres')->value, [2], 'right value for genres' );
 
-=comment
-my $id = $book->id;
-
 $params->{authors} = [];
 $params->{genres} = [2,4];
-$form->process($params);
+$form->process( item => $book, params => $params);
 
-is_deeply( $form->field('authors')->value, [], 'author value right in form');
+is( $form->field('authors')->filled_from, 'params', 'authors filled from params' );
+is_deeply( $form->field('authors')->value, [], 'authors value right in form');
+
 is( $form->field('publisher')->value, 'EreWhon Publishing', 'right publisher');
 
 my $value_hash = { %{$params},
@@ -93,6 +91,7 @@ ok( $form, 'create form from db object');
 my $genres_field = $form->field('genres');
 is_deeply( sort $genres_field->value, [2, 4], 'value of multiple field is correct');
 
+=comment
 my $bad_2 = {
     'title' => "Another Silly Test Book",
     'authors' => [6],

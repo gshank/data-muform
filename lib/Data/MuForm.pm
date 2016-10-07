@@ -103,7 +103,6 @@ sub build_renderer {
     my $self = shift;
     require Data::MuForm::Renderer::Standard;
     my $renderer = Data::MuForm::Renderer::Standard->new( localizer => $self->localiser );
-$DB::single=1;
     return $renderer;
 }
 

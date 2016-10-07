@@ -42,18 +42,11 @@ has 'type' => ( is => 'ro', required => 1, default => 'Text' );
 has 'default' => ( is => 'rw' );
 has 'input' => ( is => 'rw', predicate => 'has_input', clearer => 'clear_input' );
 has 'input_without_param' => ( is => 'rw', predicate => 'has_input_without_param' );
-has 'value' => ( is => 'rw', predicate => '_has_value', clearer => 'clear_value' );
-# TODO: put this in to fix tags, but it didn't help. Is this correct?
-sub has_value {
-  my $self = shift;
-  return 0 unless $self->_has_value;
-  return 0 if ( ref $self->value eq 'ARRAY' && scalar @{$self->value} == 0 );
-  return 0 if ( ref $self->value eq 'HASH' && scalar( keys %{$self->value} ) == 0 );
-  return 1;
-}
+has 'value' => ( is => 'rw', predicate => 'has_value', clearer => 'clear_value' );
 has 'init_value' => ( is => 'rw', predicate => 'has_init_value', clearer => 'clear_init_value' );
 has 'no_value_if_empty' => ( is => 'rw', isa => Bool );
 has 'input_param' => ( is => 'rw', isa => Str );
+has 'filled_from' => ( is => 'rw', clearer => 'clear_filled_from' );
 has 'password' => ( is => 'rw', isa => Bool, default => 0 );
 has 'accessor' => ( is => 'rw', lazy => 1, builder => 'build_accessor' );
 sub build_accessor {
@@ -626,6 +619,7 @@ sub match_when {
 sub fill_from_params {
     my ( $self, $input, $exists ) = @_;
 
+    $self->filled_from('params');
     if ( $exists ) {
         $self->transform_and_set_input($input);
     }
@@ -640,6 +634,7 @@ sub fill_from_params {
 sub fill_from_object {
     my ( $self, $value ) = @_;
 
+    $self->filled_from('object');
     $self->value($value);
 
     if ( $self->form ) {
@@ -657,6 +652,7 @@ sub fill_from_object {
 sub fill_from_fields {
     my ( $self, ) = @_;
 
+    $self->filled_from('fields');
     if ( $self->disabled && $self->has_init_value ) {
         $self->value($self->init_value);
     }
@@ -681,6 +677,7 @@ sub clear_data {
     $self->clear_value;
     $self->clear_errors;
     $self->_clear_active;
+    $self->clear_filled_from;
 }
 
 sub get_default_value {

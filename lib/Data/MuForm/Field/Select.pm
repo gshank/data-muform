@@ -3,6 +3,7 @@ use Moo;
 extends 'Data::MuForm::Field';
 use Types::Standard -types;
 use HTML::Entities;
+use Data::Dump ('pp');
 
 sub build_form_element { 'select' }
 
@@ -30,28 +31,23 @@ has 'options_from' => ( isa => Str, is => 'rw', default => 'none' );
 has 'do_not_reload' => ( isa => Bool, is => 'ro' );
 has 'no_option_validation' => ( isa => Bool, is => 'rw' );
 
-has 'options_index' => ( is => 'rw', isa => Num, default => 0 );
-sub inc_options_index { $_[0]->{options_index}++; }
-sub dec_options_index { $_[0]->{options_index}--; }
-sub reset_options_index { $_[0]->{options_index} = 0; }
-
-has 'multiple' => ( is => 'rw', isa => Bool, default => 0 );
+has 'multiple' => ( is => 'ro', isa => Bool, default => 0 );
 has 'empty_select' => ( is => 'rw', isa => Str );
-has '+input_without_param' => ( lazy => 1, builder => 'build_input_without_param' );
-sub build_input_without_param {
-    my $self = shift;
-    if( $self->multiple ) {
-        $self->not_nullable(1);
-        return [];
+
+# add trigger to 'value' so we can enforce arrayref value for multiple
+has '+value' => ( trigger => 1 );
+sub _trigger_value {
+    my ( $self, $value ) = @_;
+    return unless $self->multiple;
+    if (!defined $value || $value eq ''){
+        $value = [];
     }
-    return '';
+    else {
+       $value = ref $value eq 'ARRAY' ? $value : [$value];
+    }
+    $self->{value} = $value;
 }
-has 'value_when_empty' => ( is => 'ro', lazy => 1, builder => 'build_value_when_empty' );
-sub build_value_when_empty {
-    my $self = shift;
-    return [] if $self->multiple;
-    return undef;
-}
+
 has 'label_column' => ( is => 'rw', default => 'name' );
 has 'active_column' => ( is => 'rw', default => 'active' );
 has 'sort_column' => ( is => 'rw' );
@@ -79,7 +75,6 @@ sub BUILD {
 
 sub fill_from_params {
     my ( $self, $input, $exists ) = @_;
-
     $input = ref $input eq 'ARRAY' ? $input : [$input]
         if $self->multiple;
     $self->next::method( $input, $exists );
@@ -102,28 +97,6 @@ sub fill_from_field {
     $self->_load_options;
     $self->value($self->default)
         if( defined $self->default && not $self->has_value );
-}
-
-=comment
-# this doesn't work (two different value attributes combined).
-# TODO: look for better ways to arrayref a multiple value
-before 'value' => sub {
-    my $self  = shift;
-
-    #return undef unless $self->has_result;
-    my $value = $self->value;
-    if( $self->multiple ) {
-        if ( !defined $value || $value eq '' || ( ref $value eq 'ARRAY' && scalar @$value == 0 ) ) {
-            $self->value( $self->value_when_empty );
-        }
-    }
-};
-=cut
-
-sub clear_data {
-    my $self = shift;
-    $self->next::method();
-    $self->reset_options_index;
 }
 
 sub _load_options {

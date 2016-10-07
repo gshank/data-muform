@@ -67,16 +67,6 @@ is( $field->num_options, 3, 'right number of options');
        );
    }
 
-=comment
-   has 'options_build_attr' => ( is => 'ro', traits => ['Array'], lazy_build => 1 );
-   sub _build_options_build_attr {
-       return [
-           1 => 'testing',
-           2 => 'moose',
-           3 => 'attr builder',
-       ];
-   }
-=cut
 }
 
 
@@ -105,18 +95,6 @@ $field_options = $form->field('fruit')->options;
 is_deeply( $field_options, $fruit_options,
     'get options for fruit' );
 
-=comment
-my $build_attr_options = [ {'label' => 'testing',
-       'value' => 1 },
-      {'label' => 'moose',
-       'value' => 2 },
-      {'label' => 'attr builder',
-       'value' => 3 } ];
-$field_options = $form->field('build_attr')->options;
-is_deeply( $field_options, $build_attr_options,
-    'get options for build_attr' );
-=cut
-
 is( $form->field('fruit')->value, 2, 'initial value ok');
 
 $form->process( params => {},
@@ -127,11 +105,6 @@ is_deeply( $field_options, $veg_options,
 $field_options = $form->field('fruit')->options;
 is_deeply( $field_options, $fruit_options,
     'get options for fruit after process' );
-=comment
-$field_options = $form->field('build_attr')->options;
-is_deeply( $field_options, $build_attr_options,
-    'get options for fruit after process' );
-=cut
 
 my $params = {
    fruit => 2,
@@ -145,7 +118,6 @@ is_deeply( $form->field('vegetables')->value, [2,4], 'vegetables value is correc
 
 is_deeply( $form->fif, { fruit => 2, vegetables => [2, 4], empty => ['test'], test_field => '', build_attr => '' },
     'fif is correct');
-#is_deeply( $form->values, { fruit => 2, vegetables => [2, 4], empty => ['test'], build_attr => undef },
 is_deeply( $form->values, { fruit => 2, vegetables => [2, 4], empty => ['test'] },
     'values are correct');
 

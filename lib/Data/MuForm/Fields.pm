@@ -26,7 +26,6 @@ sub values { $_[0]->value }
 has 'init_value' => ( is => 'rw', clearer => 'clear_init_value' );
 has 'input' => ( is => 'rw', clearer => 'clear_input' );
 has 'filled_from' => ( is => 'rw', clearer => 'clear_filled_from' );
-
 has 'meta_fields' => ( is => 'rw' );
 has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_field_list' );
 sub build_field_list {[]}
@@ -597,6 +596,7 @@ sub clear_data {
     # TODO - better way?
     $self->_clear_active unless $self->is_form;;
     $self->clear_error_fields;
+    $self->clear_filled_from;
     foreach my $field ( $self->all_fields ) {
         $field->clear_data;
     }

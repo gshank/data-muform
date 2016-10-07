@@ -70,6 +70,8 @@ it should be pretty easy to create your own. Some fields not supplied: Hour, Min
 MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Duration, DateTime,
 Password, PasswordConf, IntRange.
 
+DBIC Model: the 'item' is now cleared on process like the other attributes. This is probably mainly
+different in tests.
 
 =cut
 
