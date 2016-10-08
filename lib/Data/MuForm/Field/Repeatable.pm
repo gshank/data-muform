@@ -110,7 +110,7 @@ rows.
 
 =item num_extra
 
-When the field results are built from an existing object (model or init_object)
+When the field results are built from an existing object (model or init_values)
 an additional number of repeatable elements will be created equal to this
 number. Default is 0.
 
@@ -300,7 +300,7 @@ sub _setup_for_js {
         { index => $self->index, html => $rendered, level => $index_level } );
 }
 
-# this is called when there is an init_object or a db model with values
+# this is called when there is an init_values or a db model with values
 sub fill_from_object {
     my ( $self, $values ) = @_;
 

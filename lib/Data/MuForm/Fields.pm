@@ -442,8 +442,8 @@ sub fill_from_object {
     if ( $self->form &&
         $self->form->fill_from_object_source &&
         $self->form->fill_from_object_source eq 'model' &&
-        $self->form->has_init_object ) {
-        $init_obj = $self->form->init_object;
+        $self->form->has_init_values ) {
+        $init_obj = $self->form->init_values;
     }
     for my $field ( $self->all_sorted_fields ) {
         next if ! $field->is_active;
@@ -453,7 +453,7 @@ sub fill_from_object {
 
             if ($init_obj) {
                 # if we're using a model, look for accessor not found in obj
-                # in the init_object
+                # in the init_values
                 my @names = split( /\./, $field->full_name );
                 my $init_obj_value = $self->find_sub_obj( $init_obj, \@names );
                 if ( defined $init_obj_value ) {
@@ -476,7 +476,7 @@ sub fill_from_object {
     return;
 }
 
-# for when there are no params and no init_object
+# for when there are no params and no init_values
 sub fill_from_fields {
     my ( $self ) = @_;
 
@@ -551,14 +551,14 @@ sub _get_value {
     # this is different than FH, I'm unsure why;
     # there was a problem with a default [1,3] ending up as [[1,3]]
     # in t/field_setup/default.t because of switching to getting
-    # non-model defaults from init_object
+    # non-model defaults from init_values
     # used to be:
     #     if( $field->has_flag('multiple')) {
     #         $value = scalar @values == 1 && ! defined $values[0] ? [] : \@values;
     #     }
     # maybe because of 'transform_default_to_value'? But defaults have always been
     # able to be [1,3] for multiples. Accidentally worked before? Well, using
-    # init_object for missing attributes was never tested well.
+    # init_values for missing attributes was never tested well.
     if( $field->has_flag('multiple')) {
         if ( scalar @values == 1 && ! defined $values[0] ) {
             $value = [];

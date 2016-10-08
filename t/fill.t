@@ -31,7 +31,7 @@ $form->process( params => $params );
 is( $form->filled_from, 'params', 'looking at param filled' );
 
 my $init_obj = { foo => 'three', bar => 'four' };
-$form->process( init_object => $init_obj, params => {} );
+$form->process( init_values => $init_obj, params => {} );
 is( $form->filled_from, 'object', 'looking at object filled' );
 
 

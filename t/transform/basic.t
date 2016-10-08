@@ -6,12 +6,12 @@ use Test::More;
     # A 'transform_value_to_fif' method changes the format of the fill-in-form string
 
     #    These two are "conveniences" for munging data passed in and out of a form
-    #    The same effect could be achieved by modifying the value in the init_object or model
+    #    The same effect could be achieved by modifying the value in the init_values or model
     #        before passing it in, and modifying it once returned, so it's primarily
     #        useful for database rows.
     #
     # A 'transform_value_to_fif' method changes the 'value' retrieved from a default source
-    #     (default, init_object, model)
+    #     (default, init_values, model)
     # A 'transform_value_after_validation'  method changes the format of the value available after validation
 
 
@@ -102,7 +102,7 @@ use Test::More;
   ok( $form );
 
   my $params = { foo => 'foo', bar => 'bar' };
-  $form->process( params => {}, init_object => { foo => 'foo', bar => 'bar' } );
+  $form->process( params => {}, init_values => { foo => 'foo', bar => 'bar' } );
 
   is ( $form->field('foo')->value, 'foo transformed', 'foo value was transformed' );
   is ( $form->field('foo')->fif, 'foo transformed', 'foo fif was transformed' );
@@ -161,10 +161,10 @@ use Test::More;
     my $form = Test::Form1->new;
     my $init_obj = { foo => 'initialfoo' };
     my $params = { foo => 'fromparams' };
-    $form->process( init_object => $init_obj, params => {} );
-    is_deeply( $form->fif, $init_obj, 'fif matches init_object' );
-    is_deeply( $form->value, $init_obj, 'value matches init_object' );
-    $form->process( init_object => $init_obj, params => $params );
+    $form->process( init_values => $init_obj, params => {} );
+    is_deeply( $form->fif, $init_obj, 'fif matches init_values' );
+    is_deeply( $form->value, $init_obj, 'value matches init_values' );
+    $form->process( init_values => $init_obj, params => $params );
     ok( $form->validated, 'form validated' );
     is_deeply( $form->fif, $params, 'fif matches params' );
     is_deeply( $form->value, $params, 'value matches params' );
@@ -189,10 +189,10 @@ use Test::More;
     my $form = Test::Form2->new;
     my $init_obj = { foo => 'initialfoo' };
     my $params = { foo => 'fromparams' };
-    $form->process( init_object => $init_obj, params => {} );
-    is_deeply( $form->fif, $init_obj, 'fif matches init_object' );
-    is_deeply( $form->value, $init_obj, 'value matches init_object' );
-    $form->process( init_object => $init_obj, params => $params );
+    $form->process( init_values => $init_obj, params => {} );
+    is_deeply( $form->fif, $init_obj, 'fif matches init_values' );
+    is_deeply( $form->value, $init_obj, 'value matches init_values' );
+    $form->process( init_values => $init_obj, params => $params );
     ok( $form->validated, 'form validated' );
     is_deeply( $form->fif, $params, 'fif matches params' );
     is_deeply( $form->value, { foo => 'inflatedfoo' }, 'value is inflated' );
@@ -216,10 +216,10 @@ use Test::More;
     my $form = Test::Form3->new;
     my $init_obj = { foo => 'initialfoo' };
     my $params = { foo => 'fromparams' };
-    $form->process( init_object => $init_obj, params => {} );
+    $form->process( init_values => $init_obj, params => {} );
     is_deeply( $form->fif, { foo => 'deflatedfoo' }, 'fif is deflated foo' );
     is_deeply( $form->value, { foo => 'initialfoo' }, 'value is initial foo' );
-    $form->process( init_object => $init_obj, params => $params );
+    $form->process( init_values => $init_obj, params => $params );
     ok( $form->validated, 'form validated' );
     is_deeply( $form->fif, $params, 'fif matches params' );
     is_deeply( $form->value, $params, 'value matches params' );
@@ -246,10 +246,10 @@ use Test::More;
     my $form = Test::Form5->new;
     my $init_obj = { foo => 'initialfoo' };
     my $params = { foo => 'fromparams' };
-    $form->process( init_object => $init_obj, params => {} );
+    $form->process( init_values => $init_obj, params => {} );
     is_deeply( $form->fif, { foo => 'deflatedfoo' }, 'fif is deflated' );
     is_deeply( $form->value, $init_obj, 'value is initial' );
-    $form->process( init_object => $init_obj, params => $params );
+    $form->process( init_values => $init_obj, params => $params );
     ok( $form->validated, 'form validated' );
     is_deeply( $form->fif, $params, 'fif matches params' );
     is_deeply( $form->value, { foo => 'inflatedfoo' }, 'value is inflated' );
@@ -272,10 +272,10 @@ use Test::More;
     my $form = Test::Form6->new;
     my $init_obj = { foo => 'initialfoo' };
     my $params = { foo => 'fromparams' };
-    $form->process( init_object => $init_obj, params => {} );
+    $form->process( init_values => $init_obj, params => {} );
     is_deeply( $form->fif, { foo => 'infl_def_foo' }, 'fif matches inflate_default' );
-    is_deeply( $form->value, { foo => 'infl_def_foo' }, 'value matches init_object' );
-    $form->process( init_object => $init_obj, params => $params );
+    is_deeply( $form->value, { foo => 'infl_def_foo' }, 'value matches init_values' );
+    $form->process( init_values => $init_obj, params => $params );
     ok( $form->validated, 'form validated' );
     is_deeply( $form->fif, $params, 'fif matches params' );
     is_deeply( $form->value, $params, 'value matches params' );
@@ -299,10 +299,10 @@ use Test::More;
     my $form = Test::Form7->new;
     my $init_obj = { foo => 'initialfoo' };
     my $params = { foo => 'fromparams' };
-    $form->process( init_object => $init_obj, params => {} );
-    is_deeply( $form->fif, $init_obj, 'fif matches init_object' );
-    is_deeply( $form->value, $init_obj, 'value matches init_object' );
-    $form->process( init_object => $init_obj, params => $params );
+    $form->process( init_values => $init_obj, params => {} );
+    is_deeply( $form->fif, $init_obj, 'fif matches init_values' );
+    is_deeply( $form->value, $init_obj, 'value matches init_values' );
+    $form->process( init_values => $init_obj, params => $params );
     ok( $form->validated, 'form validated' );
     is_deeply( $form->fif, $params, 'fif matches params' );
     is_deeply( $form->value, { foo => 'defl_val_foo' }, 'value is deflated by deflate_value' );
@@ -327,10 +327,10 @@ use Test::More;
     my $form = Test::Form8->new;
     my $init_obj = { foo => 'initialfoo' };
     my $params = { foo => 'fromparams' };
-    $form->process( init_object => $init_obj, params => {} );
-    is_deeply( $form->fif, { foo => 'infl_def_foo' }, 'fif matches init_object' );
-    is_deeply( $form->value, { foo => 'infl_def_foo' }, 'value matches init_object' );
-    $form->process( init_object => $init_obj, params => $params );
+    $form->process( init_values => $init_obj, params => {} );
+    is_deeply( $form->fif, { foo => 'infl_def_foo' }, 'fif matches init_values' );
+    is_deeply( $form->value, { foo => 'infl_def_foo' }, 'value matches init_values' );
+    $form->process( init_values => $init_obj, params => $params );
     ok( $form->validated, 'form validated' );
     is_deeply( $form->fif, $params, 'fif matches params' );
     is_deeply( $form->value, { foo => 'defl_val_foo' }, 'value from deflate_value' );

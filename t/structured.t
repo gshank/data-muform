@@ -90,10 +90,10 @@ is_deeply( $form->field('tags')->value, ['Perl', 'programming', 'Moose' ],
 is( $form->field('addresses.0.city')->value, 'Prime City', 'get address field OK' );
 is( $form->field('options.flags.opt_in')->value, 1, 'get opt_in flag');
 #============
-# test structured init_object/model
+# test structured init_values/model
 my $form2 = Structured::Form->new;
 ok( $form2, 'form created' );
-$form2->process( init_object => $struct, data => {} );
+$form2->process( init_values => $struct, data => {} );
 is( $form2->num_fields, 6, 'correct number of fields' );
 ok( !$form2->validated, 'form validated');
 is_deeply( $form2->field('employer')->obj, { name => 'TechTronix', country => 'Utopia', }, 'has model');

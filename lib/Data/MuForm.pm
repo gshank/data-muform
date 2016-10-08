@@ -436,19 +436,17 @@ The form's name.  Useful for multiple forms. Used for the form element 'id'.
 When 'html_prefix' is set it is used to construct the field 'id'
 and 'name'.  The default is derived from the form class name.
 
-=head3 init_object
+=head3 init_values
 
-An 'init_object' may be used instead of the 'model' to pre-populate the values
+An 'init_values' object or hashref  may be used instead of the 'model' to pre-populate the values
 in the form. This can be useful when populating a form from default values
 stored in a similar but different object than the one the form is creating.
-The 'init_object' should be either a hash or the same type of object that
-the model uses (a DBIx::Class row for the DBIC model). It can be set in a
-variety of ways:
+It can be set in a variety of ways:
 
-   my $form = MyApp::Form->new( init_object => { .... } );
-   $form->process( init_object => {...}, ... );
-   has '+init_object' => ( default => sub { { .... } } );
-   sub init_object { my $self = shift; .... }
+   my $form = MyApp::Form->new( init_values => { .... } );
+   $form->process( init_values => {...}, ... );
+   has '+init_values' => ( default => sub { { .... } } );
+   sub init_values { my $self = shift; .... }
 
 The method version is useful if the organization of data in your form does
 not map to an existing or database object in an automatic way, and you need
@@ -541,12 +539,12 @@ sub form { shift }
 sub is_form {1}
 sub parent { }
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
-# init_object can be a blessed object or a hashref
-has 'init_object' => ( is => 'rw' );
-sub clear_init_object { $_[0]->{init_object} = undef }
-sub has_init_object {
+# init_values can be a blessed object or a hashref
+has 'init_values' => ( is => 'rw' );
+sub clear_init_values { $_[0]->{init_values} = undef }
+sub has_init_values {
     my $self = shift;
-    my $init_obj = $self->init_object;
+    my $init_obj = $self->init_values;
     return 0 unless defined $init_obj;
     return 0 if ref $init_obj eq 'HASH' and ! scalar keys %$init_obj;
     return 1;
@@ -701,7 +699,7 @@ sub clear {
     $self->clear_filled_from;
     $self->submitted(undef);
     $self->model(undef);
-    $self->clear_init_object;
+    $self->clear_init_values;
     $self->fill_from_object_source(undef);
     $self->ctx(undef);
     $self->processed(0);
@@ -743,7 +741,7 @@ sub setup {
     # set the submitted flag
     $self->submitted(1) if ( $self->has_params && ! defined $self->submitted );
 
-    # fill the 'value' attributes from model, init_object or fields
+    # fill the 'value' attributes from model, init_values or fields
     $self->fill_values;
 
     # fill in the input attribute
@@ -766,9 +764,9 @@ sub fill_values {
       $self->fill_from_object_source('model');
       $self->fill_from_object($self->model);
     }
-    elsif ( $self->init_object ) {
-        $self->fill_from_object_source('init_object');
-        $self->fill_from_object($self->init_object );
+    elsif ( $self->init_values ) {
+        $self->fill_from_object_source('init_values');
+        $self->fill_from_object($self->init_values );
     }
     elsif ( !$self->submitted ) {
         # no initial object. empty form must be initialized

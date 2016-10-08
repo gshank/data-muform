@@ -5,6 +5,13 @@ package Data::MuForm::Manual::FormHandlerDiff;
 This documents the differences between FormHandler and MuForm, in order to
 assist converting forms or deciding which package to use.
 
+Since this is an entirely new package I have taken the opportunity to
+make all of the changes and improvements that you can't do when you
+have actual users, including renaming things, removing features, changing
+behavior, and removing cruft. A very large part of the core FormHandler
+code and functionality has stood the test of time and use very well, and has been moved
+to MuForm with only minor changes.
+
 Note: this is still a work in process, so please contact me if your
 favorite feature has gone missing. Some features may be supplied via
 roles.
@@ -12,6 +19,10 @@ roles.
 The 'result' objects have been removed because there was too much overhead
 and complication for low payout. Some rendering tasks were practically
 impossible to support using the results.
+
+The 'item' has been renamed to 'model' and is now cleared on process like the other attributes.
+
+The 'init_object' has been renamed to 'init_values'.
 
 Note: the rendering is entirely different, so much that there's no point in
 documenting the individual differences here. No more widgets. I found that the rendering
@@ -24,12 +35,14 @@ in templates with 'render_element' while still allowing full-automatic rendering
 See the rendering documentation. There will be 'layouts'.
 
 No 'has_block', since that's purely a rendering thing. There will some way of
-doing something similar in the renderer, but it's not yet been developed.
+doing something similar in the renderer, but it's not been developed yet.
 
 Localization now uses a gettext style .po file and a gettext type localizer,
 with named parameters.
 Users can supply their own localizer as long as it can use the translation
 files and supports the calls that the internal add_error* methods use.
+Gettext has more complicated methods for localizing, so a few additional
+add_error* methods have been added, but shouldn't be needed very often.
 
 Added 'check' method for validation, which doesn't do 'update_model', for
 non-form type validation.
@@ -48,18 +61,17 @@ be defined as a simple coderef instead of an apply-style action.
 
 The active => [] and inactive => [] no longer have a permanent build (on new) effect.
 Do in your own form code if you want this. They still work the same on ->process.
+The 'active' and 'inactive' flags are implemented slightly differently, but shouldn't affect
+field definitions.
 
 The 'posted' flag has been renamed to 'submitted', because you also need on a 'get'. Also
 a params hashref with no field name keys will not need the submitted => 0 flag.
-
-The 'active' and 'inactive' flags are implemented slightly differently, but shouldn't affect
-field definitions.
 
 Removed 'use_fields_for_input_without_param'. Can be implemented in other ways.
 
 Removed flag 'use_init_obj_when_no_accessor_in_item'. This should happen automatically now.
 
-Removed flag 'use_init_obj_over_item'. Just use init_object in your process call instead.
+Removed flag 'use_init_obj_over_item'. Just use init_values in your process call instead.
 
 Removed flag 'use_defaults_over_obj'. Use a transform instead.
 
@@ -67,7 +79,7 @@ Removed 'no_update' flag on form. Use 'check' method instead.
 
 Removed 'update_field_list'. Can be implemented easily via user code if needed.
 
-Removed 'defaults' on 'process'. Use init_object instead or implement via user code.
+Removed 'defaults' on 'process'. Use init_values instead or implement via user code.
 
 The inflate/deflate transforms have been renamed: 'inflate_method' = 'transform_input_to_value',
 'deflate_method' = 'tranform_value_to_fif', 'inflate_default_method' = 'transform_default_to_value',
@@ -88,7 +100,6 @@ MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Dur
 Password, PasswordConf, IntRange.  Could possibly be supplied in a compatibility library. Let me
 know if you want this.
 
-DBIC Model: the 'item' has been renamed to 'model' and is now cleared on process like the other attributes.
 
 =cut
 

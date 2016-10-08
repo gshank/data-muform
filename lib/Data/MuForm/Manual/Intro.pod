@@ -136,9 +136,9 @@ in a field definition:
 
 The database row ('model') that is passed in will provide initial values
 for the form, of course. You can also provide default values with an
-'init_object', which acts kind of like a database object:
+'init_values', which acts kind of like a database object:
 
-   $form->process( init_object => { foo => '...', bar => '...' } );
+   $form->process( init_values => { foo => '...', bar => '...' } );
 
 There are a number of other flags and methods for providing defaults.
 See L<Data::MuForm::Manual::Defaults>.

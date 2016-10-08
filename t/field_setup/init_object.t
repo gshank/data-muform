@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-# this tests that a multiple select with value from an init_object
+# this tests that a multiple select with value from an init_values
 # has the right value with both a hashref and a blessed object
 {
     package MyApp::Form::Test;
@@ -38,7 +38,7 @@ my $init_obj = {
     foo => [1],
     bar => 'my_test',
 };
-$form->process( init_object => $init_obj );
+$form->process( init_values => $init_obj );
 is_deeply( $form->field('foo')->value, [1], 'right value for foo field with hashref init_obj' );
 
 # try with object
@@ -46,7 +46,7 @@ my $foo = FooObject->new(
     foo => [1],
     bar => 'my_test',
 );
-$form->process( init_object => $foo );
+$form->process( init_values => $foo );
 is_deeply( $form->field('foo')->value, [1], 'right value for foo field with object init_obj' );
 
 done_testing;

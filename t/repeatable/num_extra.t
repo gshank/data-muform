@@ -51,7 +51,7 @@ my $obj = {
     ],
 };
 
-$form->process( init_object => $obj );
+$form->process( init_values => $obj );
 $expected_fif = {
    'occupation' => 'Flaneur',
    'user_name' => 'billy',

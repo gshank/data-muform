@@ -26,9 +26,9 @@ is_deeply( $form->fif, $cmp_fif, 'fif has right defaults' );
 $form->process( params => {} );
 is_deeply( $form->fif, $cmp_fif, 'fif has right defaults' );
 
-# test that an init_object overrides defaults in fields
+# test that an init_values overrides defaults in fields
 my $init_obj = { foo => '', bar => 'testing', bax => '' };
-$form->process( init_object => $init_obj, params => {} );
+$form->process( init_values => $init_obj, params => {} );
 is_deeply( $form->fif, { foo => '', bar => 'testing', bax => '' }, 'object overrides defaults');
 
 =comment
@@ -43,9 +43,9 @@ is_deeply( $form->fif, { foo => '', bar => 'testing', bax => '' }, 'object overr
     has_field 'bar' => ( default_over_obj => '' );
     has_field 'bax' => ( default_over_obj => 'default_bax' );
 }
-# test that the 'default_over_obj' type defaults override an init_object/model
+# test that the 'default_over_obj' type defaults override an init_values/model
 $form = Test::DefaultsX->new;
-$form->process( init_object => $init_obj, params => {} );
+$form->process( init_values => $init_obj, params => {} );
 is( $form->field('foo')->default_over_obj, 'default_foo', 'foo correct' );
 is_deeply( $form->fif, $cmp_fif, 'fif uses defaults overriding object' );
 =cut
@@ -65,14 +65,14 @@ is_deeply( $form->fif, $cmp_fif, 'fif uses defaults overriding object' );
 
 
 $init_obj = { reqname => 'Starting Perl', optname => 'Over Again' };
-$form = My::Form1->new( init_object => $init_obj );
-# additional test for init_object provided defaults
+$form = My::Form1->new( init_values => $init_obj );
+# additional test for init_values provided defaults
 ok( $form, 'non-db form created OK');
 is( $form->field('optname')->value, 'Over Again', 'get right value from form');
-$form->process(init_object => $init_obj, params => {});
+$form->process(init_values => $init_obj, params => {});
 ok( !$form->validated, 'form validated' );
 is( $form->field('reqname')->fif, 'Starting Perl',
-                      'get right fif with init_object');
+                      'get right fif with init_values');
 
 {
     package My::Form2;
@@ -84,15 +84,15 @@ is( $form->field('reqname')->fif, 'Starting Perl',
     has_field 'foo';
     has_field 'bar';
     has_field 'bax' => ( default => 'default_bax' );
-    has '+init_object' => ( default => sub { { foo => 'initfoo' } } );
+    has '+init_values' => ( default => sub { { foo => 'initfoo' } } );
     sub default_bar { 'init_value_bar' }
 }
 
 $form = My::Form2->new;
 # test default_<field_name> methods in form
-# plus init_object defined in form class
-# plus default is used when init_object doesn't have key/accessor
-is( $form->field('foo')->value, 'initfoo', 'value from init_object' );
+# plus init_values defined in form class
+# plus default is used when init_values doesn't have key/accessor
+is( $form->field('foo')->value, 'initfoo', 'value from init_values' );
 is( $form->field('foo')->fif,   'initfoo', 'fif ok' );
 is( $form->field('bar')->value, 'init_value_bar', 'value from field default meth' );
 is( $form->field('bar')->fif,   'init_value_bar', 'fif ok' );
@@ -129,7 +129,7 @@ is( $form->field('bax')->fif,   'default_bax', 'fif ok' );
                   ]
     );
 
-    sub init_object {
+    sub init_values {
         my $self = shift;
         return { bar => 'initbar' };
     }
@@ -161,13 +161,13 @@ is_deeply( $form->field('foo_list')->value, [1,3], 'multiple default works' );
     has_field 'foo';
     has_field 'bar';
 
-    sub init_object {
+    sub init_values {
         my $self = shift;
         return { foo => $self->quuz, bar => 'bar!' };
     }
 }
 $form = Test::Form->new;
-is( $form->field('foo')->value, 'some_quux', 'field initialized by init_object' );
+is( $form->field('foo')->value, 'some_quux', 'field initialized by init_values' );
 
 
 {

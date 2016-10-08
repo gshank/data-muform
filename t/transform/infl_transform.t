@@ -32,16 +32,16 @@ use Test::Exception;
     }
 }
 
-my $init_object = { bullets => [{ text => 'one'}, { text => 'two' }, { text => 'three'}] };
+my $init_values = { bullets => [{ text => 'one'}, { text => 'two' }, { text => 'three'}] };
 my $fif = { bullets => 'one;two;three' };
 my $form = Test::Deflate2->new;
 ok( $form, 'form built');
-$form->process( init_object => $init_object, params => {} );
+$form->process( init_values => $init_values, params => {} );
 is_deeply( $form->fif, $fif, 'right fif' );
-is_deeply( $form->value, $init_object, 'right value' );
+is_deeply( $form->value, $init_values, 'right value' );
 
 $form->process( params => $fif );
 is_deeply( $form->fif, $fif, 'right fif' );
-is_deeply( $form->value, $init_object, 'right value' );
+is_deeply( $form->value, $init_values, 'right value' );
 
 done_testing;

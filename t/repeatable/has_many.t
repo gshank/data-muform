@@ -40,7 +40,7 @@ $form->process( params => {} );
 ok( $form->field('addresses')->field('0')->field('city'), 'empty field exists' );
 is( $form->field('addresses')->field('0')->field('sector')->num_options, 3, 'right number of options');
 
-my $init_object = {
+my $init_values = {
    addresses => [
       {
          street => 'First Street',
@@ -63,20 +63,20 @@ my $init_object = {
    ],
 };
 
-$form = Repeatable::Form->new( init_object => $init_object );
+$form = Repeatable::Form->new( init_values => $init_values );
 ok( $form, 'created form from initial object' );
 
-# add in fields in form not in init_object
-$init_object->{my_test} = undef;
-$init_object->{addresses}->[0]->{sector} = undef;
-$init_object->{addresses}->[1]->{sector} = undef;
-$init_object->{addresses}->[2]->{sector} = undef;
-is_deeply( $form->values, $init_object, 'get values back out' );
+# add in fields in form not in init_values
+$init_values->{my_test} = undef;
+$init_values->{addresses}->[0]->{sector} = undef;
+$init_values->{addresses}->[1]->{sector} = undef;
+$init_values->{addresses}->[2]->{sector} = undef;
+is_deeply( $form->values, $init_values, 'get values back out' );
 
 =comment
-delete $init_object->{my_test};
-is_deeply( $form->field('addresses')->value, $init_object->{addresses}, 'hasmany field value');
-is_deeply( $form->field('addresses')->field('0')->value, $init_object->{addresses}->[0],
+delete $init_values->{my_test};
+is_deeply( $form->field('addresses')->value, $init_values->{addresses}, 'hasmany field value');
+is_deeply( $form->field('addresses')->field('0')->value, $init_values->{addresses}->[0],
     'instance field value' );
 is( $form->field('addresses')->field('0')->field('sector')->num_options, 3, 'right number of options');
 is( $form->field('addresses')->field('0')->field('city')->value, 'Prime City',
@@ -108,9 +108,9 @@ $form->process($fif);
 ok($form->validated, 'validate fif');
 $fif->{my_test} = '';
 is_deeply( $form->fif, $fif, 'still get right fif');
-$init_object->{addresses}->[0]->{city} = 'Primary City';
-$init_object->{addresses}->[2]->{country} = 'Grand Fenwick';
-is_deeply( $form->values, $init_object, 'still get right values');
+$init_values->{addresses}->[0]->{city} = 'Primary City';
+$init_values->{addresses}->[2]->{country} = 'Grand Fenwick';
+is_deeply( $form->values, $init_values, 'still get right values');
 
 $fif = {
    'addresses.0.street' => 'First Street',
@@ -161,10 +161,10 @@ my $no_repeat = {
 $form->process( $no_repeat );
 is_deeply( $form->value()->{addresses}, [],  'Addresses deleted not in params' );
 
-$form->process( init_object => $init_object );
+$form->process( init_values => $init_values );
 ok( exists $form->value->{addresses}[0], 'Addresses are back' );
 is( $form->field('addresses')->field('0')->field('sector')->num_options, 3, 'right number of options');
-$form->clear_init_object;
+$form->clear_init_values;
 $form->process( { my_test => 'test' } );
 is_deeply( $form->value()->{addresses}, [], 'Addresses deleted' );
 

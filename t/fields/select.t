@@ -98,7 +98,7 @@ is_deeply( $field_options, $fruit_options,
 is( $form->field('fruit')->value, 2, 'initial value ok');
 
 $form->process( params => {},
-    init_object => { vegetables => undef, fruit => undef, build_attr => undef } );
+    init_values => { vegetables => undef, fruit => undef, build_attr => undef } );
 $field_options = $form->field('vegetables')->options;
 is_deeply( $field_options, $veg_options,
    'get options for vegetables after process' );
@@ -156,12 +156,12 @@ is_deeply( $form->field('vegetables')->fif, [4], 'fif for vegetables correct' );
 }
 
 $form = Test::Multiple::InitObject->new;
-my $init_object = { foo => 'new_foo', bar => [3,4] };
-$form->process(init_object => $init_object, params => {} );
+my $init_values = { foo => 'new_foo', bar => [3,4] };
+$form->process(init_values => $init_values, params => {} );
 my $rendered = $form->render;
 like($rendered, qr/<option value="4" id="bar.1" selected="selected">four<\/option>/, 'rendered option');
 my $value = $form->value;
-is_deeply( $value, $init_object, 'correct value');
+is_deeply( $value, $init_values, 'correct value');
 =cut
 
 done_testing;

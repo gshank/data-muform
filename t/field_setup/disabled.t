@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 
-# tests that an init_value provided by model/init_object is used
+# tests that an init_value provided by model/init_values is used
 # for disabled fields, and that disabled fields are not validated.
 {
     {
@@ -28,12 +28,12 @@ use Data::Dumper;
     }
 
     my $form = MyApp::Test::Form1->new;
-    my $init_object = {
+    my $init_values = {
         foo => 'my_foo',
         bar => 'my_bar',
         user => { email_address => 'joe@nowhere.com' },
     };
-    $form->process( init_object => $init_object, params => {} );
+    $form->process( init_values => $init_values, params => {} );
     my $fif = {
         foo => 'my_foo',
         bar => 'my_bar',
@@ -44,12 +44,12 @@ use Data::Dumper;
         bar => 'subm_bar',
     };
 
-    $form->process( init_object => $init_object, params => $submitted );
+    $form->process( init_values => $init_values, params => $submitted );
     $fif->{bar} = 'subm_bar';
     is_deeply( $form->fif, $fif,
-       'right fif after submission, init_object' );
-    $init_object->{bar} = 'subm_bar';
-    is_deeply( $form->value, $init_object, 'right value' );
+       'right fif after submission, init_values' );
+    $init_values->{bar} = 'subm_bar';
+    is_deeply( $form->value, $init_values, 'right value' );
 }
 
 {

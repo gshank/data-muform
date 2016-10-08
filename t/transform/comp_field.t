@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 # This demonstrates a field that comes in as a single string from
-# defaults/init_object/model, and is split up into multiple subfields,
+# defaults/init_values/model, and is split up into multiple subfields,
 # then is flattened again into a string.
 #
 
@@ -51,8 +51,8 @@ use Test::More;
 
 my $form = Test::Deflate->new;
 ok( $form, 'form builds' );
-my $init_object = { foo => 'one-1-two-2-three-3', bar => 'xxyyzz' };
-$form->process( init_object => $init_object, params => {} );
+my $init_values = { foo => 'one-1-two-2-three-3', bar => 'xxyyzz' };
+$form->process( init_values => $init_values, params => {} );
 is_deeply( $form->value, { foo => { one => 1, two => 2, three => 3 },
         bar => 'xxyyzz' }, 'value is correct?' );
 is_deeply( $form->fif, { 'foo.one' => 1, 'foo.two' => 2, 'foo.three' => 3, bar => 'xxyyzz' },
@@ -85,8 +85,8 @@ is( $form->field('foo')->value, 'one-x-two-xx-three-xxx', 'right value for foo f
 }
 
 $form = Test::RepDeflate->new;
-$init_object = { foo => ['one-1-two-2-three-3', 'one-10-two-11-three-12'], bar => 'xxyyzz' };
-$form->process( init_object => $init_object, params => {} );
+$init_values = { foo => ['one-1-two-2-three-3', 'one-10-two-11-three-12'], bar => 'xxyyzz' };
+$form->process( init_values => $init_values, params => {} );
 is_deeply( $form->value, { foo => [ { one => 1, two => 2, three => 3 }, { one => 10, two => 11, three => 12 } ],
         bar => 'xxyyzz' }, 'value is correct?' );
 is_deeply( $form->fif, { 'foo.0.one' => 1, 'foo.0.two' => 2, 'foo.0.three' => 3,

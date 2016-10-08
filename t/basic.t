@@ -25,8 +25,6 @@ use_ok('Data::MuForm');
       return [
          fruit => 'Select',
          optname => { label => 'Second' }
-#        { name => 'fruit', type => 'Select' },
-#        { name => 'optname', label => 'Second' },
       ];
    }
 
@@ -120,17 +118,17 @@ is( $form->num_errors, 0, 'no leftover errors' );
 ok( !$form->field('reqname')->has_errors, 'no leftover error in field' );
 ok( !$form->field('optname')->fif, 'no lefover fif values' );
 
-my $init_object = {
+my $init_values = {
    reqname => 'Starting Perl',
    optname => 'Over Again'
 };
 
-$form = My::Form->new( init_object => $init_object );
+$form = My::Form->new( init_values => $init_values );
 is( $form->field('optname')->value, 'Over Again', 'value with init_obj' );
-ok( $form->has_init_object );
+ok( $form->has_init_values );
 
 # non-posted params
-$form->process( init_object => $init_object, params => {} );
+$form->process( init_values => $init_values, params => {} );
 ok( !$form->validated, 'form did not validate' );
 
 my $init_obj_plus_defaults = {
@@ -153,7 +151,7 @@ my $expected_fif = {
 };
 
 $fif = $form->fif;
-is_deeply( $fif, $expected_fif, 'get right fif with init_object' );
+is_deeply( $fif, $expected_fif, 'get right fif with init_values' );
 
 # make sure that checkbox is 0 in values
 my $params = {
@@ -163,7 +161,7 @@ my $params = {
 };
 
 ok( $form->process($params), 'form validates with params' );
-#my %init_obj_value = (%$init_object, fruit => undef );
+#my %init_obj_value = (%$init_values, fruit => undef );
 #is_deeply( $form->value, \%init_obj_value, 'value init obj' );
 
 my $expected_value = {
@@ -176,7 +174,7 @@ my $expected_value = {
 is_deeply( $form->value, $expected_value, 'value init obj' );
 $fif->{must_select} = 1;
 $fif->{my_selected} = 0;
-is_deeply( $form->fif, $fif, 'get right fif with init_object' );
+is_deeply( $form->fif, $fif, 'get right fif with init_values' );
 
 
 if ( !$form->process( params => { bar => 1, } ) )
