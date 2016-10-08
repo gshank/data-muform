@@ -1,4 +1,5 @@
 package Data::MuForm::Field::Text;
+# ABSTRACT: Text field
 use Moo;
 extends 'Data::MuForm::Field';
 

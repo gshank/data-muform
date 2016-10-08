@@ -1,4 +1,6 @@
 package Data::MuForm;
+# ABSTRACT: Data validator and form processor
+
 use Moo;
 use Data::MuForm::Meta;
 

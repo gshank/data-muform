@@ -1,4 +1,5 @@
 package Data::MuForm::Field::Checkbox;
+# ABSTRACT: Checkbox field
 use Moo;
 extends 'Data::MuForm::Field';
 

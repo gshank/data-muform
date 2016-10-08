@@ -1,4 +1,5 @@
 package Data::MuForm::Localizer;
+# ABSTRACT: Localizer
 use Moo;
 
 use Types::Standard -types;
@@ -17,7 +18,7 @@ the various LOCALE flags for languages. Language must be set
 on creation of the form. It does handle plurals.
 
 TODO: implement allowing specification of user-provided messages
-file, and merging two
+file, and merging two message files
 
 =cut
 

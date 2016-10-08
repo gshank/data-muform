@@ -1,4 +1,5 @@
 package Data::MuForm::Manual::FormHandlerDiff;
+# ABSTRACT: Changes from FormHandler to MuForm
 
 =head1 DESCRIPTION
 

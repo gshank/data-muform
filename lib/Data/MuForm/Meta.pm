@@ -1,4 +1,5 @@
 package Data::MuForm::Meta;
+# ABSTRACT: Meta magic to create 'has_fields'
 
 use Moo::_Utils;
 

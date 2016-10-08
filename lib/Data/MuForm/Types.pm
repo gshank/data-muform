@@ -1,4 +1,5 @@
 package Data::MuForm::Types;
+# ABSTRACT: Type::Tiny types
 
 =head1 SYNOPSIS
 

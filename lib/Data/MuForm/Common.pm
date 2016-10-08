@@ -1,4 +1,5 @@
 package Data::MuForm::Common;
+# ABSTRACT: common role
 use Moo::Role;
 
 sub has_flag {

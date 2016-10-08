@@ -1,4 +1,5 @@
 package Data::MuForm::Manual;
+# ABSTRACT: MuForm manual
 
 =head1 DESCRIPTION
 

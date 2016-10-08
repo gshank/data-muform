@@ -1,4 +1,6 @@
 package Data::MuForm::Field::Select;
+# ABSTRACT: Select field
+
 use Moo;
 extends 'Data::MuForm::Field';
 use Types::Standard -types;

@@ -1,4 +1,6 @@
 package Data::MuForm::Renderer::Base;
+# ABSTRACT: Renderer
+
 use Moo;
 
 =head1 NAME

@@ -1,4 +1,5 @@
 package Data::MuForm::Manual::Rendering;
+# ABSTRACT: Rendering documentation
 
 =head1 NAME
 

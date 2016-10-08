@@ -1,4 +1,6 @@
 package Data::MuForm::Model;
+# ABSTRACT: Base Model role
+
 use Moo::Role;
 
 has 'model' => (

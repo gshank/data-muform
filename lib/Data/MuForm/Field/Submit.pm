@@ -1,4 +1,6 @@
 package Data::MuForm::Field::Submit;
+# ABSTRACT: Submit field
+
 use Moo;
 extends 'Data::MuForm::Field';
 

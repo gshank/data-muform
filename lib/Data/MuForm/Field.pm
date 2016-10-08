@@ -1,4 +1,5 @@
 package Data::MuForm::Field;
+# ABSTRACT: Base field package
 use Moo;
 use Types::Standard -types;
 use Try::Tiny;

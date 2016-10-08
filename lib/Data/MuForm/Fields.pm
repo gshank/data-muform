@@ -1,4 +1,5 @@
 package Data::MuForm::Fields;
+# ABSTRACT: Common attributes and methods for forms and compound fields
 use Moo::Role;
 
 use Types::Standard -types;
@@ -602,51 +603,16 @@ sub clear_data {
     }
 }
 
-=comment
-sub _install_methods {
-    my $self = shift;
-    foreach my $field ( $self->all_fields ) {
-        next unless $field->form;
-        my $suffix = $self->convert_full_name($field->full_name);
-        foreach my $prefix ( 'validate', 'default' ) {
-            my $meth_name = "${prefix}_$suffix";
-            if ( my $meth = $self->form->can($meth_name) ) {
-                my $wrap_sub = sub {
-                    my $self = shift;
-                    return $self->form->$meth;
-                };
-                $field->{methods}->{$prefix} = $wrap_sub;
-            }
-        }
-    }
-}
-=cut
-
-=comment
-sub convert_full_name {
-    my $full_name = shift;
-    $full_name =~ s/\.\d+\./_/g;
-    $full_name =~ s/\./_/g;
-    return $full_name;
-}
-=cut
-
-
 # References to fields with errors are propagated up the tree.
 # All fields with errors should end up being in the form's
 # error_results. Once.
 sub propagate_error {
     my ( $self, $field ) = @_;
 
-#   my ($found) = grep { $_ == $result } $self->result->all_error_results;
-#   unless ( $found ) {
-        $self->add_error_field($field);
-        if ( $self->parent ) {
-            $self->parent->propagate_error( $field );
-        }
-#   }
-
-
+    $self->add_error_field($field);
+    if ( $self->parent ) {
+        $self->parent->propagate_error( $field );
+    }
 }
 
 1;
