@@ -405,7 +405,7 @@ sub validate {1}
 sub validate_field {
     my $self = shift;
 
-    return unless $self->has_input;
+    return unless $self->has_input || $self->has_value;
 
     my $continue_validation = 1;
     if ( ( $self->required ||

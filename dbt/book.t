@@ -83,7 +83,7 @@ my $bad_1 = {
     silly_field   => 4,
 };
 
-ok( !$form->process( $bad_1 ), 'bad 1' );
+ok( !$form->process( item => $book, params => $bad_1 ), 'bad 1' );
 
 $form = BookDB::Form::Book->new(item => $book, schema => $schema);
 ok( $form, 'create form from db object');
@@ -91,7 +91,6 @@ ok( $form, 'create form from db object');
 my $genres_field = $form->field('genres');
 is_deeply( sort $genres_field->value, [2, 4], 'value of multiple field is correct');
 
-=comment
 my $bad_2 = {
     'title' => "Another Silly Test Book",
     'authors' => [6],
@@ -110,39 +109,23 @@ my $values = $form->value;
 $values->{year} = 1999;
 $values->{pages} = 101;
 $values->{format} = 2;
-my $validated = $form->validate( $values );
+my $validated = $form->process( item => $book, params => $values );
 ok( $validated, 'now form validates' );
 
-$form->process;
+$form->process( item => $book, params => {} );
 is( $book->publisher, 'EreWhon Publishing', 'publisher has not changed');
 
 # test that multiple fields (genres) with value of [] deletes genres
 is( $book->genres->count, 2, 'multiple select list updated ok');
 $params->{genres} = [];
-$form->process( $params );
+$form->process( item => $book, params => $params );
 is( $book->genres->count, 0, 'multiple select list has no selected options');
 
+=comment
+form's active_column
 $form = BookDB::Form::Book->new(schema => $schema, active_column => 'is_active');
 is( $form->field( 'genres' )->num_options, 3, 'active_column test' );
-
-{
-    package Test::Book;
-    use Moo;
-    use Data::MuForm::Meta;
-    extends 'Data::MuForm::Model::DBIC';
-
-    has_field 'title' => ( minlength => 3, maxlength => 40, required => 1 );
-    has_field 'year';
-    has_field 'submit' => ( type => 'Submit' );
-}
-
-# this tests to make sure that result loaded from db object is cleared when
-# the result is then loaded from the params
-$form = Test::Book->new;
-my $new_book = $schema->resultset('Book')->new_result({});
-$form->process( item => $new_book, params => {} );
-$form->process( item => $new_book, params => { title => 'abc' } );
-is( $form->result->num_results, 3, 'right number of results');
 =cut
+
 
 done_testing;
