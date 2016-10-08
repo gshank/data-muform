@@ -1,5 +1,7 @@
 # Data::MuForm - validator and HTML form processor using Moo
 
+# EXPERIMENTAL - for experimentation and feedback only
+
 Data::MuForm is a data validation and form handling package written in Moo.
 It is a conversion of HTML::FormHandler to Moo. The core behavior is the same,
 but things have been regularized, simplified, renamed, and in some cases re-written.
@@ -9,7 +11,7 @@ A MuForm 'validator' or 'form' is a Perl subclass of L<Data::MuForm>. In your
 class you define fields and validators. Because it's a Perl class written with
 Moo, you have a lot of flexibility and control.
 
-Data::MuForm will loaded into CPAN evenutually.
+Data::MuForm will be loaded into CPAN evenutually.
 
 # QUICK START GUIDE:
 

@@ -8,5 +8,6 @@ Makefile.old
 MANIFEST.bak
 HTML-MuForm-*
 .build
-t/db/book.db
+dbt/db/book.db
 notes
+template.t

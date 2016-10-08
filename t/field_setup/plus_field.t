@@ -30,7 +30,6 @@ use Test::More;
 
 my $form = MyApp::Form::Test->new;
 ok( $form );
-$DB::single=1;
 is( $form->field('bar_one')->type, 'Repeatable', 'right type' );
 
 done_testing;

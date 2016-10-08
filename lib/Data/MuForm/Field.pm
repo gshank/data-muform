@@ -155,23 +155,24 @@ sub render {
   my $render_args = $self->get_render_args(%$rargs);
   return $self->renderer->render_field($render_args);
 }
+
 sub render_element {
   my ( $self, $rargs ) = @_;
   my $render_args = $self->get_render_args( element => $rargs );
   return $self->renderer->render_element($render_args);
 }
-=comment
+
 sub render_errors {
   my ( $self, $rargs ) = @_;
-  my $render_args = { %{$self->get_render_args}, %$rargs };
+  my $render_args = $self->get_render_args( errors_ele => $rargs );
   return $self->renderer->render_errors($render_args);
 }
+
 sub render_label {
   my ( $self, $rargs ) = @_;
-  my $render_args = { %{$self->get_render_args}, %$rargs };
+  my $render_args = $self->get_render_args( label_ele => $rargs );
   return $self->renderer->render_label($render_args);
 }
-=cut
 
 around BUILDARGS => sub {
   my ( $orig, $class, %args ) = @_;
@@ -770,4 +771,3 @@ sub convert_full_name {
 
 
 1;
-

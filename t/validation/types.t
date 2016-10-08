@@ -169,7 +169,7 @@ $form = Test::Form::Type::Tiny->new;
 
 ok($form, 'get form');
 
-my $params = {
+$params = {
     test_a => 'str1',
     test_b => 'str2',
 };
