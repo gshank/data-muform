@@ -55,5 +55,4 @@ sub validate_occupation
    }
 }
 
-no HTML::FormHandler::Moose;
 1;

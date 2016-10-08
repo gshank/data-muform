@@ -1,6 +1,7 @@
 package BookDB::Form::BookOwner;
 
-use HTML::FormHandler::Moose::Role;
+use Moo::Role;
+use Data::MuForm::Meta;
 
 has_field 'user_name';
 has_field 'fav_cat' => ( label => 'Favorite Book Category' );
@@ -16,3 +17,5 @@ sub validate_occupation
       $field->add_error('No layabouts allowed');
    }
 }
+
+1;

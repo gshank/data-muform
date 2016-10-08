@@ -1,7 +1,7 @@
 package BookDB::Form::Field::AltText;
 
-use Moose;
-extends 'HTML::FormHandler::Field::Text';
+use Moo;
+extends 'Data::MuForm::Field::Text';
 
 
 has 'another_attribute' => ( isa => 'Str', is => 'rw' );

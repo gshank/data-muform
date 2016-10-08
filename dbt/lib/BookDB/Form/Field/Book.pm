@@ -1,7 +1,8 @@
 package BookDB::Form::Field::Book;
 
-use HTML::FormHandler::Moose;
-extends 'HTML::FormHandler::Field::Compound';
+use Moo;
+use Data::MuForm::Meta;
+extends 'Data::MuForm::Field::Compound';
 
 has_field 'id' => (
     type => 'PrimaryKey',
@@ -65,6 +66,4 @@ sub validate {
       if ( ( $year_field->value > 3000 ) || ( $year_field->value < 1600 ) );
 }
 
-__PACKAGE__->meta->make_immutable;
-no HTML::FormHandler::Moose;
 1;
