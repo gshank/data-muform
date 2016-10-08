@@ -17,6 +17,44 @@ has 'localizer' => ( is => 'rw' );
 
 has 'html_filter' => ( is => 'rw', default => sub { *default_html_filter } );
 
+has 'layouts' => ( is => 'rw', builder => 'build_layouts' );
+
+sub build_layouts {
+    my $self = shift;
+    my $layouts = {
+        bare => *layout_bare,
+        simple => *layout_simple,
+        w_errs => *layout_w_errs,
+    };
+    return $layouts;
+}
+
+sub layout_bare {
+    my ( $self, $rargs ) = @_;
+    my $out = '';
+    $out .= $self->render_label($rargs);
+    $out .= $self->render_element($rargs);
+    $out .= $self->render_errors($rargs);
+    return $out;
+}
+
+sub layout_simple {
+    my ( $self, $rargs ) = @_;
+    my $out = qq{<div };
+    $out .= $self->_render_attrs( $rargs->{wrapper} );
+    $out .= qq{>};
+    $out .= $self->layout_bare($rargs);
+    $out .= qq{</div>};
+}
+
+sub layout_w_errs {
+    my ( $self, $rargs ) = @_;
+    my $out = '';
+    $out .= $self->render_element($rargs);
+    $out .= $self->render_errors($rargs);
+    return $out;
+}
+
 sub localize {
    my ( $self, @message ) = @_;
    return $self->localizer->loc_($message[0]);
@@ -24,14 +62,22 @@ sub localize {
 
 
 sub render {
-    my $self = shift;
+    my ($self, $rargs ) = @_;
 }
 
 sub render_field {
   my ( $self, $rargs ) = @_;
 
-  my $rendered;
-  my $form_element = $self->render_element($rargs);
+  my $layout = $rargs->{layout} || 'bare';
+  my $meth = $self->layouts->{$layout};
+  my $out;
+  if ( $meth ) {
+    $out .= $meth->($self, $rargs);
+  }
+  else {
+    die "layout $layout not found";
+  }
+  return $out;
 }
 
 =head2 render_input
@@ -46,12 +92,12 @@ sub render_input {
   my $id = $rargs->{name};
   my $fif = $rargs->{fif};
 
-  my $out = qq{<input type="$input_type" };
+  my $out = qq{\n<input type="$input_type" };
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
   $out .= qq{value="$fif" };
   $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
-  $out .= ">";
+  $out .= "/>";
   return $out;
 }
 
@@ -95,7 +141,7 @@ sub render_select {
   my $name = $rargs->{name};
 
   # beginning of select
-  my $out = qq{<select };
+  my $out = qq{\n<select };
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
   $out .= qq{multiple="multiple" } if $rargs->{multiple};
@@ -133,7 +179,7 @@ sub render_checkbox {
   my $checkbox_value = $rargs->{checkbox_value};
   my $fif = $rargs->{fif};
 
-  my $out = qq{<checkbox };
+  my $out = qq{\n<checkbox };
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
   $out .= qq{value="$checkbox_value" };
@@ -154,7 +200,7 @@ sub render_textarea {
   my $id = $rargs->{id};
   my $fif = $rargs->{fif};
 
-  my $out = "<textarea ";
+  my $out = "\n<textarea ";
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
   $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
@@ -183,7 +229,7 @@ sub render_label {
 
   my $id = $rargs->{id};
   my $label = $self->localize($rargs->{label});
-  my $out = qq{<label for="$id">$label</label>};
+  my $out = qq{\n<label for="$id">$label</label>};
   return $out
 }
 
@@ -197,8 +243,9 @@ sub render_errors {
   my $errors = $rargs->{errors} || [];
   my $out = '';
   foreach my $error (@$errors) {
-    $out .= qq{<span>$error</span>};
+    $out .= qq{\n<span>$error</span>};
   }
+  return $out;
 }
 
 sub default_html_filter {
