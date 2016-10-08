@@ -78,7 +78,7 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
 
    TBD: a work in process, not yet completely designed
 
-   html_prefix         Flag to prefix html field names with the form name.
+   field_prefix       String to prefix to field names when rendered
                            Useful for multiple instances of the same form
    http_method         For storing 'post' or 'get'
    action              Store the form 'action' on submission. No default value.
@@ -156,8 +156,8 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
 
    label           Text label for this field. Defaults to ucfirst field name.
    methods => { build_label => <coderef> }   provide a builder for 'label' attribute
-   id              Useful for javascript (default is html_name. to prefix with
-                       form name, use 'html_prefix' in your form)
+   id              Useful for javascript (default is prefixed_name. to prefix with
+                       form name, use 'field_prefix' in your form)
    methods => { build_id => <coderef> } Provide a builder for 'id' attribute
    size            Text & select fields.
 

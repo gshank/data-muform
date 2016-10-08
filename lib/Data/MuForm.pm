@@ -196,19 +196,19 @@ or as structured data in the form of hashes and lists:
 CGI style parameters will be converted to hashes and lists for HFH to
 operate on.
 
-=head3 posted
+=head3 submitted
 
 Note that FormHandler by default uses empty params as a signal that the
-form has not actually been posted, and so will not attempt to validate
+form has not actually been submitted, and so will not attempt to validate
 a form with empty params. Most of the time this works OK, but if you
 have a small form with only the controls that do not return a post
 parameter if unselected (checkboxes and select lists), then the form
 will not be validated if everything is unselected. For this case you
-can either add a hidden field as an 'indicator', or use the 'posted' flag:
+can either add a hidden field as an 'indicator', or use the 'submitted' flag:
 
-   $form->process( posted => ($c->req->method eq 'POST'), params => ... );
+   $form->process( submitted => ($c->req->method eq 'POST'), params => ... );
 
-The 'posted' flag also works to prevent validation from being performed
+The 'submitted' flag also works to prevent validation from being performed
 if there are extra params in the params hash and it is not a 'POST' request.
 
 =head2 Getting data out
@@ -439,7 +439,7 @@ each request, you may need to clear those yourself.
 =head3 name
 
 The form's name.  Useful for multiple forms. Used for the form element 'id'.
-When 'html_prefix' is set it is used to construct the field 'id'
+When 'field_prefix' is set it is used to construct the field 'id'
 and 'name'.  The default is derived from the form class name.
 
 =head3 init_values
@@ -491,9 +491,9 @@ Flag to indicate that validation has been run. This flag will be
 false when the form is initially loaded and displayed, since
 validation is not run until FormHandler has params to validate.
 
-=head3 html_prefix
+=head3 field_prefix
 
-Flag to indicate that the form name is used as a prefix for fields
+String to be used as a prefix for field id's and names
 in an HTML form. Useful for multiple forms
 on the same HTML page. The prefix is stripped off of the fields
 before creating the internal field name, and added back in when
@@ -503,10 +503,10 @@ the field name in the MuForm form (and the database column)
 would be just "borrower".
 
    has '+name' => ( default => 'book' );
-   has '+html_prefix' => ( default => 1 );
+   has '+field_prefix' => ( default => 'book' );
 
-Also see the Field attribute "html_name", a convenience function which
-will return the form name + "." + field full_name
+Also see the Field attribute "prefixed_name", a convenience function which
+will return the field_prefix + "." + field full_name
 
 =cut
 
@@ -536,7 +536,7 @@ sub params {
     }
     return $self->{_params};
 }
-has 'html_prefix' => ( is => 'rw' );
+has 'field_prefix' => ( is => 'rw' );
 
 has 'form_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 has 'index' => ( is => 'rw', isa => HashRef, default => sub {{}} );
@@ -627,7 +627,7 @@ sub errors_by_id {
 sub errors_by_name {
     my $self = shift;
     my %errors;
-    $errors{$_->html_name} = [$_->all_errors] for $self->error_fields;
+    $errors{$_->prefixed_name} = [$_->all_errors] for $self->error_fields;
     return \%errors;
 }
 
@@ -794,8 +794,8 @@ sub munge_params {
 
     my $_fix_params = Data::MuForm::Params->new;
     my $new_params = $_fix_params->expand_hash($params);
-    if ( $self->html_prefix ) {
-        $new_params = $new_params->{ $self->html_prefix };
+    if ( $self->field_prefix ) {
+        $new_params = $new_params->{ $self->field_prefix };
     }
     $new_params = {} if !defined $new_params;
     return $new_params;
@@ -832,24 +832,6 @@ sub set_active {
 #====================================================================
 # Validation
 #====================================================================
-
-=head2 validate_form
-sub validate_form {
-    my $self   = shift;
-    my $params = $self->params;
-    $self->_set_dependency;    # set required dependencies
-    $self->_fields_validate;
-    $self->validate;           # empty method for users
-    $self->validate_model;     # model specific validation
-    $self->fields_set_value;
-    $self->build_errors;       # move errors to result
-    $self->_clear_dependency;
-    $self->clear_posted;
-    $self->ran_validation(1);
-    $self->dump_validated if $self->verbose;
-    return $self->validated;
-}
-=cut
 
 sub validate_form {
     my $self = shift;

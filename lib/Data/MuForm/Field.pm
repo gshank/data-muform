@@ -30,12 +30,12 @@ sub build_id {
    if ( my $meth = $self->get_method('build_id') ) {
        return $meth->($self, @_);
    }
-   return $self->html_name;
+   return $self->prefixed_name;
 }
-has 'html_name' => ( isa => Str, is => 'rw', lazy => 1, builder => 'build_html_name');
-sub build_html_name {
+has 'prefixed_name' => ( isa => Str, is => 'rw', lazy => 1, builder => 'build_prefixed_name');
+sub build_prefixed_name {
     my $self = shift;
-    my $prefix = ( $self->form && $self->form->html_prefix ) ? $self->form->name . "." : '';
+    my $prefix = ( $self->form && $self->form->field_prefix ) ? $self->field_prefix. "." : '';
     return $prefix . $self->full_name;
 }
 has 'form' => ( is => 'rw', weak_ref => 1, predicate => 'has_form' );
@@ -118,7 +118,7 @@ sub base_render_args {
   my $self = shift;
   my $args = {
     form => $self->form,
-    name => $self->html_name,
+    name => $self->prefixed_name,
     form_element => $self->form_element,
     input_type => $self->input_type,
     id => $self->id,

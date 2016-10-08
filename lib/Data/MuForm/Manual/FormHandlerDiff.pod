@@ -101,6 +101,7 @@ MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Dur
 Password, PasswordConf, IntRange.  Could possibly be supplied in a compatibility library. Let me
 know if you want this.
 
+Renamed html_prefix to field_prefix and it should be set to the string used to prefix fields.
 
 =cut
 

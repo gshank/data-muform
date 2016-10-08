@@ -10,7 +10,7 @@ use Test::More;
     extends 'Data::MuForm';
 
     has '+name' => ( default => 'F123' );
-    has '+html_prefix' => ( default => 1 );
+    has '+field_prefix' => ( default => 'ffm' );
 
     has_field 'foo';
     has_field 'bar';

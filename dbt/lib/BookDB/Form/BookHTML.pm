@@ -6,7 +6,7 @@ extends 'Data::MuForm::Model::DBIC';
 
 has '+model_class' => ( default => 'Book' );
 has '+name' => ( default => 'book' );
-has '+html_prefix' => ( default => 1 );
+has '+field_prefix' => ( default => 1 );
 
 sub field_list {
      [

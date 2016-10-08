@@ -132,7 +132,7 @@ sub fields_fif {
 
     $prefix ||= '';
     $prefix = $prefix . "."
-        if ( $self->isa('Data::MuForm') && $self->html_prefix );
+        if ( $self->isa('Data::MuForm') && $self->field_prefix );
 
     my %params;
     foreach my $field ( $self->all_sorted_fields ) {
