@@ -1,0 +1,61 @@
+package Data::MuForm::Manual::Rendering;
+
+=head1 NAME
+
+Data::MuForm::Manual::Rendering
+
+=head1 DESCRIPTION
+
+Note: much of this isn't even implemented yet, so very much a work in process.
+
+One of the main goals of this new rendering system is to make it easier to
+render forms in templates in ways that allow the classes and other html
+rendering pieces to be kept out of the Perl class definitions. You should be
+able to do it in Perl if you want, but it should be easy and possible to
+keep almost all of that in the templates.
+
+There is 'render_args' hashref for every field, which will contain attributes for
+the various parts of the field that need to be rendered.
+
+   # field render_args
+   render_args => {
+       element => { class => 'xxx', placeholder => 'Type here' },
+       label_ele => { },
+       errors_ele => { },
+       wrapper => { },
+   },
+
+Leaving the render_args as a plain hashref means that you don't have to add new
+attributes or flags in order to implement a custom renderer.
+
+A few attributes are still defined in fields because they are structural or necessary
+to the code, like the field name, id, and value (and fif). Some field attributes are part of
+validation, like 'maxlength'.
+
+=head1 FORM METHODS
+
+=head2 render_start
+
+=head2 render_end
+
+=head1 FIELD METHODS
+
+=head2 render
+
+  [% form.field('foo').render({ element = { class = 'xxx ppp' }, layout = 'bare'} });
+
+=head2 render_element
+
+  [% form.field('foo').render_element({ class = 'ddd xxx' }) %]
+
+=head2 render_label
+
+  [% form.field('foo').render_label %]
+
+=head2 render_errors
+
+  [% form.field('foo').render_errors %]
+
+=cut
+
+1;

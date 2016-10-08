@@ -47,21 +47,19 @@ An example of a custom form class:
     extends 'Data::MuForm';
 
     has_field 'name' => ( type => 'Text' );
-    has_field 'age' => ( type => 'PosInteger', apply => [ 'MinimumAge' ] );
+    has_field 'age' => ( type => 'Integer', apply => [ 'MinimumAge' ] );
     has_field 'hobbies' => ( type => 'Multiple' );
     has_field 'address' => ( type => 'Compound' );
     has_field 'address.city' => ( type => 'Text' );
     has_field 'address.state' => ( type => 'Select' );
     has_field 'email' => ( type => 'Email' );
 
-    1;
-
 
 A dynamic form - one that does not use a custom form class - may be
 created using the 'field_list' attribute to set fields:
 
     my $validator = Data::MuForm->new(
-        name => 'user_form',
+        name => 'login_form',
         field_list => [
             'username' => {
                 type  => 'Text',
@@ -87,7 +85,7 @@ The new constructor takes name/value pairs:
     MyForm->new( action => $action );
 
 No attributes are required on new. Normally you would pass in persistent
-attributes on 'new' (such as 'schema') and request/process related attributes on 'process';
+attributes on 'new' (such as 'schema') and request/process related attributes on 'process'.
 
 The form's fields will be built from the form definitions on new.
 
@@ -115,7 +113,13 @@ See the model class for more information about 'model', 'model_id',
 'model_class', and 'schema' (for the DBIC model).
 L<Data::MuForm::Model::DBIC>.
 
-=head2 Processing the form
+=head2 Processing
+
+=head3 check
+
+Use the 'check' method to perform validation on your data:
+
+    $validator->check( data => { ... } );
 
 =head3 process
 
