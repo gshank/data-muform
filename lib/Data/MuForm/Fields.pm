@@ -433,29 +433,29 @@ sub fill_from_params {
 }
 
 sub fill_from_object {
-    my ( $self, $item ) = @_;
+    my ( $self, $obj ) = @_;
 
-    return unless ( $item || $self->has_fields );    # empty fields for compounds
+    return unless ( $obj || $self->has_fields );    # empty fields for compounds
     $self->filled_from('object');
     my $my_value;
     my $init_obj;
     if ( $self->form &&
         $self->form->fill_from_object_source &&
-        $self->form->fill_from_object_source eq 'item' &&
+        $self->form->fill_from_object_source eq 'model' &&
         $self->form->has_init_object ) {
         $init_obj = $self->form->init_object;
     }
     for my $field ( $self->all_sorted_fields ) {
         next if ! $field->is_active;
-        if ( (ref $item eq 'HASH' && !exists $item->{ $field->accessor } ) ||
-             ( blessed($item) && !$item->can($field->accessor) ) ) {
+        if ( (ref $obj eq 'HASH' && !exists $obj->{ $field->accessor } ) ||
+             ( blessed($obj) && !$obj->can($field->accessor) ) ) {
             my $found = 0;
 
             if ($init_obj) {
-                # if we're using an item, look for accessor not found in item
+                # if we're using a model, look for accessor not found in obj
                 # in the init_object
                 my @names = split( /\./, $field->full_name );
-                my $init_obj_value = $self->find_sub_item( $init_obj, \@names );
+                my $init_obj_value = $self->find_sub_obj( $init_obj, \@names );
                 if ( defined $init_obj_value ) {
                     $found = 1;
                     $field->fill_from_object( $init_obj_value );
@@ -465,7 +465,7 @@ sub fill_from_object {
             $field->fill_from_fields() unless $found;
         }
         else {
-           my $value = $self->_get_value( $field, $item ) unless $field->writeonly;
+           my $value = $self->_get_value( $field, $obj ) unless $field->writeonly;
            $field->fill_from_object( $value );
         }
 #       TODO: the following doesn't work for 'input_without_param' fields like checkboxes
@@ -505,34 +505,34 @@ sub fill_from_fields {
     return;
 }
 
-sub find_sub_item {
-    my ( $self, $item, $field_name_array ) = @_;
+sub find_sub_obj {
+    my ( $self, $obj, $field_name_array ) = @_;
     my $this_fname = shift @$field_name_array;;
     my $field = $self->field($this_fname);
-    my $new_item = $self->_get_value( $field, $item );
+    my $new_obj = $self->_get_value( $field, $obj );
     if ( scalar @$field_name_array ) {
-        $new_item = $field->find_sub_item( $new_item, $field_name_array );
+        $new_obj = $field->find_sub_obj( $new_obj, $field_name_array );
     }
-    return $new_item;
+    return $new_obj;
 }
 
 
 
 sub _get_value {
-    my ( $self, $field, $item ) = @_;
+    my ( $self, $field, $obj ) = @_;
 
     my $accessor = $field->accessor;
     my @values;
-    if ( blessed($item) && $item->can($accessor) ) {
+    if ( blessed($obj) && $obj->can($accessor) ) {
         # this must be an array, so that DBIx::Class relations are arrays not resultsets
-        @values = $item->$accessor;
+        @values = $obj->$accessor;
         # for non-DBIC blessed object where access returns arrayref
         if ( scalar @values == 1 && ref $values[0] eq 'ARRAY' && $field->has_flag('multiple') ) {
             @values = @{$values[0]};
         }
     }
-    elsif ( exists $item->{$accessor} ) {
-        my $v = $item->{$accessor};
+    elsif ( exists $obj->{$accessor} ) {
+        my $v = $obj->{$accessor};
         if($field->has_flag('multiple') && ref($v) eq 'ARRAY'){
             @values = @$v;
         } else {
@@ -551,7 +551,7 @@ sub _get_value {
     # this is different than FH, I'm unsure why;
     # there was a problem with a default [1,3] ending up as [[1,3]]
     # in t/field_setup/default.t because of switching to getting
-    # non-item defaults from init_object
+    # non-model defaults from init_object
     # used to be:
     #     if( $field->has_flag('multiple')) {
     #         $value = scalar @values == 1 && ! defined $values[0] ? [] : \@values;

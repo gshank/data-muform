@@ -78,10 +78,6 @@ use Test::More;
     use Data::MuForm::Meta;
     extends 'Data::MuForm';
 
-    has '+item_class' => (
-        default => 'Company'
-    );
-
     has_field 'name';
     has_field 'username';
     has_field 'tier';

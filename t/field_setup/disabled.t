@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 
-# tests that an init_value provided by item/init_object is used
+# tests that an init_value provided by model/init_object is used
 # for disabled fields, and that disabled fields are not validated.
 {
     {

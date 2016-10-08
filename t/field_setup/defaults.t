@@ -43,7 +43,7 @@ is_deeply( $form->fif, { foo => '', bar => 'testing', bax => '' }, 'object overr
     has_field 'bar' => ( default_over_obj => '' );
     has_field 'bax' => ( default_over_obj => 'default_bax' );
 }
-# test that the 'default_over_obj' type defaults override an init_object/item
+# test that the 'default_over_obj' type defaults override an init_object/model
 $form = Test::DefaultsX->new;
 $form->process( init_object => $init_obj, params => {} );
 is( $form->field('foo')->default_over_obj, 'default_foo', 'foo correct' );
@@ -139,14 +139,14 @@ is( $form->field('bax')->fif,   'default_bax', 'fif ok' );
 my $obj = Mock::Object->new( foo => 'myfoo', bar => 'mybar', baz => 'mybaz' );
 
 $form = Test::Object1->new;
-$form->process( item => $obj, item_id => 1, params => {} );
-# test that item is used for value
-is( $form->field('foo')->value, 'myfoo', 'field value from item');
-is( $form->field('foo')->fif, 'myfoo', 'field fif from item');
-is( $form->field('bar')->value, 'mybar', 'field value from item');
-is( $form->field('bar')->fif, 'mybar', 'field fif from item');
-# test that non-item default is used
-is( $form->field('bax')->value, 'bax_from_default', 'non-item field value from default' );
+$form->process( model => $obj, model_id => 1, params => {} );
+# test that model is used for value
+is( $form->field('foo')->value, 'myfoo', 'field value from model');
+is( $form->field('foo')->fif, 'myfoo', 'field fif from model');
+is( $form->field('bar')->value, 'mybar', 'field value from model');
+is( $form->field('bar')->fif, 'mybar', 'field fif from model');
+# test that non-model default is used
+is( $form->field('bax')->value, 'bax_from_default', 'non-model field value from default' );
 is( $form->field('zero')->value, 0, 'zero default works');
 is_deeply( $form->field('foo_list')->value, [1,3], 'multiple default works' );
 
@@ -188,8 +188,8 @@ is( $form->field('foo')->value, 'some_quux', 'field initialized by init_object' 
 $obj = Mock::Object2->new( meow => 'the_real_meow' );
 
 $form = Test::Object3->new;
-$form->process( item => $obj, item_id => 1, params => {} );
-is( $form->field('meow')->value, 'the_real_meow', 'defaults should not override actual item values');
+$form->process( model => $obj, model_id => 1, params => {} );
+is( $form->field('meow')->value, 'the_real_meow', 'defaults should not override actual model values');
 
 
 done_testing;

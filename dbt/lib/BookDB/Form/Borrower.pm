@@ -14,7 +14,7 @@ Catalyst Controller.
 =cut
 
 
-has '+item_class' => ( default => 'Borrower' );
+has '+model_class' => ( default => 'Borrower' );
 
 __PACKAGE__->meta->make_immutable;
 

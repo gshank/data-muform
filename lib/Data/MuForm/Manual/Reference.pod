@@ -24,7 +24,7 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
    language         Used by 'localizer' to get the right translation file.
    ctx              Application context for your use. Weak_ref, cleared on each process call.
 
-   init_object      For default values instead of $item, or in addition to.
+   init_object      For default values instead of 'model', or in addition to.
 
    fields           Field arrayref
    sorted_fields    The sorted array of fields
@@ -38,10 +38,10 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
 
 =head2 Form database attributes
 
-   item             DB row object
-   item_class       Class of db item
-   item_id          Primary key of db item
-   schema           Schema of item
+   model            DB row object
+   model_class      Class of db model
+   model_id         Primary key of db model
+   schema           Schema of model
 
    Also 'update_model' sub
 
@@ -111,7 +111,7 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
    trim          Transform to trim the field
    transform_value_to_fif    Coderef to deflate the field (for filling in the form)
    transform_input_to_value  Coderef to inflate the field (before validation)
-   transform_default_to_value  Coderef to inflate value from item/init_object
+   transform_default_to_value  Coderef to inflate value from model/init_object
    transform_value_after_validate    Coderef to deflate value after validation
    transform_input_to_value  Coderef to transform input to value
 

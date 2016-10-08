@@ -4,7 +4,7 @@ use Data::MuForm::Meta;
 extends 'Data::MuForm::Model::DBIC';
 use DateTime;
 
-has '+item_class' => ( default => 'User');
+has '+model_class' => ( default => 'User');
 
 has_field 'user_name';
 has_field 'fav_cat' => ( label => 'Category' );

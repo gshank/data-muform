@@ -53,7 +53,7 @@ subfields in the compound field.
 =cut
 
 sub is_compound {1}
-has 'item' => ( is => 'rw', clearer => 'clear_item' );
+has 'obj' => ( is => 'rw', clearer => 'clear_obj' );
 has 'primary_key' => ( is => 'rw', isa => ArrayRef,
     predicate => 'has_primary_key', );
 
@@ -94,14 +94,14 @@ sub test_validate_field {
 around 'fill_from_object' => sub {
     my $orig = shift;
     my $self = shift;
-    my ( $item ) = @_;
-    $self->item($item) if $item;
+    my ( $obj ) = @_;
+    $self->obj($obj) if $obj;
     $self->$orig(@_);
 };
 
 after 'clear_data' => sub {
     my $self = shift;
-    $self->clear_item;
+    $self->clear_obj;
 };
 
 around 'fill_from_params' => sub {

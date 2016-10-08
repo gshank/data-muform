@@ -90,14 +90,14 @@ is_deeply( $form->field('tags')->value, ['Perl', 'programming', 'Moose' ],
 is( $form->field('addresses.0.city')->value, 'Prime City', 'get address field OK' );
 is( $form->field('options.flags.opt_in')->value, 1, 'get opt_in flag');
 #============
-# test structured init_object/item
+# test structured init_object/model
 my $form2 = Structured::Form->new;
 ok( $form2, 'form created' );
 $form2->process( init_object => $struct, data => {} );
 is( $form2->num_fields, 6, 'correct number of fields' );
 ok( !$form2->validated, 'form validated');
-is_deeply( $form2->field('employer')->item, { name => 'TechTronix', country => 'Utopia', }, 'has item');
-is_deeply( $form2->field('addresses')->item, $struct->{addresses}, 'item for repeatable' );
+is_deeply( $form2->field('employer')->obj, { name => 'TechTronix', country => 'Utopia', }, 'has model');
+is_deeply( $form2->field('addresses')->obj, $struct->{addresses}, 'model for repeatable' );
 #=============
 
 my $fif = {
@@ -135,11 +135,11 @@ ok( $form->validated, 'form processed from fif' );
 is_deeply( $form->values, $struct, 'values round-tripped from fif');
 
 #=========
-# works with item and params
-$form2->process( item => $struct, data => $fif );
+# works with model and params
+$form2->process( model => $struct, data => $fif );
 ok( $form2->validated, 'form processed from fif' );
 is( $form2->num_fields, 6, 'correct number of fields' );
-is_deeply( $form2->field('employer')->item, { name => 'TechTronix', country => 'Utopia', }, 'has item');
-is_deeply( $form2->field('addresses')->item, $struct->{addresses}, 'item for repeatable' );
+is_deeply( $form2->field('employer')->obj, { name => 'TechTronix', country => 'Utopia', }, 'has model');
+is_deeply( $form2->field('addresses')->obj, $struct->{addresses}, 'model for repeatable' );
 
 done_testing;

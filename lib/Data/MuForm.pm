@@ -120,12 +120,12 @@ L<Data::MuForm::Model::DBIC>.
 =head3 process
 
 Call the 'process' method on your form to perform validation and
-update. A database form must have either an item (row object) or
-a schema, item_id (row primary key), and item_class (usually set in the form).
+update. A database form must have either a model (row object) or
+a schema, model_id (row primary key), and model_class (usually set in the form).
 A non-database form requires only parameters.
 
-   $form->process( item => $book, params => $c->req->parameters );
-   $form->process( item_id => $item_id,
+   $form->process( model => $book, params => $c->req->parameters );
+   $form->process( model_id => $model_id,
        schema => $schema, params => $c->req->parameters );
    $form->process( params => $c->req->parameters );
 
@@ -141,7 +141,7 @@ a database form) can be retrieved with C<< $form->value >>.
 If you don't want to update the database on this process call, you can
 set the 'no_update' flag:
 
-   $form->process( item => $book, params => $params, no_update => 1 );
+   $form->process( model => $book, params => $params, no_update => 1 );
 
 =head3 params
 
@@ -438,7 +438,7 @@ and 'name'.  The default is derived from the form class name.
 
 =head3 init_object
 
-An 'init_object' may be used instead of the 'item' to pre-populate the values
+An 'init_object' may be used instead of the 'model' to pre-populate the values
 in the form. This can be useful when populating a form from default values
 stored in a similar but different object than the one the form is creating.
 The 'init_object' should be either a hash or the same type of object that
@@ -455,10 +455,9 @@ not map to an existing or database object in an automatic way, and you need
 to create a different type of object for initialization. (You might also
 want to do 'update_model' yourself.)
 
-The 'use_init_obj_when_no_accessor_in_item' flag is particularly useful
+You can use both a 'model' and an 'init_values' hashref
 when some of the fields in your form come from the database and some
-are process or environment type flags that are not in the database. You
-can provide defaults from both a database row and an 'init_object.
+are process or environment type flags that are not in the database.
 
 =head3 ctx
 
@@ -701,7 +700,7 @@ sub clear {
     $self->clear_params;
     $self->clear_filled_from;
     $self->submitted(undef);
-    $self->item(undef);
+    $self->model(undef);
     $self->clear_init_object;
     $self->fill_from_object_source(undef);
     $self->ctx(undef);
@@ -744,7 +743,7 @@ sub setup {
     # set the submitted flag
     $self->submitted(1) if ( $self->has_params && ! defined $self->submitted );
 
-    # fill the 'value' attributes from item, init_object or fields
+    # fill the 'value' attributes from model, init_object or fields
     $self->fill_values;
 
     # fill in the input attribute
@@ -763,9 +762,9 @@ sub fill_values {
     my $self = shift;
 
     # these fill the 'value' attributes
-    if ( $self->item ) {
-      $self->fill_from_object_source('item');
-      $self->fill_from_object($self->item);
+    if ( $self->model ) {
+      $self->fill_from_object_source('model');
+      $self->fill_from_object($self->model);
     }
     elsif ( $self->init_object ) {
         $self->fill_from_object_source('init_object');
@@ -904,7 +903,7 @@ sub after_update_model {
     # is re-presented, repeatable elements without primary keys may
     # be created again. There is no reliable way to connect up
     # existing repeatable elements with their db-created primary keys.
-    if ( $self->has_repeatable_fields && $self->item ) {
+    if ( $self->has_repeatable_fields && $self->model ) {
         foreach my $field ( $self->all_repeatable_fields ) {
             next unless $field->is_active;
             # Check to see if there are any repeatable subfields with
@@ -921,14 +920,14 @@ sub after_update_model {
             }
             next unless $needs_reload;
             my @names = split( /\./, $field->full_name );
-            my $rep_item = $self->find_sub_item( $self->item, \@names );
-            # $rep_item is a single row or an array of rows or undef
-            # If we found a database item for the repeatable, replace
-            # the existing result with a result derived from the item.
-            if ( ref $rep_item ) {
+            my $rep_model = $self->find_sub_obj( $self->model, \@names );
+            # $rep_model is a single row or an array of rows or undef
+            # If we found a database model for the repeatable, replace
+            # the existing result with a result derived from the model.
+            if ( ref $rep_model ) {
                 my $parent = $field->parent;
                 $field->init_state;
-                $field->fill_from_object( $rep_item );
+                $field->fill_from_object( $rep_model );
                 # find index of existing result
                #my $index = $parent->result->find_result_index( sub { $_ == $result } );
                 # replace existing result with new result

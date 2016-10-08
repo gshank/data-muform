@@ -84,8 +84,8 @@ sub fill_from_params {
 }
 
 sub fill_from_object {
-    my ( $self, $item ) = @_;
-    $self->next::method( $item );
+    my ( $self, $obj ) = @_;
+    $self->next::method( $obj );
     $self->_load_options;
     $self->value($self->default)
         if( defined $self->default && not $self->has_value );

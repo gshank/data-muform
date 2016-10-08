@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-# this test emulates using a database item, and checks
-# to see that the repeatable is updated from the item,
+# this test emulates using a database model, and checks
+# to see that the repeatable is updated from the model,
 # and that 'fif' is correct
 {
     package MyApp::Test::Form;
@@ -26,24 +26,24 @@ use Test::More;
             $rep->{rep_id} = $index;
             $index++;
         }
-        $self->item( $value );
+        $self->model( $value );
     }
 }
 
 my $form = MyApp::Test::Form->new;
 ok( $form );
 
-my $item = {
+my $model = {
     foo => 'my_foo',
     bar => 'my_bar',
     my_rep => [
     ],
 };
-$form->process( item => $item );
+$form->process( model => $model );
 my $fif = $form->fif;
 $fif->{'my_rep.0.one'} = 'my_one';
 $fif->{'my_rep.0.two'} = 'my_two';
-$form->process( item => $item, params => $fif );
+$form->process( model => $model, params => $fif );
 $fif->{'my_rep.0.rep_id'} = 1;
 my $new_fif = $form->fif;
 is_deeply( $new_fif, $fif, 'fif is correct' );

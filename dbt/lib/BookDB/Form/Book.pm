@@ -18,7 +18,7 @@ Catalyst Form.
 
 =cut
 
-has '+item_class'        => ( default => 'Book' );
+has '+model_class'        => ( default => 'Book' );
 
 has_field 'title' => (
     type             => 'Text',

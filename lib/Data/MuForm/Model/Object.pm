@@ -6,12 +6,12 @@ use Moo::Role;
 sub update_model {
     my $self = shift;
 
-    my $item = $self->item;
-    return unless $item;
+    my $model = $self->model;
+    return unless $model;
     foreach my $field ( $self->sorted_fields ) {
         my $name = $field->name;
-        next unless $item->can($name);
-        $item->$name( $field->value );
+        next unless $model->can($name);
+        $model->$name( $field->value );
     }
 }
 

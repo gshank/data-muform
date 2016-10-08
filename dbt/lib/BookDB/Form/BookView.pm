@@ -6,7 +6,7 @@ extends 'Data::MuForm::Model::DBIC';
 use DateTime;
 
 
-has '+item_class' => ( default => 'Book' );
+has '+model_class' => ( default => 'Book' );
 
 has_field 'borrower' => ( type => 'Select' );
 has_field 'borrowed';

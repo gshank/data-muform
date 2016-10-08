@@ -88,8 +88,7 @@ MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Dur
 Password, PasswordConf, IntRange.  Could possibly be supplied in a compatibility library. Let me
 know if you want this.
 
-DBIC Model: the 'item' is now cleared on process like the other attributes. This is probably mainly
-different in tests.
+DBIC Model: the 'item' has been renamed to 'model' and is now cleared on process like the other attributes.
 
 =cut
 

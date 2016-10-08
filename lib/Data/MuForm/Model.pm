@@ -1,36 +1,34 @@
 package Data::MuForm::Model;
 use Moo::Role;
 
-has 'item' => (
+has 'model' => (
     is      => 'rw',
     lazy    => 1,
-    builder => 'build_item',
-    clearer => 'clear_item',
-    trigger => sub { shift->set_item(@_) }
+    builder => 'build_model',
+    clearer => 'clear_model',
+    trigger => sub { shift->set_model(@_) }
 );
-sub build_item { return }
+sub build_model { return }
 
-sub set_item {
-    my ( $self, $item ) = @_;
-    $self->item_class( ref $item );
+sub set_model {
+    my ( $self, $model ) = @_;
+    $self->model_class( ref $model );
 }
 
-has 'item_id' => (
+has 'model_id' => (
     is      => 'rw',
-    clearer => 'clear_item_id',
-    trigger => sub { shift->set_item_id(@_) }
+    clearer => 'clear_model_id',
+    trigger => sub { shift->set_model_id(@_) }
 );
 
-sub set_item_id { }
+sub set_model_id { }
 
-has 'item_class' => (
+has 'model_class' => (
 #   isa => 'Str',
     is  => 'rw',
 );
 
 sub validate_model { }
-
-sub clear_model { }
 
 sub update_model { }
 

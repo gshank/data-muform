@@ -363,10 +363,10 @@ sub translate {
 }
 
 sub length_or_empty_list {
-    my $item = shift;
-    defined $item or return;
-    length $item or return;
-    return $item;
+    my $thing = shift;
+    defined $thing or return;
+    length $thing or return;
+    return $thing;
 }
 
 sub _calculate_multiplural_index {

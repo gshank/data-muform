@@ -53,7 +53,7 @@ use Test::More;
     my $form = MyApp::Test::Compound2->new;
     ok( $form );
     is( $form->field('comp_foo.one')->value, 1, 'value is one' );
-    is( ref $form->field('comp_foo')->item, 'MyApp::Foo', 'item saved' );
+    is( ref $form->field('comp_foo')->obj, 'MyApp::Foo', 'model saved' );
 }
 
 done_testing;

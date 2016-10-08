@@ -90,7 +90,7 @@ otherwise the repeatable elements will not have primary keys. Although this
 works, if you have included other fields in your repeatable elements
 that do *not* come from the database, the defaults/values must be
 able to be loaded in a way that works when the form is initialized from
-the database item. This is only an issue if you re-present the form
+the database model (row). This is only an issue if you re-present the form
 after the database update succeeds.
 
 =head1 ATTRIBUTES
@@ -110,7 +110,7 @@ rows.
 
 =item num_extra
 
-When the field results are built from an existing object (item or init_object)
+When the field results are built from an existing object (model or init_object)
 an additional number of repeatable elements will be created equal to this
 number. Default is 0.
 
@@ -300,13 +300,13 @@ sub _setup_for_js {
         { index => $self->index, html => $rendered, level => $index_level } );
 }
 
-# this is called when there is an init_object or a db item with values
+# this is called when there is an init_object or a db model with values
 sub fill_from_object {
     my ( $self, $values ) = @_;
 
     return $self->fill_from_fields()
         if ( $self->num_when_empty > 0 && !$values );
-    $self->item($values);
+    $self->obj($values);
     $self->init_state;
     # Create field instances and fill with values
     my $index = 0;

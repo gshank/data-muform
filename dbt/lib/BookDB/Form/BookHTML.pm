@@ -4,7 +4,7 @@ use Data::MuForm::Meta;
 extends 'Data::MuForm::Model::DBIC';
 
 
-has '+item_class' => ( default => 'Book' );
+has '+model_class' => ( default => 'Book' );
 has '+name' => ( default => 'book' );
 has '+html_prefix' => ( default => 1 );
 

@@ -26,7 +26,7 @@
     use Data::MuForm::Meta;
     extends 'Data::MuForm::Model::DBIC';
 
-    has '+item_class' => ( default => 'Author' );
+    has '+model_class' => ( default => 'Author' );
 
     has_field 'title' => ( type => 'Text', required => 1 );
     has_field 'publisher' => ( type => 'Text', required => 1 );

@@ -13,7 +13,7 @@ my $form = BookDB::Form::Author->new;
 
 ok( $form, 'form built' );
 
-$form->process( item => $author, params => {});
+$form->process( model => $author, params => {});
 
 is($form->field('books.0.genres')->num_options, 6, 'got right number of genre options' );
 

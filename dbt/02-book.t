@@ -12,10 +12,10 @@ use_ok( 'BookDB::Schema');
 my $schema = BookDB::Schema->connect('dbi:SQLite:dbt/db/book.db');
 ok($schema, 'get db schema');
 
-my $item = $schema->resultset('Book')->new_result({});
+my $model = $schema->resultset('Book')->new_result({});
 my $form = BookDB::Form::Book->new;
 
-ok( !$form->process( item => $item ), 'Empty data' );
+ok( !$form->process( model => $model ), 'Empty data' );
 
 # check authors options
 my $author_options = $form->field('authors')->options;
@@ -39,9 +39,9 @@ my $params = {
     'year' => '',
 };
 
-ok( $form->process( item => $item, params => $params ), 'Good data' );
+ok( $form->process( model => $model, params => $params ), 'Good data' );
 
-my $book = $form->item;
+my $book = $form->model;
 END { $book->delete };
 
 ok ($book, 'get book object from form');
@@ -57,12 +57,12 @@ is( $num_genres, 2, 'multiple select list updated ok');
 is( $form->field('format')->value, 2, 'get value for format' );
 
 $params->{genres} = 2;
-ok( $form->process( item => $book, params => $params), 'handle one value for multiple select' );
+ok( $form->process( model => $book, params => $params), 'handle one value for multiple select' );
 is_deeply( $form->field('genres')->value, [2], 'right value for genres' );
 
 $params->{authors} = [];
 $params->{genres} = [2,4];
-$form->process( item => $book, params => $params);
+$form->process( model => $book, params => $params);
 
 is( $form->field('authors')->filled_from, 'params', 'authors filled from params' );
 is_deeply( $form->field('authors')->value, [], 'authors value right in form');
@@ -83,9 +83,9 @@ my $bad_1 = {
     silly_field   => 4,
 };
 
-ok( !$form->process( item => $book, params => $bad_1 ), 'bad 1' );
+ok( !$form->process( model => $book, params => $bad_1 ), 'bad 1' );
 
-$form = BookDB::Form::Book->new(item => $book, schema => $schema);
+$form = BookDB::Form::Book->new(model => $book, schema => $schema);
 ok( $form, 'create form from db object');
 
 my $genres_field = $form->field('genres');
@@ -109,16 +109,16 @@ my $values = $form->value;
 $values->{year} = 1999;
 $values->{pages} = 101;
 $values->{format} = 2;
-my $validated = $form->process( item => $book, params => $values );
+my $validated = $form->process( model => $book, params => $values );
 ok( $validated, 'now form validates' );
 
-$form->process( item => $book, params => {} );
+$form->process( model => $book, params => {} );
 is( $book->publisher, 'EreWhon Publishing', 'publisher has not changed');
 
 # test that multiple fields (genres) with value of [] deletes genres
 is( $book->genres->count, 2, 'multiple select list updated ok');
 $params->{genres} = [];
-$form->process( item => $book, params => $params );
+$form->process( model => $book, params => $params );
 is( $book->genres->count, 0, 'multiple select list has no selected options');
 
 =comment

@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 # This demonstrates a field that comes in as a single string from
-# defaults/init_object/item, and is split up into multiple subfields,
+# defaults/init_object/model, and is split up into multiple subfields,
 # then is flattened again into a string.
 #
 

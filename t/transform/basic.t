@@ -6,12 +6,12 @@ use Test::More;
     # A 'transform_value_to_fif' method changes the format of the fill-in-form string
 
     #    These two are "conveniences" for munging data passed in and out of a form
-    #    The same effect could be achieved by modifying the value in the init_object or item
+    #    The same effect could be achieved by modifying the value in the init_object or model
     #        before passing it in, and modifying it once returned, so it's primarily
     #        useful for database rows.
     #
     # A 'transform_value_to_fif' method changes the 'value' retrieved from a default source
-    #     (default, init_object, item)
+    #     (default, init_object, model)
     # A 'transform_value_after_validation'  method changes the format of the value available after validation
 
 

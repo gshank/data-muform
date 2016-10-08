@@ -37,7 +37,7 @@ use Test::More;
 
 my $form = MyApp::Form::RepHash->new;
 ok( $form );
-my $item = {
+my $model = {
   'lookup' => {
     'k1' => 'v1',
     'k2' => 'v2',
@@ -57,17 +57,17 @@ my $inflated = {
 };
 
 {
-  $form->process(item => $item);
+  $form->process(model => $model);
   my $fif = $form->fif;
   my $value = $form->value;
   is_deeply( $fif, $params, 'fif is correct' );
-  is_deeply( $value, $inflated, 'value from item is correct' );
+  is_deeply( $value, $inflated, 'value from model is correct' );
 }
 
 {
   $form->process(params => $params);
   my $value = $form->value;
-  is_deeply( $value, $item, 'value from params is correct' );
+  is_deeply( $value, $model, 'value from params is correct' );
 }
 
 done_testing;

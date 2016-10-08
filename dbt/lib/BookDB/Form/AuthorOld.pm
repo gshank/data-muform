@@ -4,7 +4,7 @@ use Moo;
 use Data::MuForm::Meta;
 extends 'Data::MuForm::Model::DBIC';
 
-has '+item_class' => ( default => 'AuthorOld' );
+has '+model_class' => ( default => 'AuthorOld' );
 
 has_field 'last_name' => ( type => 'Text', required => 1 );
 has_field 'first_name' => ( type => 'Text', required => 1 );
