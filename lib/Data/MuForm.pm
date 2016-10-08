@@ -2,16 +2,6 @@ package Data::MuForm;
 use Moo;
 use Data::MuForm::Meta;
 
-=head1 NAME
-
-Data::MuForm
-
-=head1 DESCRIPTION
-
-Moo conversion of HTML::FormHandler.
-
-=cut
-
 with 'Data::MuForm::Model';
 with 'Data::MuForm::Fields';
 with 'Data::MuForm::Common';
@@ -22,6 +12,500 @@ use Data::Clone ('data_clone');
 use Data::MuForm::Params;
 use Data::MuForm::Localizer;
 use MooX::Aliases;
+
+our $VERSION = '0.01';
+
+=head1 NAME
+
+Data::MuForm
+
+=head1 SYNOPSIS
+
+Moo conversion of Data::MuForm, with more emphasis on data
+validation and a new way of rendering.
+
+See the manual at L<Data::MuForm::Manual>.
+
+    my $validator = MyApp::Form::Test->new;
+    $validator->check( data => $params );
+                    or
+    my $form = MyApp::Form::User->new;
+    $form->process( model => $row, params => $params );
+    my $rendered_form = $form->render;
+    if( $form->validated ) {
+        # perform validated form actions
+    }
+    else {
+        # perform non-validated actions
+    }
+
+An example of a custom form class:
+
+    package MyApp::Form::User;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    has_field 'name' => ( type => 'Text' );
+    has_field 'age' => ( type => 'PosInteger', apply => [ 'MinimumAge' ] );
+    has_field 'hobbies' => ( type => 'Multiple' );
+    has_field 'address' => ( type => 'Compound' );
+    has_field 'address.city' => ( type => 'Text' );
+    has_field 'address.state' => ( type => 'Select' );
+    has_field 'email' => ( type => 'Email' );
+
+    1;
+
+
+A dynamic form - one that does not use a custom form class - may be
+created using the 'field_list' attribute to set fields:
+
+    my $validator = Data::MuForm->new(
+        name => 'user_form',
+        field_list => [
+            'username' => {
+                type  => 'Text',
+                apply => [ { check => qr/^[0-9a-z]*\z/,
+                   message => 'Contains invalid characters' } ],
+            },
+            'password' => { apply => [ Password ] },
+        ],
+    );
+
+
+=head1 DESCRIPTION
+
+This documentation is mainly of Data::MuForm class attributes and methods.
+For general-purpose documentation see L<Data::MuForm::Manual>.
+
+=head1 ATTRIBUTES and METHODS
+
+=head2 Creating a form with 'new'
+
+The new constructor takes name/value pairs:
+
+    MyForm->new( action => $action );
+
+No attributes are required on new. Normally you would pass in persistent
+attributes on 'new' (such as 'schema') and request/process related attributes on 'process';
+
+The form's fields will be built from the form definitions on new.
+
+The 'field_list' is passed in on 'new' because fields are build at construction time.
+It can also be a method in the form class.
+
+   field_list  - an array of field definitions
+
+=head2 process & check
+
+Data to be validated/processed:
+
+   data     $validator->check( data => {} );
+   params   $form->process( params => {} );
+
+The 'init_values' hashref can be passed in, but can also be set in the form class:
+
+   init_values - a hashref or object to provide initial values
+
+Passed in on process with a DBIC model MuForm class:
+
+   model     - database row object
+
+See the model class for more information about 'model', 'model_id',
+'model_class', and 'schema' (for the DBIC model).
+L<Data::MuForm::Model::DBIC>.
+
+=head2 Processing the form
+
+=head3 process
+
+Call the 'process' method on your form to perform validation and
+update. A database form must have either an item (row object) or
+a schema, item_id (row primary key), and item_class (usually set in the form).
+A non-database form requires only parameters.
+
+   $form->process( item => $book, params => $c->req->parameters );
+   $form->process( item_id => $item_id,
+       schema => $schema, params => $c->req->parameters );
+   $form->process( params => $c->req->parameters );
+
+This process method returns the 'validated' flag (C<< $form->validated >>).
+If it is a database form and the form validates, the database row
+will be updated.
+
+After the form has been processed, you can get a parameter hashref suitable
+for using to fill in the form from C<< $form->fif >>.
+A hash of inflated values (that would be used to update the database for
+a database form) can be retrieved with C<< $form->value >>.
+
+If you don't want to update the database on this process call, you can
+set the 'no_update' flag:
+
+   $form->process( item => $book, params => $params, no_update => 1 );
+
+=head3 params
+
+Parameters are passed in when you call 'process'.
+HFH gets data to validate and store in the database from the params hash.
+If the params hash is empty, no validation is done, so it is not necessary
+to check for POST before calling C<< $form->process >>. (Although see
+the 'posted' option for complications.)
+
+Params can either be in the form of CGI/HTTP style params:
+
+   {
+      user_name => "Joe Smith",
+      occupation => "Programmer",
+      'addresses.0.street' => "999 Main Street",
+      'addresses.0.city' => "Podunk",
+      'addresses.0.country' => "UT",
+      'addresses.0.address_id' => "1",
+      'addresses.1.street' => "333 Valencia Street",
+      'addresses.1.city' => "San Francisco",
+      'addresses.1.country' => "UT",
+      'addresses.1.address_id' => "2",
+   }
+
+or as structured data in the form of hashes and lists:
+
+   {
+      addresses => [
+         {
+            city => 'Middle City',
+            country => 'GK',
+            address_id => 1,
+            street => '101 Main St',
+         },
+         {
+            city => 'DownTown',
+            country => 'UT',
+            address_id => 2,
+            street => '99 Elm St',
+         },
+      ],
+      'occupation' => 'management',
+      'user_name' => 'jdoe',
+   }
+
+CGI style parameters will be converted to hashes and lists for HFH to
+operate on.
+
+=head3 posted
+
+Note that FormHandler by default uses empty params as a signal that the
+form has not actually been posted, and so will not attempt to validate
+a form with empty params. Most of the time this works OK, but if you
+have a small form with only the controls that do not return a post
+parameter if unselected (checkboxes and select lists), then the form
+will not be validated if everything is unselected. For this case you
+can either add a hidden field as an 'indicator', or use the 'posted' flag:
+
+   $form->process( posted => ($c->req->method eq 'POST'), params => ... );
+
+The 'posted' flag also works to prevent validation from being performed
+if there are extra params in the params hash and it is not a 'POST' request.
+
+=head2 Getting data out
+
+=head3 fif  (fill in form)
+
+If you don't use FormHandler rendering and want to fill your form values in
+using some other method (such as with HTML::FillInForm or using a template)
+this returns a hash of values that are equivalent to params which you may
+use to fill in your form.
+
+The fif value for a 'title' field in a TT form:
+
+   [% form.fif.title %]
+
+Or you can use the 'fif' method on individual fields:
+
+   [% form.field('title').fif %]
+
+If you use FormHandler to render your forms or field you probably won't use
+these methods.
+
+=head3 value
+
+Returns a hashref of all field values. Useful for non-database forms, or if
+you want to update the database yourself. The 'fif' method returns
+a hashref with the field names for the keys and the field's 'fif' for the
+values; 'value' returns a hashref with the field accessors for the keys, and the
+field's 'value' (possibly inflated) for the values.
+
+Forms containing arrays to be processed with L<Data::MuForm::Field::Repeatable>
+will have parameters with dots and numbers, like 'addresses.0.city', while the
+values hash will transform the fields with numbers to arrays.
+
+=head2 Accessing and setting up fields
+
+Fields are declared with a number of attributes which are defined in
+L<Data::MuForm::Field>. If you want additional attributes you can
+define your own field classes (or apply a role to a field class - see
+L<Data::MuForm::Manual::Cookbook>). The field 'type' (used in field
+definitions) is the short class name of the field class, used when
+searching the 'field_name_space' for the field class.
+
+=head3 has_field
+
+The most common way of declaring fields is the 'has_field' syntax.
+Using the 'has_field' syntax sugar requires C< use Data::MuForm::Moose; >
+or C< use Data::MuForm::Moose::Role; > in a role.
+See L<Data::MuForm::Manual::Intro>
+
+   use Data::MuForm::Moose;
+   has_field 'field_name' => ( type => 'FieldClass', .... );
+
+=head3 field_list
+
+A 'field_list' is an array of field definitions which can be used as an
+alternative to 'has_field' in small, dynamic forms to create fields.
+
+    field_list => [
+       field_one => {
+          type => 'Text',
+          required => 1
+       },
+       field_two => 'Text,
+    ]
+
+The field_list array takes elements which are either a field_name key
+pointing to a 'type' string or a field_name key pointing to a
+hashref of field attributes. You can also provide an array of
+hashref elements with the name as an additional attribute.
+The field list can be set inside a form class, when you want to
+add fields to the form depending on some other state, although
+you can also create all the fields and set some of them inactive.
+
+   sub field_list {
+      my $self = shift;
+      my $fields = $self->schema->resultset('SomeTable')->
+                          search({user_id => $self->user_id, .... });
+      my @field_list;
+      while ( my $field = $fields->next )
+      {
+         < create field list >
+      }
+      return \@field_list;
+   }
+
+
+=head3 active/inactive
+
+A field can be marked 'inactive' and set to active at process time
+by specifying the field name in the 'active' array:
+
+   has_field 'foo' => ( type => 'Text', inactive => 1 );
+   ...
+   my $form = MyApp::Form->new;
+   $form->process( active => ['foo'] );
+
+Or a field can be a normal active field and set to inactive at process
+time:
+
+   has_field 'bar';
+   ...
+   my $form = MyApp::Form->new;
+   $form->process( inactive => ['foo'] );
+
+Fields specified as active/inactive on 'process' will have the flag
+flag cleared when the form is cleared (on the next process/check call).
+
+The 'sorted_fields' method returns only active fields, sorted according to the
+'order' attribute. The 'fields' method returns all fields.
+
+   foreach my $field ( $self->sorted_fields ) { ... }
+
+You can test whether a field is active by using the field 'is_active' and 'is_inactive'
+methods.
+
+=head3 field_namespace
+
+Use to look for field during form construction. If a field is not found
+with the field_name_space (or Data::MuForm/Data::MuFormX),
+the 'type' must start with a '+' and be the complete package name.
+
+=head3 fields
+
+The array of fields, objects of L<Data::MuForm::Field> or its subclasses.
+A compound field will itself have an array of fields,
+so this is a tree structure.
+
+=head3 sorted_fields
+
+Returns those fields from the fields array which are currently active. This
+is the method that returns the fields that are looped through when rendering.
+
+=head3 field($name), subfield($name)
+
+'field' is the method that is usually called to access a field:
+
+    my $title = $form->field('title')->value;
+    [% f = form.field('title') %]
+
+    my $city = $form->field('addresses.0.city')->value;
+
+Pass a second true value to die on errors.
+
+Since fields are searched for using the form as a base, if you want to find
+a sub field in a compound field method, the 'subfield' method may be more
+useful, since you can search starting at the current field. The 'chained'
+method also works:
+
+    -- in a compound field --
+    $self->field('media.caption'); # fails
+    $self->field('media')->field('caption'); # works
+    $self->subfield('media.caption'); # works
+
+=head2 Constraints and validation
+
+Most validation is performed on a per-field basis, and there are a number
+of different places in which validation can be performed.
+
+See also L<Data::MuForm::Manual::Validation>.
+
+=head3 Class validation for individual fields
+
+You can define a method in your class to perform validation on a field.
+This method is the equivalent of the field class validate method except it is
+in the validator/form class, so you might use this
+validation method if you don't want to create a field subclass.
+
+It has access to the form ($self) and the field.
+This method is called after the field class 'validate' method, and is not
+called if the value for the field is empty ('', undef). (If you want an
+error message when the field is empty, use the 'required' flag and message
+or the form 'validate' method.)
+The name of this method can be set with 'set_validate' on the field. The
+default is 'validate_' plus the field name:
+
+   sub validate_testfield { my ( $self, $field ) = @_; ... }
+
+If the field name has dots they should be replaced with underscores.
+
+Note that you can also provide a coderef which will be a method on the field:
+
+   has_field 'foo' => ( methods => { validate => *validate_foo } );
+
+=head3 validate
+
+This is a form method that is useful for cross checking values after they have
+been saved as their final validated value, and for performing more complex
+dependency validation. It is called after all other field validation is done,
+and whether or not validation has succeeded, so it has access to the
+post-validation values of all the fields.
+
+This is the best place to do validation checks that depend on the values of
+more than one field.
+
+=head2 Accessing errors
+
+Also see L<Data::MuForm::Manual::Errors>.
+
+Set an error in a field with C<< $field->add_error('some error string'); >>.
+Set a form error not tied to a specific field with
+C<< $self->add_form_error('another error string'); >>.
+The 'add_error' and 'add_form_error' methods call localization. If you
+want to skip localization for a particular error, you can use 'push_errors'
+or 'push_form_errors' instead.
+
+  has_errors - returns true or false
+  error_fields - returns list of fields with errors
+  errors - returns array of error messages for the entire form
+  num_errors - number of errors in form
+
+Each field has an array of error messages. (errors, has_errors, num_errors,
+clear_errors)
+
+  $form->field('title')->errors;
+
+Compound fields also have an array of error_fields.
+
+=head2 Clear form state
+
+The clear method is called at the beginning of 'process' if the form
+object is reused, such as when it is persistent,
+or in tests.  If you add other attributes to your form that are set on
+each request, you may need to clear those yourself.
+
+=head2 Miscellaneous attributes
+
+=head3 name
+
+The form's name.  Useful for multiple forms. Used for the form element 'id'.
+When 'html_prefix' is set it is used to construct the field 'id'
+and 'name'.  The default is derived from the form class name.
+
+=head3 init_object
+
+An 'init_object' may be used instead of the 'item' to pre-populate the values
+in the form. This can be useful when populating a form from default values
+stored in a similar but different object than the one the form is creating.
+The 'init_object' should be either a hash or the same type of object that
+the model uses (a DBIx::Class row for the DBIC model). It can be set in a
+variety of ways:
+
+   my $form = MyApp::Form->new( init_object => { .... } );
+   $form->process( init_object => {...}, ... );
+   has '+init_object' => ( default => sub { { .... } } );
+   sub init_object { my $self = shift; .... }
+
+The method version is useful if the organization of data in your form does
+not map to an existing or database object in an automatic way, and you need
+to create a different type of object for initialization. (You might also
+want to do 'update_model' yourself.)
+
+The 'use_init_obj_when_no_accessor_in_item' flag is particularly useful
+when some of the fields in your form come from the database and some
+are process or environment type flags that are not in the database. You
+can provide defaults from both a database row and an 'init_object.
+
+=head3 ctx
+
+Place to store application context for your use in your form's methods.
+
+=head2 Localizer
+
+The form has a 'localizer' object which is shared with form fields.
+Uses gettext style .po files with names parameters, and is implemented
+with internal code borrowed from L<Locale::TextDomain::OO>.
+
+=head2 Flags
+
+=head3 validated, is_valid
+
+Flag that indicates if form has been validated. You might want to use
+this flag if you're doing something in between process and returning,
+such as setting a stash key. ('is_valid' is a synonym for this flag)
+
+   $form->process( ... );
+   $c->stash->{...} = ...;
+   return unless $form->validated;
+
+=head3 ran_validation
+
+Flag to indicate that validation has been run. This flag will be
+false when the form is initially loaded and displayed, since
+validation is not run until FormHandler has params to validate.
+
+=head3 html_prefix
+
+Flag to indicate that the form name is used as a prefix for fields
+in an HTML form. Useful for multiple forms
+on the same HTML page. The prefix is stripped off of the fields
+before creating the internal field name, and added back in when
+returning a parameter hash from the 'fif' method. For example,
+the field name in the HTML form could be "book.borrower", and
+the field name in the MuForm form (and the database column)
+would be just "borrower".
+
+   has '+name' => ( default => 'book' );
+   has '+html_prefix' => ( default => 1 );
+
+Also see the Field attribute "html_name", a convenience function which
+will return the form name + "." + field full_name
+
+=cut
 
 has 'name' => ( is => 'ro', isa => Str, builder => 'build_name');
 sub build_name {
@@ -50,9 +534,6 @@ sub params {
     return $self->{_params};
 }
 has 'html_prefix' => ( is => 'rw' );
-#has 'use_defaults_over_obj' => ( is => 'rw', isa => Bool, default => 0 );
-#has 'use_init_obj_over_item' => ( is => 'rw', isa => Bool, default => 0 );
-
 
 has 'form_meta_fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 has 'index' => ( is => 'rw', isa => HashRef, default => sub {{}} );

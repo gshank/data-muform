@@ -7,6 +7,17 @@ This is the Data::MuForm manual.
 Data::MuForm performs validation and is a framework for processing
 forms.
 
+One of the main goals of MuForm is flexibility. There are many customizable
+methods and transforms, and a number of official hooks for changing class behavior.
+In addition, since MuForm is written in Moo, you can override almost everything.
+
+You can split the pieces of your forms up into logical parts and compose
+complete forms from MuForm classes, roles, fields, collections of
+validations, transformations and type constraints.
+You can write custom methods to process forms, add any attribute you like,
+and use method modifiers.  MuForm validators/forms are Perl classes, so there's
+a lot of flexibility in what you can do.
+
 =head1 SECTIONS
 
 =head2 L<Data::MuForm::Manual::FormHandlerDiff>
@@ -63,6 +74,22 @@ Test your forms
 =head2 L<Data::MuForm::Manual::Reference>
 
 Quick reference of MuForm interface
+
+=cut
+
+=head1 SUPPORT
+
+IRC:
+
+   Join #formhandler on irc.perl.org
+
+Mailing list:
+
+  http://groups.google.com/group/formhandler
+
+=head1 AUTHOR
+
+gshank: Gerda Shank <gshank@cpan.org>
 
 =cut
 

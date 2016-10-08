@@ -5,26 +5,43 @@ package Data::MuForm::Manual::FormHandlerDiff;
 This documents the differences between FormHandler and MuForm, in order to
 assist converting forms or deciding which package to use.
 
+Note: this is still a work in process, so please contact me if your
+favorite feature has gone missing. Some features may be supplied via
+roles.
+
+The 'result' objects have been removed because there was too much overhead
+and complication for low payout. Some rendering tasks were practically
+impossible to support using the results.
+
 Note: the rendering is entirely different, so much that there's no point in
-documenting the differences here. See the rendering documentation.
+documenting the individual differences here. No more widgets. I found that the rendering
+of form elements hardly changed at all, and that trying to have one wrapper
+method that handled everything ended up with a large mess. Attributes that
+were rendering specific have been mostly moved into a render_args hashref
+that will be passed to a renderer, in order to allow more flexibility and reduce
+the overhead of form construction. I attempted to make it easier to render
+in templates with 'render_element' while still allowing full-automatic rendering.
+See the rendering documentation. There will be 'layouts'.
 
-Localization now uses a gettext style .po file and a gettext type localizer.
+No 'has_block', since that's purely a rendering thing. There will some way of
+doing something similar in the renderer, but it's not yet been developed.
+
+Localization now uses a gettext style .po file and a gettext type localizer,
+with named parameters.
 Users can supply their own localizer as long as it can use the translation
-files.
+files and supports the calls that the internal add_error* methods use.
 
-Added 'check' method for validation, which doesn't do 'update_model'.
-
-Renamed 'field_name_space' to 'field_namespace'
+Added 'check' method for validation, which doesn't do 'update_model', for
+non-form type validation.
 
 Added 'data' alias for 'params', for better naming when doing simple validation
+
+Renamed 'field_name_space' to 'field_namespace'
 
 Standardized returns from attributes to arrayref, instead of array. If an array return
 is available it will be in the 'all_' version. The important ones are 'options' and 'fields'.
 A field 'options' returns an arrayref of options. 'all_options' returns an array. The 'fields'
 attribute returns an arrayref of fields, 'all_fields' returns an array.
-
-The names of the validation methods used in custom fields have changed. Use 'base_validate'
-instead of _inner_validate.
 
 The trim method is a separate coderef and is not added to the apply actions. Needs to
 be defined as a simple coderef instead of an apply-style action.
@@ -33,7 +50,7 @@ The active => [] and inactive => [] no longer have a permanent build (on new) ef
 Do in your own form code if you want this. They still work the same on ->process.
 
 The 'posted' flag has been renamed to 'submitted', because you also need on a 'get'. Also
-a params hashref with no field named keys will not need the submitted flag.
+a params hashref with no field name keys will not need the submitted => 0 flag.
 
 The 'active' and 'inactive' flags are implemented slightly differently, but shouldn't affect
 field definitions.
@@ -50,17 +67,17 @@ Removed 'no_update' flag on form. Use 'check' method instead.
 
 Removed 'update_field_list'. Can be implemented easily via user code if needed.
 
-Removed 'defaults' on 'process'. Use init_object instead.
+Removed 'defaults' on 'process'. Use init_object instead or implement via user code.
 
 The inflate/deflate transforms have been renamed: 'inflate_method' = 'transform_input_to_value',
 'deflate_method' = 'tranform_value_to_fif', 'inflate_default_method' = 'transform_default_to_value',
 'deflate_value_method' = 'transform_value_after_validate'. Added new transform: 'transform_param_to_input'.
 
-Removed 'deflation'.
+Removed 'deflation'. Many other ways of doing this.
 
 Removed 'missing'.
 
-Varous methods that could be set in a field definition have been moved into a 'methods' hashref:
+Various methods that could be set in a field definition have been moved into a 'methods' hashref:
 'build_id', 'build_options', 'build_label', 'validate', 'default'.
 
 TextArea field renamed to Textarea for consistency.
@@ -68,7 +85,8 @@ TextArea field renamed to Textarea for consistency.
 A number of trivial fields are no longer supplied by the distribution. If you need these fields
 it should be pretty easy to create your own. Some fields not supplied: Hour, Minute, Month,
 MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Duration, DateTime,
-Password, PasswordConf, IntRange.
+Password, PasswordConf, IntRange.  Could possibly be supplied in a compatibility library. Let me
+know if you want this.
 
 DBIC Model: the 'item' is now cleared on process like the other attributes. This is probably mainly
 different in tests.
