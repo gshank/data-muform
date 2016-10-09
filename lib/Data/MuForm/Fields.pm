@@ -131,7 +131,7 @@ sub fields_fif {
     my ( $self, $prefix ) = @_;
 
     $prefix ||= '';
-    $prefix = $prefix . "."
+    $prefix = $self->field_prefix . "."
         if ( $self->isa('Data::MuForm') && $self->field_prefix );
 
     my %params;
@@ -141,6 +141,7 @@ sub fields_fif {
         my $fif = $field->fif;
         next if ( !defined $fif || (ref $fif eq 'ARRAY' && ! scalar @{$fif} ) );
         if ( $field->has_fields ) {
+            # this builds up foo.0.bar.name
             my $next_params = $field->fields_fif( $prefix . $field->name . '.' );
             next unless $next_params;
             %params = ( %params, %{$next_params} );
