@@ -336,7 +336,8 @@ sub _update_or_create {
 
     $parent ||= $self->form;
     $field_attr->{parent} = $parent;
-    #$field_attr->{localizer} = $parent->localizer;
+    $field_attr->{localizer} = $parent->localizer;
+    $field_attr->{renderer} = $parent->renderer;
     $field_attr->{form} = $self->form if $self->form;
     my $index = $parent->field_index( $field_attr->{name} );
     my $field;

@@ -141,36 +141,39 @@ sub build_renderer {
   require Data::MuForm::Renderer::Standard;
   return Data::MuForm::Renderer::Standard->new( localizer => $self->localizer );
 }
+
 sub get_render_args {
   my ( $self, %args ) = @_;
-  my $render_args = {
-    %{ $self->base_render_args },
-    %{ $self->render_args },
-  };
+  my $render_args = merge( $self->base_render_args, $self->render_args );
   $render_args = merge( $render_args, \%args );
   return $render_args;
 }
+
 sub render {
   my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args(%$rargs);
+  my $render_args = $self->get_render_args(%$rargs, rendering => 'field');
+  $self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_field($render_args);
 }
 
 sub render_element {
   my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args( element => $rargs );
+  my $render_args = $self->get_render_args( element => $rargs, rendering => 'element' );
+  $self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_element($render_args);
 }
 
 sub render_errors {
   my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args( errors_ele => $rargs );
+  my $render_args = $self->get_render_args( errors_ele => $rargs, rendering => 'errors' );
+  $self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_errors($render_args);
 }
 
 sub render_label {
   my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args( label_ele => $rargs );
+  my $render_args = $self->get_render_args( label_ele => $rargs, rendering => 'label' );
+  $self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_label($render_args);
 }
 

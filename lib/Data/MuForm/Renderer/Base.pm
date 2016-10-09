@@ -40,11 +40,11 @@ sub layout_bare {
 
 sub layout_simple {
     my ( $self, $rargs ) = @_;
-    my $out = qq{<div };
+    my $out = qq{\n<div };
     $out .= $self->_render_attrs( $rargs->{wrapper} );
     $out .= qq{>};
     $out .= $self->layout_bare($rargs);
-    $out .= qq{</div>};
+    $out .= qq{\n</div>};
 }
 
 sub layout_w_errs {
@@ -61,14 +61,37 @@ sub localize {
 }
 
 
-sub render {
+sub render_form {
+    my ($self, $rargs, $fields ) = @_;
+
+    my $out = '';
+    $out .= $self->render_start($rargs);
+
+    foreach my $field ( @$fields ) {
+        $out .= $field->render;
+    }
+
+    $out .= $self->render_end($rargs);
+    return $out;
+}
+
+sub render_start {
     my ($self, $rargs ) = @_;
+
+    my $out = qq{<form };
+    $out .= q{>};
+}
+
+sub render_end {
+    my ($self, $rargs ) = @_;
+
+   return q{</form>};
 }
 
 sub render_field {
   my ( $self, $rargs ) = @_;
 
-  my $layout = $rargs->{layout} || 'bare';
+  my $layout = $rargs->{layout} || 'simple';
   my $meth = $self->layouts->{$layout};
   my $out;
   if ( $meth ) {
@@ -88,6 +111,9 @@ sub render_input {
   my ( $self, $rargs ) = @_;
 
   my $input_type = $rargs->{input_type};
+  # checkboxes are special
+  return $self->render_checkbox($rargs) if $input_type eq 'checkbox';
+
   my $name = $rargs->{name};
   my $id = $rargs->{name};
   my $fif = $rargs->{fif};
@@ -125,8 +151,11 @@ sub _render_class {
   $class ||= [];
   $class = [split(' ', $class)] unless ref $class eq 'ARRAY';
   push @$class, 'error' if $has_errors;
-  my $classes = join(' ', @$class);
-  my $out = qq{class="$classes" };
+  my $out = '';
+  if ( @$class ) {
+    my $classes = join(' ', @$class);
+    $out = qq{class="$classes" };
+  }
   return $out;
 }
 
@@ -159,11 +188,11 @@ sub render_select {
   foreach my $option ( @$options ) {
     my $value = $option->{value};
     my $label = $option->{label};
-    $out .= qq{<option value="$value">$label</option>};
+    $out .= qq{\n<option value="$value">$label</option>};
   }
 
   # end of select
-  $out .= "</select>\n";
+  $out .= "\n</select>\n";
   return $out;
 }
 
@@ -179,13 +208,14 @@ sub render_checkbox {
   my $checkbox_value = $rargs->{checkbox_value};
   my $fif = $rargs->{fif};
 
-  my $out = qq{\n<checkbox };
+  my $out = qq{\n<input };
+  $out .= qq{type="checkbox" };
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
   $out .= qq{value="$checkbox_value" };
   $out .= qq{checked="checked" } if $fif eq $checkbox_value;
   $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
-  $out .= ">";
+  $out .= "/>";
   return $out;
 }
 

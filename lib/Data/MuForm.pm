@@ -14,6 +14,7 @@ use Data::Clone ('data_clone');
 use Data::MuForm::Params;
 use Data::MuForm::Localizer;
 use MooX::Aliases;
+use Data::MuForm::Merge ('merge');
 
 our $VERSION = '0.01';
 
@@ -586,9 +587,23 @@ has 'renderer' => ( is => 'rw', lazy => 1, builder => 'build_renderer' );
 sub build_renderer {
     my $self = shift;
     require Data::MuForm::Renderer::Standard;
-    my $renderer = Data::MuForm::Renderer::Standard->new( localizer => $self->localiser );
+    my $renderer = Data::MuForm::Renderer::Standard->new( localizer => $self->localizer );
     return $renderer;
 }
+has 'render_args' => ( is => 'rw', lazy => 1, isa => HashRef, builder => 'build_render_args' );
+sub build_render_args {{}}
+sub base_render_args {
+  my $self = shift;
+  my $args = {
+    name => $self->name,
+    id => $self->name,
+    form_errors => $self->form_errors || [],
+    method => $self->http_method,
+  };
+  $args->{action} = $self->action if $self->action;
+  return $args;
+}
+
 
 #========= Errors ==========
 has 'form_errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
@@ -667,6 +682,10 @@ sub all_messages {
 #========= Methods ==========
 sub BUILD {
     my $self = shift;
+
+    # instantiate
+    $self->localizer;
+    $self->renderer;
     $self->build_fields;
     $self->after_build_fields;
     # put various defaults into fields. Should this happen?
@@ -921,6 +940,38 @@ sub after_update_model {
             }
         }
     }
+}
+
+sub render_hook {
+    my ( $self, $rargs ) = @_;
+}
+
+sub get_render_args {
+  my ( $self, %args ) = @_;
+  my $render_args = merge( $self->base_render_args, $self->render_args );
+  $render_args = merge( $render_args, \%args );
+  return $render_args;
+}
+
+sub render {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args(%$rargs, rendering => 'form');
+  $self->form->render_hook($render_args) if $self->form;
+  return $self->renderer->render_form($render_args, $self->sorted_fields);
+}
+
+sub render_start {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args(%$rargs, rendering => 'form_start');
+  $self->form->render_hook($render_args) if $self->form;
+  return $self->renderer->render_start($render_args);
+}
+
+sub render_end {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args(%$rargs, rendering => 'form_end');
+  $self->form->render_hook($render_args) if $self->form;
+  return $self->renderer->render_end($render_args);
 }
 
 1;

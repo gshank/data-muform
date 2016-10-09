@@ -10,7 +10,7 @@ has '+input_without_param' => ( default => 0 );
 has 'option_label'         => ( is => 'rw' );
 has 'option_wrapper'       => ( is => 'rw' );
 
-sub build_form_element { 'checkbox' }
+sub build_input_type { 'checkbox' }
 
 sub base_render_args {
     my $self = shift;

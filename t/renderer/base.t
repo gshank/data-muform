@@ -74,7 +74,7 @@ is_html( $rendered, $expected, 'got expected output for select element' );
 # checkbox field
 $rendered = $form->field('jax')->render_element({ class => 'hhh yyy' });
 $expected = q{
-  <checkbox id="jax" name="jax" value="yes" class="hhh yyy">
+  <input type="checkbox" id="jax" name="jax" value="yes" class="hhh yyy">
 };
 is_html( $rendered, $expected, 'got expected output for checkbox element' );
 
@@ -104,5 +104,37 @@ $expected = q{
   </div>
 };
 is_html( $rendered, $expected, 'foo field rendered correctly' );
+
+$rendered = $form->render;
+$expected = q{
+<form >
+  <div >
+    <label for="foo">Foo</label>
+    <input type="text" name="foo" id="foo" value="" class="error" maxlength="10" />
+    <span>'Foo' field is required</span>
+  </div>
+  <div >
+    <label for="bar">Bar</label>
+    <select name="bar" id="bar" >
+      <option value="">-- Choose --</option>
+      <option value="1">one</option>
+      <option value="2">two</option>
+    </select>
+  </div>
+  <div >
+    <label for="jax">Jax</label>
+    <input type="checkbox" name="jax" id="jax" value="yes" >
+  </div>
+  <div >
+    <label for="sol">Sol</label>
+    <textarea name="sol" id="sol" cols="50" rows="3" >Some text</textarea>
+  </div>
+  <div >
+    <label for="submitted">Submitted</label>
+    <input type="submit" name="submitted" id="submitted" value="Save" />
+  </div>
+</form>
+};
+is_html( $rendered, $expected, 'form rendered correctly' );
 
 done_testing;
