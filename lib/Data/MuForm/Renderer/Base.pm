@@ -15,8 +15,6 @@ Base functionality for renderers, including rendering standard form elements.
 
 has 'localizer' => ( is => 'rw' );
 
-has 'html_filter' => ( is => 'rw', default => sub { *default_html_filter } );
-
 has 'layouts' => ( is => 'rw', builder => 'build_layouts' );
 
 sub build_layouts {
@@ -72,6 +70,16 @@ sub render_form {
     }
 
     $out .= $self->render_end($rargs);
+    return $out;
+}
+
+sub render_compound {
+    my ( $self, $rargs, $fields ) = @_;
+
+    my $out = '';
+    foreach my $field ( @$fields ) {
+        $out .= $field->render;
+    }
     return $out;
 }
 
@@ -278,7 +286,7 @@ sub render_errors {
   return $out;
 }
 
-sub default_html_filter {
+sub html_filter {
     my $string = shift;
     return '' if (!defined $string);
     $string =~ s/&/&amp;/g;
@@ -286,6 +294,26 @@ sub default_html_filter {
     $string =~ s/>/&gt;/g;
     $string =~ s/"/&quot;/g;
     return $string;
+}
+
+sub render_radio_option {
+    my ( $self, $rargs, $option ) = @_;
+
+    my $value = html_filter($option->{value});
+    my $name  = $rargs->{name};
+
+    my $out = qq{\n<input type="radio" };
+    $out .= qq{name="$name" };
+    $out .= qq{value="$value" };
+    if ( $rargs->{fif} eq $value ) {
+        $out .= qq{checked="checked" };
+    }
+    # TODO - handle attributes
+    $out .= q{/>};
+}
+
+sub render_radiogroup {
+    my ( $self, $rargs ) = @_;
 }
 
 1;

@@ -17,6 +17,26 @@ Note: this is still a work in process, so please contact me if your
 favorite feature has gone missing. Some features may be supplied via
 roles.
 
+In your MuForm classes do;
+
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+instead of:
+
+    use HTML::FormHandler::Moose;
+    extends 'HTML::FormHandler';
+
+In your MuForm roles do:
+
+    use Moo::Role;
+    use Data::MuForm::Meta;
+
+instead of:
+
+    use HTML::FormHandler::Moose::Role;
+
 The 'result' objects have been removed because there was too much overhead
 and complication for low payout. Some rendering tasks were practically
 impossible to support using the results.
@@ -59,6 +79,9 @@ attribute returns an arrayref of fields, 'all_fields' returns an array.
 
 The trim method is a separate coderef and is not added to the apply actions. Needs to
 be defined as a simple coderef instead of an apply-style action.
+
+The 'render_filter_method' has been removed. The 'html_filter' is defined in the Renderer.
+If you want a different filter, create your own renderer.
 
 The active => [] and inactive => [] no longer have a permanent build (on new) effect.
 Do in your own form code if you want this. They still work the same on ->process.

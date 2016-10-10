@@ -117,8 +117,10 @@ has 'html5_type_attr' => ( is => 'rw' );
 sub base_render_args {
   my $self = shift;
   my $args = {
-    form => $self->form,
+#   form => $self->form,  # in theory we shouldn't need this
     name => $self->prefixed_name,
+    field_name => $self->name,
+    type => $self->type,
     form_element => $self->form_element,
     input_type => $self->input_type,
     id => $self->id,
