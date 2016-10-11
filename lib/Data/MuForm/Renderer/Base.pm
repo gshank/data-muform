@@ -439,7 +439,7 @@ sub cb2l {
 
   my $id = $rargs->{id};
   my $option_label = $self->localize($rargs->{option_label}) || '';
-  $out .= qq{\n<label for="$id">$cb_element $option_label</label>};
+  $out .= qq{\n<label for="$id">$cb_element$option_label</label>};
   return $out;
 }
 
