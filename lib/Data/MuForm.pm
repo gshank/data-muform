@@ -587,7 +587,11 @@ has 'renderer' => ( is => 'rw', lazy => 1, builder => 'build_renderer' );
 sub build_renderer {
     my $self = shift;
     require Data::MuForm::Renderer::Standard;
-    my $renderer = Data::MuForm::Renderer::Standard->new( localizer => $self->localizer );
+    my $render_hook = sub {
+      my $self = shift;
+      return $self->form->render_hook($self, @_);
+    };
+    my $renderer = Data::MuForm::Renderer::Standard->new( localizer => $self->localizer, form => $self->form );
     return $renderer;
 }
 has 'render_args' => ( is => 'rw', lazy => 1, isa => HashRef, builder => 'build_render_args' );
@@ -942,8 +946,9 @@ sub after_update_model {
     }
 }
 
+# model for render_hook in forms to modify render_args for rendering
 sub render_hook {
-    my ( $self, $rargs ) = @_;
+    my ( $self, $renderer, $rargs ) = @_;
 }
 
 sub get_render_args {
@@ -956,21 +961,18 @@ sub get_render_args {
 sub render {
   my ( $self, $rargs ) = @_;
   my $render_args = $self->get_render_args(%$rargs, rendering => 'form');
-  $self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_form($render_args, $self->sorted_fields);
 }
 
 sub render_start {
   my ( $self, $rargs ) = @_;
   my $render_args = $self->get_render_args(%$rargs, rendering => 'form_start');
-  $self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_start($render_args);
 }
 
 sub render_end {
   my ( $self, $rargs ) = @_;
   my $render_args = $self->get_render_args(%$rargs, rendering => 'form_end');
-  $self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_end($render_args);
 }
 

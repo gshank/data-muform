@@ -13,11 +13,18 @@ Base functionality for renderers, including rendering standard form elements.
 
 =cut
 
-has 'localizer' => ( is => 'rw' );
+has 'form' => ( is => 'ro' );
+
+has 'localizer' => ( is => 'ro' );
 
 has 'layouts' => ( is => 'rw', builder => 'build_layouts' );
 
 has 'default_cb_layout' => ( is => 'rw', default => 'cbwrll' );
+
+sub render_hook {
+    my $self = shift;
+    return $self->form->render_hook($self, @_);
+}
 
 sub build_layouts {
     my $self = shift;
@@ -36,7 +43,8 @@ sub layout_bare {
 
 sub render_field_bare {
     my ( $self, $rargs ) = @_;
-    if ( $rargs->{form_element} eq 'checkbox' ) {
+$DB::single=1;
+    if ( $rargs->{form_element} eq 'input' && $rargs->{input_type} eq 'checkbox' ) {
        return $self->render_field_checkbox($rargs);
     }
     my $out = '';
@@ -116,6 +124,8 @@ sub render_compound {
 sub render_field {
   my ( $self, $rargs ) = @_;
 
+  $rargs->{rendering} = 'field';
+  $self->render_hook($rargs);
   my $layout = $rargs->{layout} || 'simple';
   my $meth = $self->layouts->{$layout};
   my $out;
@@ -257,6 +267,8 @@ sub render_textarea {
 sub render_element {
   my ( $self, $rargs ) = @_;
 
+  $rargs->{rendering} = 'element';
+  $self->render_hook($rargs);
   my $form_element = $rargs->{form_element};
   my $meth = "render_$form_element";
   return $self->$meth($rargs);
@@ -269,6 +281,8 @@ sub render_element {
 sub render_label {
   my ( $self, $rargs, $left_of_label, $right_of_label ) = @_;
 
+  $rargs->{rendering} = 'label';
+  $self->render_hook($rargs);
   $right_of_label ||= '';
   $left_of_label ||= '';
 
@@ -290,6 +304,8 @@ sub render_label {
 sub render_errors {
   my ( $self, $rargs ) = @_;
 
+  $rargs->{rendering} = 'errors';
+  $self->render_hook($rargs);
   my $errors = $rargs->{errors} || [];
   my $out = '';
   foreach my $error (@$errors) {
@@ -337,10 +353,9 @@ sub render_field_checkbox {
 
   my $cb_element = $self->render_checkbox($rargs);
   my $cb_layout = $rargs->{cb_layout} || $self->default_cb_layout;
-
   my $out = '';
   if ( my $meth = $self->can($cb_layout) ) {
-     $out = $meth->($self, $rargs);
+     $out = $meth->($self, $rargs, $cb_element);
   }
   else {
     die "Checkbox layout '$cb_layout' not found";
@@ -363,7 +378,7 @@ sub render_checkbox {
   my $checkbox_value = $rargs->{checkbox_value};
   my $fif = $rargs->{fif};
 
-  my $out = qq{\n<input };
+  my $out = qq{<input };
   $out .= qq{type="checkbox" };
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };

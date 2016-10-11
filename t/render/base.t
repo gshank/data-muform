@@ -107,31 +107,29 @@ is_html( $rendered, $expected, 'foo field rendered correctly' );
 
 $rendered = $form->render;
 $expected = q{
-<form >
-  <div >
+<form>
+  <div>
     <label for="foo">Foo</label>
-    <input type="text" name="foo" id="foo" value="" class="error" maxlength="10" />
-    <span>'Foo' field is required</span>
+    <input class="error" id="foo" maxlength="10" name="foo" type="text" value="" /> <span>&apos;Foo&apos; field is required</span>
   </div>
-  <div >
+  <div>
     <label for="bar">Bar</label>
-    <select name="bar" id="bar" >
+    <select id="bar" name="bar">
       <option value="">-- Choose --</option>
       <option value="1">one</option>
       <option value="2">two</option>
     </select>
   </div>
-  <div >
-    <label for="jax">Jax</label>
-    <input type="checkbox" name="jax" id="jax" value="yes" >
+  <div>
+    <label for="jax">Jax<input id="jax" name="jax" type="checkbox" value="yes" /></label>
   </div>
-  <div >
+  <div>
     <label for="sol">Sol</label>
-    <textarea name="sol" id="sol" cols="50" rows="3" >Some text</textarea>
+    <textarea cols="50" id="sol" name="sol" rows="3">Some text</textarea>
   </div>
-  <div >
+  <div>
     <label for="submitted">Submitted</label>
-    <input type="submit" name="submitted" id="submitted" value="Save" />
+    <input id="submitted" name="submitted" type="submit" value="Save" />
   </div>
 </form>
 };
