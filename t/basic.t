@@ -13,6 +13,7 @@ use_ok('Data::MuForm');
    extends 'Data::MuForm';
 
    has '+name'         => ( default  => 'testform_' );
+   has '+skip_fields_without_input' => ( default => 1 );
 
    has_field 'optname' => ( label     => 'First' );
    has_field 'reqname' => ( required => 1 );
@@ -85,7 +86,6 @@ my $fif = {
    somename => '',
 };
 is_deeply( $form->fif, $fif, 'fif is correct with missing field' );
-
 
 $good->{somename} = 'testing';
 $form->process($good);
@@ -194,6 +194,5 @@ if ( !$form->process( params => { bar => 1, } ) )
         fail("error messages match");
    }
 }
-
 
 done_testing;

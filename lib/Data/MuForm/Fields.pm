@@ -26,6 +26,7 @@ sub clear_value { $_[0]->{value} = {} }
 sub values { $_[0]->value }
 has 'init_value' => ( is => 'rw', clearer => 'clear_init_value' );
 has 'input' => ( is => 'rw', clearer => 'clear_input' );
+has 'skip_fields_without_input' => ( is => 'rw' );  # except 'input_without_param'
 has 'filled_from' => ( is => 'rw', clearer => 'clear_filled_from' );
 has 'meta_fields' => ( is => 'rw' );
 has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_field_list' );
@@ -119,6 +120,7 @@ sub fields_validate {
     my %value_hash;
     foreach my $field ( $self->all_sorted_fields ) {
         next if ( !$field->is_active || $field->disabled );
+        next if ( $self->skip_fields_without_input && ! $field->has_input && ! $field->has_input_without_param );
         # Validate each field and "inflate" input -> value.
         $field->validate_field;    # this calls the field's 'validate' routine
         $value_hash{ $field->accessor } = $field->value
@@ -137,7 +139,6 @@ sub fields_fif {
     my %params;
     foreach my $field ( $self->all_sorted_fields ) {
         next if ( ! $field->is_active || $field->password || $field->no_fif );
-       #next unless $field->has_input || $field->has_value;
         my $fif = $field->fif;
         next if ( !defined $fif || (ref $fif eq 'ARRAY' && ! scalar @{$fif} ) );
         if ( $field->has_fields ) {
@@ -339,6 +340,8 @@ sub _update_or_create {
     $field_attr->{localizer} = $parent->localizer;
     $field_attr->{renderer} = $parent->renderer;
     $field_attr->{form} = $self->form if $self->form;
+    $field_attr->{skip_fields_without_input} = $parent->skip_fields_without_input
+        if ! $self->is_form && $self->is_compound && ! exists $field_attr->{skip_fields_without_input};
     my $index = $parent->field_index( $field_attr->{name} );
     my $field;
     if ( defined $index ) {
@@ -425,7 +428,9 @@ sub fill_from_params {
         foreach my $field ( $self->all_sorted_fields ) {
             next if ! $field->is_active;
             my $fname = $field->input_param || $field->name;
-            $field->fill_from_params($input->{$fname}, exists $input->{$fname});
+            my $exists = exists $input->{$fname};
+            next if ( $self->skip_fields_without_input && ! $exists && ! $field->has_input_without_param );
+            $field->fill_from_params($input->{$fname}, $exists );
             $my_input->{$fname} = $field->input if $field->has_input;
         }
     }
