@@ -635,14 +635,14 @@ sub errors { [$_[0]->all_errors] }
 sub errors_by_id {
     my $self = shift;
     my %errors;
-    $errors{$_->id} = [$_->all_errors] for $self->error_fields;
+    $errors{$_->id} = [$_->all_errors] for $self->all_error_fields;
     return \%errors;
 }
 
 sub errors_by_name {
     my $self = shift;
     my %errors;
-    $errors{$_->prefixed_name} = [$_->all_errors] for $self->error_fields;
+    $errors{$_->prefixed_name} = [$_->all_errors] for $self->all_error_fields;
     return \%errors;
 }
 

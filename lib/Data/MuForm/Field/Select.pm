@@ -50,6 +50,20 @@ sub _trigger_value {
     $self->{value} = $value;
 }
 
+# this is necessary because if a Select field is unselected, no param will be
+# submitted
+has '+input_without_param' => ( lazy => 1, builder => 'build_input_without_param' );
+sub build_input_without_param {
+    my $self = shift;
+    if( $self->multiple ) {
+        $self->not_nullable(1);
+        return [];
+    }
+    else {
+        return '';
+    }
+}
+
 has 'label_column' => ( is => 'rw', default => 'name' );
 has 'active_column' => ( is => 'rw', default => 'active' );
 has 'sort_column' => ( is => 'rw' );

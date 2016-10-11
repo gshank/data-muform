@@ -110,75 +110,6 @@ sub is_compound {}
 sub is_form {0}
 sub no_fif {0}
 
-#=================
-# Rendering
-#=================
-has 'html5_type_attr' => ( is => 'rw' );
-sub base_render_args {
-  my $self = shift;
-  my $args = {
-#   form => $self->form,  # in theory we shouldn't need this
-    name => $self->prefixed_name,
-    field_name => $self->name,
-    type => $self->type,
-    form_element => $self->form_element,
-    input_type => $self->input_type,
-    id => $self->id,
-    label => $self->loc_label,
-    required => $self->required,
-    errors => $self->errors || [],
-    fif => $self->fif,
-  };
-  return $args;
-}
-
-has 'render_args' => ( is => 'rw', lazy => 1, isa => HashRef, builder => 'build_render_args' );
-sub build_render_args {{}}
-has 'renderer' => (
-  is => 'rw', lazy => 1,
-  builder => 'build_renderer',
-);
-sub build_renderer {
-  my $self = shift;
-  require Data::MuForm::Renderer::Standard;
-  return Data::MuForm::Renderer::Standard->new( localizer => $self->localizer );
-}
-
-sub get_render_args {
-  my ( $self, %args ) = @_;
-  my $render_args = merge( $self->base_render_args, $self->render_args );
-  $render_args = merge( $render_args, \%args );
-  return $render_args;
-}
-
-sub render {
-  my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args(%$rargs, rendering => 'field');
-  $self->form->render_hook($render_args) if $self->form;
-  return $self->renderer->render_field($render_args);
-}
-
-sub render_element {
-  my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args( element => $rargs, rendering => 'element' );
-  $self->form->render_hook($render_args) if $self->form;
-  return $self->renderer->render_element($render_args);
-}
-
-sub render_errors {
-  my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args( errors_ele => $rargs, rendering => 'errors' );
-  $self->form->render_hook($render_args) if $self->form;
-  return $self->renderer->render_errors($render_args);
-}
-
-sub render_label {
-  my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args( label_ele => $rargs, rendering => 'label' );
-  $self->form->render_hook($render_args) if $self->form;
-  return $self->renderer->render_label($render_args);
-}
-
 around BUILDARGS => sub {
   my ( $orig, $class, %args ) = @_;
 
@@ -307,6 +238,72 @@ sub build_input_type { 'text' }
 has 'layout' => ( is => 'rw' );
 has 'layout_group' => ( is => 'rw' );
 has 'order' => ( is => 'rw', isa => Int, default => 0 );
+has 'html5_type_attr' => ( is => 'rw' );
+
+sub base_render_args {
+  my $self = shift;
+  my $args = {
+#   form => $self->form,  # in theory we shouldn't need this
+    name => $self->prefixed_name,
+    field_name => $self->name,
+    type => $self->type,
+    form_element => $self->form_element,
+    input_type => $self->input_type,
+    id => $self->id,
+    label => $self->loc_label,
+    required => $self->required,
+    errors => $self->errors || [],
+    fif => $self->fif,
+  };
+  return $args;
+}
+
+has 'render_args' => ( is => 'rw', lazy => 1, isa => HashRef, builder => 'build_render_args' );
+sub build_render_args {{}}
+has 'renderer' => (
+  is => 'rw', lazy => 1,
+  builder => 'build_renderer',
+);
+sub build_renderer {
+  my $self = shift;
+  require Data::MuForm::Renderer::Standard;
+  return Data::MuForm::Renderer::Standard->new( localizer => $self->localizer );
+}
+
+sub get_render_args {
+  my ( $self, %args ) = @_;
+  my $render_args = merge( $self->base_render_args, $self->render_args );
+  $render_args = merge( $render_args, \%args );
+  return $render_args;
+}
+
+sub render {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args(%$rargs, rendering => 'field');
+  $self->form->render_hook($render_args) if $self->form;
+  return $self->renderer->render_field($render_args);
+}
+
+sub render_element {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args( element => $rargs, rendering => 'element' );
+  $self->form->render_hook($render_args) if $self->form;
+  return $self->renderer->render_element($render_args);
+}
+
+sub render_errors {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args( errors_ele => $rargs, rendering => 'errors' );
+  $self->form->render_hook($render_args) if $self->form;
+  return $self->renderer->render_errors($render_args);
+}
+
+sub render_label {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args( label_ele => $rargs, rendering => 'label' );
+  $self->form->render_hook($render_args) if $self->form;
+  return $self->renderer->render_label($render_args);
+}
 
 
 #===================
