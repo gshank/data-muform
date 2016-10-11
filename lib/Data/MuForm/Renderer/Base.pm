@@ -17,6 +17,8 @@ has 'localizer' => ( is => 'rw' );
 
 has 'layouts' => ( is => 'rw', builder => 'build_layouts' );
 
+has 'default_cb_layout' => ( is => 'rw', default => 'cbwrll' );
+
 sub build_layouts {
     my $self = shift;
     my $layouts = {
@@ -29,6 +31,14 @@ sub build_layouts {
 
 sub layout_bare {
     my ( $self, $rargs ) = @_;
+    return $self->render_field_bare($rargs);
+}
+
+sub render_field_bare {
+    my ( $self, $rargs ) = @_;
+    if ( $rargs->{form_element} eq 'checkbox' ) {
+       return $self->render_field_checkbox($rargs);
+    }
     my $out = '';
     $out .= $self->render_label($rargs);
     $out .= $self->render_element($rargs);
@@ -58,6 +68,9 @@ sub localize {
    return $self->localizer->loc_($message[0]);
 }
 
+#==============================
+#  Forms
+#==============================
 
 sub render_form {
     my ($self, $rargs, $fields ) = @_;
@@ -73,16 +86,6 @@ sub render_form {
     return $out;
 }
 
-sub render_compound {
-    my ( $self, $rargs, $fields ) = @_;
-
-    my $out = '';
-    foreach my $field ( @$fields ) {
-        $out .= $field->render;
-    }
-    return $out;
-}
-
 sub render_start {
     my ($self, $rargs ) = @_;
 
@@ -94,6 +97,20 @@ sub render_end {
     my ($self, $rargs ) = @_;
 
    return q{</form>};
+}
+
+#==============================
+#  Forms
+#==============================
+
+sub render_compound {
+    my ( $self, $rargs, $fields ) = @_;
+
+    my $out = '';
+    foreach my $field ( @$fields ) {
+        $out .= $field->render;
+    }
+    return $out;
 }
 
 sub render_field {
@@ -111,29 +128,10 @@ sub render_field {
   return $out;
 }
 
-=head2 render_input
+#==============================
+#  Utility methods
+#==============================
 
-=cut
-
-sub render_input {
-  my ( $self, $rargs ) = @_;
-
-  my $input_type = $rargs->{input_type};
-  # checkboxes are special
-  return $self->render_checkbox($rargs) if $input_type eq 'checkbox';
-
-  my $name = $rargs->{name};
-  my $id = $rargs->{name};
-  my $fif = $rargs->{fif};
-
-  my $out = qq{\n<input type="$input_type" };
-  $out .= qq{name="$name" };
-  $out .= qq{id="$id" };
-  $out .= qq{value="$fif" };
-  $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
-  $out .= "/>";
-  return $out;
-}
 
 =head2 _render_attrs
 
@@ -167,6 +165,34 @@ sub _render_class {
   return $out;
 }
 
+#==============================
+#  Field form elements
+#==============================
+
+=head2 render_input
+
+=cut
+
+sub render_input {
+  my ( $self, $rargs ) = @_;
+
+  my $input_type = $rargs->{input_type};
+  # checkboxes are special
+  return $self->render_checkbox($rargs) if $input_type eq 'checkbox';
+
+  my $name = $rargs->{name};
+  my $id = $rargs->{name};
+  my $fif = $rargs->{fif};
+
+  my $out = qq{\n<input type="$input_type" };
+  $out .= qq{name="$name" };
+  $out .= qq{id="$id" };
+  $out .= qq{value="$fif" };
+  $out .= $self->_render_attrs( $rargs->{element_attr}, scalar @{$rargs->{errors}} );
+  $out .= "/>";
+  return $out;
+}
+
 =head2 render_select
 
 =cut
@@ -182,7 +208,7 @@ sub render_select {
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
   $out .= qq{multiple="multiple" } if $rargs->{multiple};
-  $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
+  $out .= $self->_render_attrs( $rargs->{element_attr}, scalar @{$rargs->{errors}} );
   $out .= ">";
 
   # render empty_select
@@ -204,28 +230,6 @@ sub render_select {
   return $out;
 }
 
-=head2 render_checkbox
-
-=cut
-
-sub render_checkbox {
-  my ( $self, $rargs ) = @_;
-
-  my $name = $rargs->{name};
-  my $id = $rargs->{name};
-  my $checkbox_value = $rargs->{checkbox_value};
-  my $fif = $rargs->{fif};
-
-  my $out = qq{\n<input };
-  $out .= qq{type="checkbox" };
-  $out .= qq{name="$name" };
-  $out .= qq{id="$id" };
-  $out .= qq{value="$checkbox_value" };
-  $out .= qq{checked="checked" } if $fif eq $checkbox_value;
-  $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
-  $out .= "/>";
-  return $out;
-}
 
 =head2 render_textarea
 
@@ -241,7 +245,7 @@ sub render_textarea {
   my $out = "\n<textarea ";
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
-  $out .= $self->_render_attrs( $rargs->{element}, scalar @{$rargs->{errors}} );
+  $out .= $self->_render_attrs( $rargs->{element_attr}, scalar @{$rargs->{errors}} );
   $out .= ">$fif</textarea>";
   return $out;
 }
@@ -263,11 +267,19 @@ sub render_element {
 =cut
 
 sub render_label {
-  my ( $self, $rargs ) = @_;
+  my ( $self, $rargs, $left_of_label, $right_of_label ) = @_;
+
+  $right_of_label ||= '';
+  $left_of_label ||= '';
 
   my $id = $rargs->{id};
   my $label = $self->localize($rargs->{label});
-  my $out = qq{\n<label for="$id">$label</label>};
+  my $out = qq{\n<label };
+  $out .= qq{for="$id"};
+  $out .= $self->_render_attrs( $rargs->{label_attr} );
+  $out .= qq{>};
+  $out .= qq{$left_of_label$label$right_of_label};
+  $out .= qq{</label>};
   return $out
 }
 
@@ -314,6 +326,106 @@ sub render_radio_option {
 
 sub render_radiogroup {
     my ( $self, $rargs ) = @_;
+}
+
+#==============================
+#  Checkboxes
+#==============================
+
+sub render_field_checkbox {
+    my ( $self, $rargs) = @_;
+
+  my $cb_element = $self->render_checkbox($rargs);
+  my $cb_layout = $rargs->{cb_layout} || $self->default_cb_layout;
+
+  my $out = '';
+  if ( my $meth = $self->can($cb_layout) ) {
+     $out = $meth->($self, $rargs);
+  }
+  else {
+    die "Checkbox layout '$cb_layout' not found";
+  }
+  $out .= $self->render_errors($rargs);
+
+  return $out;
+
+}
+
+=head2 render_checkbox
+
+=cut
+
+sub render_checkbox {
+  my ( $self, $rargs ) = @_;
+
+  my $name = $rargs->{name};
+  my $id = $rargs->{name};
+  my $checkbox_value = $rargs->{checkbox_value};
+  my $fif = $rargs->{fif};
+
+  my $out = qq{\n<input };
+  $out .= qq{type="checkbox" };
+  $out .= qq{name="$name" };
+  $out .= qq{id="$id" };
+  $out .= qq{value="$checkbox_value" };
+  $out .= qq{checked="checked" } if $fif eq $checkbox_value;
+  $out .= $self->_render_attrs( $rargs->{element_attr}, scalar @{$rargs->{errors}} );
+  $out .= "/>";
+  return $out;
+}
+
+=head2 cbwrll
+
+Checkbox, wrapped, label left
+
+   <label class="checkbox" for="option1"><input id="option1" name="option1" type="checkbox" value="1" /> Option1 </label>
+
+=cut
+
+sub cbwrll {
+  my ( $self, $rargs, $cb_element ) = @_;
+
+  my $out = $self->render_label($rargs, '', $cb_element);
+  return $out
+
+}
+
+=head2 cbwrlr
+
+Checkbox wrapped, label right
+
+=cut
+
+sub cbwrlr {
+  my ( $self, $rargs, $cb_element ) = @_;
+
+  my $out = $self->render_label($rargs, $cb_element, '' );
+  return $out
+}
+
+=head2 cbnowrll
+
+Checkbox not wrapped, label left
+
+=cut
+
+sub cbnowrll {
+  my ( $self, $rargs, $cb_element ) = @_;
+
+  my $out = $self->render_label($rargs);
+  $out .= $cb_element;
+  return $out;
+}
+
+sub cb2l {
+  my ( $self, $rargs, $cb_element ) = @_;
+
+  my $out = $self->render_label($rargs);
+
+  my $id = $rargs->{id};
+  my $option_label = $self->localize($rargs->{option_label}) || '';
+  $out .= qq{\n<label for="$id">$cb_element $option_label</label>};
+  return $out;
 }
 
 1;

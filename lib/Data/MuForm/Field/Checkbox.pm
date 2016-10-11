@@ -3,12 +3,24 @@ package Data::MuForm::Field::Checkbox;
 use Moo;
 extends 'Data::MuForm::Field';
 
+=head1 NAME
+
+Data::MuForm::Field::Checkbox
+
+=head1 DESCRIPTION
+
+Render args:
+  option_label
+  option_wrapper
+
+=cut
+
 has 'size' => ( is => 'rw', default => 0 );
 
 has 'checkbox_value' => ( is => 'rw', default => 1 );
 has '+input_without_param' => ( default => 0 );
-has 'option_label'         => ( is => 'rw' );
-has 'option_wrapper'       => ( is => 'rw' );
+#has 'option_label'         => ( is => 'rw' );
+#has 'option_wrapper'       => ( is => 'rw' );
 
 sub build_input_type { 'checkbox' }
 

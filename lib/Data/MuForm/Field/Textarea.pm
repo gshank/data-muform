@@ -13,8 +13,8 @@ has 'rows'    => ( isa => Int, is => 'rw', default => 5 );
 sub base_render_args {
     my $self = shift;
     my $args = $self->next::method(@_);
-    $args->{element}->{cols} = $self->cols if $self->cols;
-    $args->{element}->{rows} = $self->rows if $self->rows;
+    $args->{element_attr}->{cols} = $self->cols if $self->cols;
+    $args->{element_attr}->{rows} = $self->rows if $self->rows;
     return $args;
 }
 
