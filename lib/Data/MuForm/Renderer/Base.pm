@@ -21,55 +21,13 @@ has 'layouts' => ( is => 'rw', builder => 'build_layouts' );
 
 has 'default_cb_layout' => ( is => 'rw', default => 'cbwrll' );
 
+has 'default_rd_layout' => ( is => 'rw', default => 'labels_right' );
+
 sub render_hook {
     my $self = shift;
     return $self->form->render_hook($self, @_);
 }
 
-sub build_layouts {
-    my $self = shift;
-    my $layouts = {
-        bare => *layout_bare,
-        simple => *layout_simple,
-        w_errs => *layout_w_errs,
-    };
-    return $layouts;
-}
-
-sub layout_bare {
-    my ( $self, $rargs ) = @_;
-    return $self->render_field_bare($rargs);
-}
-
-sub render_field_bare {
-    my ( $self, $rargs ) = @_;
-$DB::single=1;
-    if ( $rargs->{form_element} eq 'input' && $rargs->{input_type} eq 'checkbox' ) {
-       return $self->render_field_checkbox($rargs);
-    }
-    my $out = '';
-    $out .= $self->render_label($rargs);
-    $out .= $self->render_element($rargs);
-    $out .= $self->render_errors($rargs);
-    return $out;
-}
-
-sub layout_simple {
-    my ( $self, $rargs ) = @_;
-    my $out = qq{\n<div };
-    $out .= $self->_render_attrs( $rargs->{wrapper} );
-    $out .= qq{>};
-    $out .= $self->layout_bare($rargs);
-    $out .= qq{\n</div>};
-}
-
-sub layout_w_errs {
-    my ( $self, $rargs ) = @_;
-    my $out = '';
-    $out .= $self->render_element($rargs);
-    $out .= $self->render_errors($rargs);
-    return $out;
-}
 
 sub localize {
    my ( $self, @message ) = @_;
@@ -108,7 +66,7 @@ sub render_end {
 }
 
 #==============================
-#  Forms
+#  Fields
 #==============================
 
 sub render_compound {
@@ -324,13 +282,34 @@ sub html_filter {
     return $string;
 }
 
+
+#==============================
+#  Radio, Radiogroup
+#==============================
+
+sub render_field_radiogroup {
+  my ( $self, $rargs ) = @_;
+
+  my $label_layout = $rargs->{rd_layout} || $self->default_rd_layout;
+
+  my $out = $self->render_label($rargs);
+  # render options
+  my $options = $rargs->{options};
+  foreach my $option ( @$options ) {
+    my $rd_element = $self->render_radio_option($rargs, $option);
+    my $rd_elements = $label_layout eq 'labels_left' ? ['', $rd_element] : [$rd_element, ''];
+    $out .= $self->render_radio_label($rargs, $option, @$rd_elements);
+  }
+  return $out;
+}
+
 sub render_radio_option {
     my ( $self, $rargs, $option ) = @_;
 
     my $value = html_filter($option->{value});
     my $name  = $rargs->{name};
 
-    my $out = qq{\n<input type="radio" };
+    my $out = qq{<input type="radio" };
     $out .= qq{name="$name" };
     $out .= qq{value="$value" };
     if ( $rargs->{fif} eq $value ) {
@@ -340,8 +319,15 @@ sub render_radio_option {
     $out .= q{/>};
 }
 
-sub render_radiogroup {
-    my ( $self, $rargs ) = @_;
+sub render_radio_label {
+  my ( $self, $rargs, $option, $left_of_label, $right_of_label ) = @_;
+
+  $right_of_label ||= '';
+  $left_of_label ||= '';
+  my $label = $self->localize($option->{label});
+  my $out = qq{\n<label>};
+  $out .= qq{$left_of_label$label$right_of_label};
+  $out .= qq{</label>};
 }
 
 #==============================
@@ -415,7 +401,7 @@ sub cbwrlr {
   my ( $self, $rargs, $cb_element ) = @_;
 
   my $out = $self->render_label($rargs, $cb_element, '' );
-  return $out
+  return $out;
 }
 
 =head2 cbnowrll
@@ -441,6 +427,58 @@ sub cb2l {
   my $option_label = $self->localize($rargs->{option_label}) || '';
   $out .= qq{\n<label for="$id">$cb_element$option_label</label>};
   return $out;
+}
+
+#==============================
+#  Layouts
+#==============================
+
+sub build_layouts {
+    my $self = shift;
+    my $layouts = {
+        bare => *layout_bare,
+        simple => *layout_simple,
+        w_errs => *layout_w_errs,
+    };
+    return $layouts;
+}
+
+sub layout_bare {
+    my ( $self, $rargs ) = @_;
+    return $self->render_field_bare($rargs);
+}
+
+sub render_field_bare {
+    my ( $self, $rargs ) = @_;
+
+    if ( $rargs->{form_element} eq 'input' && $rargs->{input_type} eq 'checkbox' ) {
+       return $self->render_field_checkbox($rargs);
+    }
+    elsif ( $rargs->{form_element} eq 'radiogroup' ) {
+       return $self->render_field_radiogroup($rargs);
+    }
+    my $out = '';
+    $out .= $self->render_label($rargs);
+    $out .= $self->render_element($rargs);
+    $out .= $self->render_errors($rargs);
+    return $out;
+}
+
+sub layout_simple {
+    my ( $self, $rargs ) = @_;
+    my $out = qq{\n<div };
+    $out .= $self->_render_attrs( $rargs->{wrapper} );
+    $out .= qq{>};
+    $out .= $self->render_field_bare($rargs);
+    $out .= qq{\n</div>};
+}
+
+sub layout_w_errs {
+    my ( $self, $rargs ) = @_;
+    my $out = '';
+    $out .= $self->render_element($rargs);
+    $out .= $self->render_errors($rargs);
+    return $out;
 }
 
 1;
