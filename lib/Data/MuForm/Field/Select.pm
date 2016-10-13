@@ -95,24 +95,18 @@ sub fill_from_params {
         if $self->multiple;
     $self->next::method( $input, $exists );
     $self->_load_options;
-    $self->value($self->default)
-        if( defined $self->default && not $self->has_value );
 }
 
 sub fill_from_object {
     my ( $self, $obj ) = @_;
     $self->next::method( $obj );
     $self->_load_options;
-    $self->value($self->default)
-        if( defined $self->default && not $self->has_value );
 }
 
 sub fill_from_field {
     my ( $self ) = @_;
     $self->next::method();
     $self->_load_options;
-    $self->value($self->default)
-        if( defined $self->default && not $self->has_value );
 }
 
 sub _load_options {
