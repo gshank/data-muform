@@ -19,6 +19,8 @@ has 'localizer' => ( is => 'ro' );
 
 has 'layouts' => ( is => 'rw', builder => 'build_layouts' );
 
+has 'default_field_layout' => ( is => 'rw', default => 'simple' );
+
 has 'default_cb_layout' => ( is => 'rw', default => 'cbwrll' );
 
 has 'default_rd_layout' => ( is => 'rw', default => 'labels_right' );
@@ -84,7 +86,7 @@ sub render_field {
 
   $rargs->{rendering} = 'field';
   $self->render_hook($rargs);
-  my $layout = $rargs->{layout} || 'simple';
+  my $layout = $rargs->{layout} || $self->default_field_layout;
   my $meth = $self->layouts->{$layout};
   my $out;
   if ( $meth ) {

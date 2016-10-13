@@ -260,6 +260,8 @@ sub base_render_args {
 
 has 'render_args' => ( is => 'rw', lazy => 1, isa => HashRef, builder => 'build_render_args' );
 sub build_render_args {{}}
+# this is really just here for testing fields. If you want to test a custom
+# renderer in a field, pass it in.
 has 'renderer' => (
   is => 'rw', lazy => 1,
   builder => 'build_renderer',

@@ -583,17 +583,20 @@ sub all_repeatable_fields {
 #========= Rendering ==========
 has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
 has 'action' => ( is => 'rw' );
+has 'renderer_class' => ( is => 'ro', default => 'Data::MuForm::Renderer::Standard' );
 has 'renderer' => ( is => 'rw', lazy => 1, builder => 'build_renderer' );
 sub build_renderer {
     my $self = shift;
-    require Data::MuForm::Renderer::Standard;
-    my $render_hook = sub {
-      my $self = shift;
-      return $self->form->render_hook($self, @_);
-    };
-    my $renderer = Data::MuForm::Renderer::Standard->new( localizer => $self->localizer, form => $self->form );
+    my $renderer_class = load_optional_class($self->renderer_class) ? $self->renderer_class : 'Data::MuForm::Renderer::Standard';
+    my $renderer = $renderer_class->new(
+        localizer => $self->localizer,
+        form => $self->form,
+        %{$self->renderer_args},
+    );
     return $renderer;
 }
+has 'renderer_args' => ( is => 'ro', isa => HashRef, builder => 'build_renderer_args' );
+sub build_renderer_args {{}}
 has 'render_args' => ( is => 'rw', lazy => 1, isa => HashRef, builder => 'build_render_args' );
 sub build_render_args {{}}
 sub base_render_args {
