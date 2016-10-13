@@ -4,8 +4,9 @@ use Test::More;
 
 {
     package MyApp::Form::Rep;
-    use HTML::FormHandler::Moose;
-    extends 'HTML::FormHandler';
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
 
     has '+name' => ( default => 'testform' );
     has_field 'foo';

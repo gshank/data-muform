@@ -100,37 +100,47 @@ sub render_field {
 #  Utility methods
 #==============================
 
+sub add_to_class {
+  my ( $href, $class ) = @_;
 
-=head2 _render_attrs
-
-=cut
-
-sub _render_attrs {
-  my ($self, $attrs, $has_errors) = @_;
-  my $out = $self->_render_class( $attrs->{class}, $has_errors);
-  while ( my ( $attr, $value ) =  each  %$attrs ) {
-    next if $attr eq 'class';  # handled separately
-    $out .= qq{$attr="$value" };
+  if ( exists $href->{class} && ref $href->{class} ne 'ARRAY' ) {
+     my @classes = split(' ', $href->{class});
+     $href->{class} = \@classes;
   }
-  return $out;
+  push @{$href->{class}}, $class;
 }
 
-=head2 _render_class
+=head2 process_attrs
 
 =cut
 
-sub _render_class {
-  my ( $self, $class, $has_errors ) = @_;
+sub process_attrs {
+    my ($attrs, $skip) = @_;
 
-  $class ||= [];
-  $class = [split(' ', $class)] unless ref $class eq 'ARRAY';
-  push @$class, 'error' if $has_errors;
-  my $out = '';
-  if ( @$class ) {
-    my $classes = join(' ', @$class);
-    $out = qq{class="$classes" };
-  }
-  return $out;
+    $skip ||= [];
+    my @use_attrs;
+    my %skip;
+    @skip{@$skip} = ();
+    for my $attr( sort keys %$attrs ) {
+        next if exists $skip{$attr};
+        my $value = '';
+        if( defined $attrs->{$attr} ) {
+            if( ref $attrs->{$attr} eq 'ARRAY' ) {
+                # we don't want class="" if no classes specified
+                next unless scalar @{$attrs->{$attr}};
+                $value = join (' ', @{$attrs->{$attr}} );
+            }
+            else {
+                $value = $attrs->{$attr};
+            }
+        }
+        if ( $value =~ /[&"<>]/ ) {
+            $value = html_filter($value);
+        }
+        push @use_attrs, sprintf( '%s="%s"', $attr, $value );
+    }
+    my $out = join( ' ', @use_attrs );
+    return $out;
 }
 
 #==============================
@@ -156,7 +166,8 @@ sub render_input {
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
   $out .= qq{value="$fif" };
-  $out .= $self->_render_attrs( $rargs->{element_attr}, scalar @{$rargs->{errors}} );
+  add_to_class( $rargs->{element_attr}, 'error' ) if @{$rargs->{errors}};
+  $out .= process_attrs($rargs->{element_attr});
   $out .= "/>";
   return $out;
 }
@@ -176,7 +187,8 @@ sub render_select {
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
   $out .= qq{multiple="multiple" } if $rargs->{multiple};
-  $out .= $self->_render_attrs( $rargs->{element_attr}, scalar @{$rargs->{errors}} );
+  add_to_class( $rargs->{element_attr}, 'error' ) if @{$rargs->{errors}};
+  $out .= process_attrs($rargs->{element_attr});
   $out .= ">";
 
   # render empty_select
@@ -188,9 +200,10 @@ sub render_select {
   # render options
   my $options = $rargs->{options};
   foreach my $option ( @$options ) {
-    my $value = $option->{value};
-    my $label = $option->{label};
-    $out .= qq{\n<option value="$value">$label</option>};
+    my $label = $self->localize($option->{label});
+    $out .= qq{\n<option };
+    $out .= process_attrs($option, ['label']);
+    $out .= qq{>$label</option>};
   }
 
   # end of select
@@ -213,7 +226,8 @@ sub render_textarea {
   my $out = "\n<textarea ";
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
-  $out .= $self->_render_attrs( $rargs->{element_attr}, scalar @{$rargs->{errors}} );
+  add_to_class( $rargs->{element_attr}, 'error' ) if @{$rargs->{errors}};
+  $out .= process_attrs($rargs->{element_attr});
   $out .= ">$fif</textarea>";
   return $out;
 }
@@ -248,7 +262,7 @@ sub render_label {
   my $label = $self->localize($rargs->{label});
   my $out = qq{\n<label };
   $out .= qq{for="$id"};
-  $out .= $self->_render_attrs( $rargs->{label_attr} );
+  $out .= process_attrs($rargs->{label_attr});
   $out .= qq{>};
   $out .= qq{$left_of_label$label$right_of_label};
   $out .= qq{</label>};
@@ -306,16 +320,13 @@ sub render_field_radiogroup {
 sub render_radio_option {
     my ( $self, $rargs, $option ) = @_;
 
-    my $value = html_filter($option->{value});
-    my $name  = $rargs->{name};
-
+    my $name = $rargs->{name};
     my $out = qq{<input type="radio" };
     $out .= qq{name="$name" };
-    $out .= qq{value="$value" };
-    if ( $rargs->{fif} eq $value ) {
+    $out .= process_attrs($option, ['label']);
+    if ( $rargs->{fif} eq $option->{value} ) {
         $out .= qq{checked="checked" };
     }
-    # TODO - handle attributes
     $out .= q{/>};
 }
 
@@ -370,7 +381,8 @@ sub render_checkbox {
   $out .= qq{id="$id" };
   $out .= qq{value="$checkbox_value" };
   $out .= qq{checked="checked" } if $fif eq $checkbox_value;
-  $out .= $self->_render_attrs( $rargs->{element_attr}, scalar @{$rargs->{errors}} );
+  add_to_class( $rargs->{element_attr}, 'error' ) if @{$rargs->{errors}};
+  $out .= process_attrs($rargs->{element_attr});
   $out .= "/>";
   return $out;
 }
@@ -467,7 +479,7 @@ sub render_field_bare {
 sub layout_simple {
     my ( $self, $rargs ) = @_;
     my $out = qq{\n<div };
-    $out .= $self->_render_attrs( $rargs->{wrapper} );
+    $out .= process_attrs($rargs->{wrapper});
     $out .= qq{>};
     $out .= $self->render_field_bare($rargs);
     $out .= qq{\n</div>};

@@ -2,8 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use HTML::FormHandler;
-
+use Data::MuForm;
 my @select_options = ( {value => 1, label => 'One'}, {value => 2, label => 'Two'}, {value => 3, label => 'Three'} );
 my $args =  {
     name       => 'test',
@@ -15,11 +14,11 @@ my $args =  {
         },
         {
             name => 'password',
-            type => 'Password',
+            type => 'Text',
         },
         {
             name => 'a_number',
-            type      => 'IntRange',
+            type      => 'Integer',
             range_min => 12,
             range_max => 291,
         },
@@ -31,18 +30,12 @@ my $args =  {
         },
         {
             name => 'long_text',
-            type => 'TextArea',
+            type => 'Textarea',
         },
         {
             name => 'hidden_text',
             type    => 'Hidden',
             default => 'bob',
-        },
-        {
-            name => 'upload_file',
-            type => 'Upload',
-            # valid_extensions => [ "jpg", "gif", "png" ],
-            max_size => 262144,
         },
         {
             name => 'a_select',
@@ -91,17 +84,12 @@ my $args =  {
             name => 'submit',
             type => 'Submit',
         },
-        {
-            name => 'a_link',
-            type => 'Display',
-            html => '<a href="http://google.com/">get me out of here</>',
-        },
     ]
 };
-my $form = HTML::FormHandler->new( %$args );
+my $form = Data::MuForm->new( %$args );
 
 ok( $form, 'form builds ok' );
 
-is( $form->num_fields, 15, 'right number of fields' );
+is( $form->num_fields, 13, 'right number of fields' );
 
 done_testing;
