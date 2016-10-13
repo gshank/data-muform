@@ -430,7 +430,12 @@ sub fill_from_params {
             my $fname = $field->input_param || $field->name;
             my $exists = exists $input->{$fname};
             next if ( $self->skip_fields_without_input && ! $exists && ! $field->has_input_without_param );
-            $field->fill_from_params($input->{$fname}, $exists );
+            if ( ! $exists && $field->disabled && ! $field->has_value ) {
+                $field->fill_from_fields;
+            }
+            else {
+                $field->fill_from_params($input->{$fname}, $exists );
+            }
             $my_input->{$fname} = $field->input if $field->has_input;
         }
     }

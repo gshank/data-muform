@@ -656,13 +656,9 @@ sub fill_from_object {
 }
 
 sub fill_from_fields {
-    my ( $self, ) = @_;
+    my ( $self ) = @_;
 
-    $self->filled_from('fields');
-    if ( $self->disabled && $self->has_init_value ) {
-        $self->value($self->init_value);
-    }
-    elsif ( my @values = $self->get_default_value ) {
+    if ( my @values = $self->get_default_value ) {
         if ( $self->has_transform_default_to_value ) {
             @values = $self->transform_default_to_value->($self, @values);
         }
@@ -673,7 +669,6 @@ sub fill_from_fields {
         }
     }
     return;
-
 }
 
 
