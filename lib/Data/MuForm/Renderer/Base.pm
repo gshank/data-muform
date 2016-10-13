@@ -103,11 +103,17 @@ sub render_field {
 sub add_to_class {
   my ( $href, $class ) = @_;
 
+  return unless defined $class;
   if ( exists $href->{class} && ref $href->{class} ne 'ARRAY' ) {
      my @classes = split(' ', $href->{class});
      $href->{class} = \@classes;
   }
-  push @{$href->{class}}, $class;
+  if ( $class && ref $class eq 'ARRAY' ) {
+     push @{$href->{class}}, @$class;
+  }
+  else {
+      push @{$href->{class}}, $class;
+  }
 }
 
 =head2 process_attrs
@@ -336,7 +342,14 @@ sub render_radio_label {
   $right_of_label ||= '';
   $left_of_label ||= '';
   my $label = $self->localize($option->{label});
-  my $out = qq{\n<label>};
+
+  my $attrs = { class => ['radio'] };
+  $attrs->{for} = $option->{id} if $option->{id};
+  add_to_class( $attrs, $rargs->{radio_label_class} );
+
+  my $out = qq{\n<label };
+  $out.= process_attrs($attrs);
+  $out .= q{>};
   $out .= qq{$left_of_label$label$right_of_label};
   $out .= qq{</label>};
 }
