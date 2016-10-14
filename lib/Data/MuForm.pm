@@ -979,4 +979,10 @@ sub render_end {
   return $self->renderer->render_end($render_args);
 }
 
+sub render_errors {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args(%$rargs, rendering => 'form_errors');
+  return $self->renderer->render_form_errors($render_args);
+}
+
 1;

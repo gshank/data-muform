@@ -116,4 +116,11 @@ around 'fill_from_params' => sub {
     }
 };
 
+sub render {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args(%$rargs);
+  return $self->renderer->render_compound($render_args);
+}
+
+
 1;

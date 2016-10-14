@@ -384,4 +384,11 @@ sub fill_from_fields {
     return;
 }
 
+sub render {
+  my ( $self, $rargs ) = @_;
+  my $render_args = $self->get_render_args(%$rargs);
+  return $self->renderer->render_repeatable($render_args);
+}
+
+
 1;

@@ -282,21 +282,18 @@ sub get_render_args {
 sub render {
   my ( $self, $rargs ) = @_;
   my $render_args = $self->get_render_args(%$rargs);
-  #$self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_field($render_args);
 }
 
 sub render_element {
   my ( $self, $rargs ) = @_;
   my $render_args = $self->get_render_args( element_attr => $rargs );
-  #$self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_element($render_args);
 }
 
 sub render_errors {
   my ( $self, $rargs ) = @_;
   my $render_args = $self->get_render_args( error_attr => $rargs );
-  #$self->form->render_hook($render_args) if $self->form;
   return $self->renderer->render_errors($render_args);
 }
 

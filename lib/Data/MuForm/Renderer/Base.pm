@@ -45,6 +45,7 @@ sub render_form {
 
     my $out = '';
     $out .= $self->render_start($rargs);
+    $out .= $self->render_form_errors($rargs);
 
     foreach my $field ( @$fields ) {
         $out .= $field->render;
@@ -57,7 +58,11 @@ sub render_form {
 sub render_start {
     my ($self, $rargs ) = @_;
 
+    my $name = $rargs->{name};
+    my $method = $rargs->{method};
     my $out = qq{<form };
+    $out .= qq{id="$name" };
+    $out .= qq{method="$method" };
     $out .= q{>};
 }
 
@@ -65,6 +70,19 @@ sub render_end {
     my ($self, $rargs ) = @_;
 
    return q{</form>};
+}
+
+sub render_form_errors {
+    my ( $self, $rargs ) = @_;
+    my $out = '';
+    if ( scalar @{$rargs->{form_errors}} ) {
+        $out .= q{<div class="form_errors>};
+        foreach my $error ( @{$rargs->{form_errors}} ) {
+            $out .= qq{<span>$error</span>};
+        }
+        $out .= q{</div>};
+    }
+    return $out;
 }
 
 #==============================
@@ -96,6 +114,10 @@ sub render_field {
     die "layout $layout not found";
   }
   return $out;
+}
+
+sub render_repeatable {
+    my ( $self, $rargs, $fields ) = @_;
 }
 
 #==============================
@@ -496,7 +518,12 @@ sub layout_simple {
     my $out = qq{\n<div };
     $out .= process_attrs($rargs->{wrapper});
     $out .= qq{>};
-    $out .= $self->render_field_bare($rargs);
+    if ( $rargs->{form_element} eq 'input' && $rargs->{input_type} eq 'submit' ) {
+        $out .= $self->render_element($rargs);
+    }
+    else {
+        $out .= $self->render_field_bare($rargs);
+    }
     $out .= qq{\n</div>};
 }
 
