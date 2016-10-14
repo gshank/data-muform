@@ -32,12 +32,12 @@ use HTML::FormHandler::Test;
     is_html($rendered, $expected, 'simple form renders ok' );
 }
 
-=comment
 {
     {
         package Test::Form::Compound;
-        use HTML::FormHandler::Moose;
-        extends 'HTML::FormHandler';
+        use Moo;
+        use Data::MuForm::Meta;
+        extends 'Data::MuForm';
 
         has '+name' => ( default => 'test_compound' );
         has_field 'my_comp' => ( type => 'Compound' );
@@ -52,7 +52,6 @@ use HTML::FormHandler::Test;
     my $rendered = $form->render;
     my $expected =
     '<form id="test_compound" method="post">
-      <div class="form_messages"></div>
        <div>
         <label for="my_comp.one">One</label>
         <input id="my_comp.one" name="my_comp.one" type="text" value="" />
@@ -65,6 +64,7 @@ use HTML::FormHandler::Test;
     is_html( $rendered, $expected, 'got expected rendering for compound' );
 }
 
+=comment
 {
     {
         package Test::Form::Repeatable;
