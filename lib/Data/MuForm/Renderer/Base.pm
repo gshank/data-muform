@@ -19,7 +19,11 @@ has 'localizer' => ( is => 'ro' );
 
 has 'layouts' => ( is => 'rw', builder => 'build_layouts' );
 
-has 'default_field_layout' => ( is => 'rw', default => 'simple' );
+has 'wrappers' => ( is => 'rw', builder => 'build_wrappers' );
+
+has 'default_field_layout' => ( is => 'rw', default => 'standard' );
+
+has 'default_field_wrapper' => ( is => 'rw', default => 'simple' );
 
 has 'default_cb_layout' => ( is => 'rw', default => 'cbwrll' );
 
@@ -94,15 +98,21 @@ sub render_field {
 
   $rargs->{rendering} = 'field';
   $self->render_hook($rargs);
+
+  # render the field layout
   my $layout = $rargs->{layout} || $self->default_field_layout;
-  my $meth = $self->layouts->{$layout};
-  my $out;
-  if ( $meth ) {
-    $out .= $meth->($self, $rargs);
-  }
-  else {
-    die "layout $layout not found";
-  }
+  my $layout_meth = $self->layouts->{$layout};
+  die "layout method '$layout' not found" unless $layout_meth;
+  my $out = '';
+  $out .= $layout_meth->($self, $rargs);
+
+  # wrap the field
+  my $wrapper = $rargs->{wrapper} || $self->default_field_wrapper;
+$DB::single=1;
+  return $out if $wrapper eq 'none';
+  my $wrapper_meth = $self->wrappers->{$wrapper};
+  die "wrapper method '$wrapper' not found" unless $wrapper_meth;
+  $out = $wrapper_meth->($self, $rargs, $out);
   return $out;
 }
 
@@ -339,7 +349,7 @@ sub html_filter {
 #  Radio, Radiogroup
 #==============================
 
-sub render_field_radiogroup {
+sub render_layout_radiogroup {
   my ( $self, $rargs ) = @_;
 
   my $label_layout = $rargs->{rd_layout} || $self->default_rd_layout;
@@ -390,7 +400,7 @@ sub render_radio_label {
 #  Checkboxes
 #==============================
 
-sub render_field_checkbox {
+sub render_layout_checkbox {
     my ( $self, $rargs) = @_;
 
   my $cb_element = $self->render_checkbox($rargs);
@@ -493,27 +503,33 @@ sub cb2l {
 sub build_layouts {
     my $self = shift;
     my $layouts = {
-        bare => *layout_bare,
-        simple => *layout_simple,
-        w_errs => *layout_w_errs,
+        standard => *layout_standard,
+        no_label => *layout_no_label,
     };
     return $layouts;
 }
 
-sub layout_bare {
-    my ( $self, $rargs ) = @_;
-    return $self->render_field_bare($rargs);
-}
-
-sub render_field_bare {
+sub layout_standard {
     my ( $self, $rargs ) = @_;
 
     if ( $rargs->{form_element} eq 'input' && $rargs->{input_type} eq 'checkbox' ) {
-       return $self->render_field_checkbox($rargs);
+       return $self->render_layout_checkbox($rargs);
     }
     elsif ( $rargs->{form_element} eq 'radiogroup' ) {
-       return $self->render_field_radiogroup($rargs);
+       return $self->render_layout_radiogroup($rargs);
     }
+    elsif ( $rargs->{form_element} eq 'input' &&
+            ( $rargs->{input_type} eq 'submit' || $rargs->{input_type} eq 'reset' ) ) {
+       return $self->render_element($rargs);
+    }
+    else {
+       return $self->render_layout_standard($rargs);
+    }
+}
+
+sub render_layout_standard {
+    my ( $self, $rargs ) = @_;
+
     my $out = '';
     $out .= $self->render_label($rargs);
     $out .= $self->render_element($rargs);
@@ -521,26 +537,35 @@ sub render_field_bare {
     return $out;
 }
 
-sub layout_simple {
-    my ( $self, $rargs ) = @_;
-    my $out = qq{\n<div };
-    $out .= process_attrs($rargs->{wrapper});
-    $out .= qq{>};
-    if ( $rargs->{form_element} eq 'input' && $rargs->{input_type} eq 'submit' ) {
-        $out .= $self->render_element($rargs);
-    }
-    else {
-        $out .= $self->render_field_bare($rargs);
-    }
-    $out .= qq{\n</div>};
-}
-
-sub layout_w_errs {
+sub layout_no_label {
     my ( $self, $rargs ) = @_;
     my $out = '';
     $out .= $self->render_element($rargs);
     $out .= $self->render_errors($rargs);
     return $out;
+}
+
+#==============================
+#  Wrappers
+#==============================
+
+sub wrapper_simple {
+    my ( $self, $rargs, $rendered ) = @_;
+
+    my $tag = $rargs->{wrapper_attr}{tag} || 'div';
+    my $out = qq{\n<div };
+    $out .= process_attrs($rargs->{wrapper_attr}, ['tag']);
+    $out .= qq{>};
+    $out .= $rendered;
+    $out .= qq{\n</div>};
+}
+
+sub build_wrappers {
+    my $self = shift;
+    my $wrappers = {
+        simple => *wrapper_simple,
+   };
+   return $wrappers;
 }
 
 1;

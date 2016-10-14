@@ -95,7 +95,7 @@ is_html( $rendered, $expected, 'got expected output for submit element' );
 
 
 # render simple div wrapper around label, input and errors
-$rendered = $form->field('foo')->render({ layout => 'simple', wrapper => { class => 'tpt'} });
+$rendered = $form->field('foo')->render({ layout => 'standard', wrapper_attr => { class => 'tpt'} });
 $expected = q{
   <div class="tpt">
   <label for="foo">Foo</label>
@@ -107,7 +107,7 @@ is_html( $rendered, $expected, 'foo field rendered correctly' );
 
 $rendered = $form->render;
 $expected = q{
-<form>
+<form id="Test" method="post">
   <div>
     <label for="foo">Foo</label>
     <input class="error" id="foo" maxlength="10" name="foo" type="text" value="" /> <span>&apos;Foo&apos; field is required</span>
@@ -128,7 +128,6 @@ $expected = q{
     <textarea cols="50" id="sol" name="sol" rows="3">Some text</textarea>
   </div>
   <div>
-    <label for="submitted">Submitted</label>
     <input id="submitted" name="submitted" type="submit" value="Save" />
   </div>
 </form>

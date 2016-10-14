@@ -15,7 +15,7 @@ use Data::MuForm::Test;
    has_field 'option3' => ( type => 'Checkbox', render_args => { cb_layout => 'cb2l', option_label => 'Try this one' });
    has_field 'option4' => ( type => 'Checkbox', render_args => { cb_layout => 'cbnowrll' });
    has_field 'option5' => ( type => 'Checkbox' );
-   has_field 'option6' => ( type => 'Checkbox', label => 'Simple Checkbox', render_args => { layout => 'bare', cb_layout => 'cbwrlr' } );
+   has_field 'option6' => ( type => 'Checkbox', label => 'Simple Checkbox', render_args => { layout => 'standard', cb_layout => 'cbwrlr', wrapper => 'none' } );
 
    sub render_hook {
        my ( $self, $renderer, $rargs ) = @_;
