@@ -89,16 +89,6 @@ sub render_form_errors {
 #  Fields
 #==============================
 
-sub render_compound {
-    my ( $self, $rargs, $fields ) = @_;
-
-    my $out = '';
-    foreach my $field ( @$fields ) {
-        $out .= $field->render;
-    }
-    return $out;
-}
-
 sub render_field {
   my ( $self, $rargs ) = @_;
 
@@ -116,8 +106,26 @@ sub render_field {
   return $out;
 }
 
+sub render_compound {
+    my ( $self, $rargs, $fields ) = @_;
+
+    my $out = '';
+    foreach my $field ( @$fields ) {
+        $out .= $field->render;
+    }
+    return $out;
+}
+
 sub render_repeatable {
     my ( $self, $rargs, $fields ) = @_;
+    my $out = '';
+    foreach my $field ( @$fields ) {
+        my $id = $field->id;
+        $out .= qq{\n<div class="repinst" id="$id">};
+        $out .= $field->render;
+        $out .= qq{</div>};
+    }
+    return $out;
 }
 
 #==============================

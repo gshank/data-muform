@@ -64,12 +64,12 @@ use HTML::FormHandler::Test;
     is_html( $rendered, $expected, 'got expected rendering for compound' );
 }
 
-=comment
 {
     {
         package Test::Form::Repeatable;
-        use HTML::FormHandler::Moose;
-        extends 'HTML::FormHandler';
+        use Moo;
+        use Data::MuForm::Meta;
+        extends 'Data::MuForm';
 
         has '+name' => ( default => 'test_rep' );
         has_field 'my_rep' => ( type => 'Repeatable' );
@@ -84,8 +84,7 @@ use HTML::FormHandler::Test;
     # 'hfh-repinst'
     my $expected =
     '<form id="test_rep" method="post">
-      <div class="form_messages"></div>
-      <div class="hfh-repinst" id="my_rep.0">
+      <div class="repinst" id="my_rep.0">
         <div>
           <label for="my_rep.0.one">One</label>
           <input id="my_rep.0.one" name="my_rep.0.one" type="text" value="" />
@@ -98,6 +97,5 @@ use HTML::FormHandler::Test;
     </form>';
     is_html( $rendered, $expected, 'got expected rendering for repeatable');
 }
-=cut
 
 done_testing;
