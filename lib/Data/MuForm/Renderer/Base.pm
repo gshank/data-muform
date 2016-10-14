@@ -2,6 +2,7 @@ package Data::MuForm::Renderer::Base;
 # ABSTRACT: Renderer
 
 use Moo;
+use List::Util ('any');
 
 =head1 NAME
 
@@ -24,6 +25,8 @@ has 'wrappers' => ( is => 'rw', builder => 'build_wrappers' );
 has 'default_field_layout' => ( is => 'rw', default => 'standard' );
 
 has 'default_field_wrapper' => ( is => 'rw', default => 'simple' );
+
+has 'default_wrapper_tag' => ( is => 'rw', default => 'div' );
 
 has 'default_cb_layout' => ( is => 'rw', default => 'cbwrll' );
 
@@ -106,9 +109,14 @@ sub render_field {
   my $out = '';
   $out .= $layout_meth->($self, $rargs);
 
+  return $self->wrap_field($rargs, $out);
+}
+
+sub wrap_field {
+  my ( $self, $rargs, $out ) = @_;
+
   # wrap the field
   my $wrapper = $rargs->{wrapper} || $self->default_field_wrapper;
-$DB::single=1;
   return $out if $wrapper eq 'none';
   my $wrapper_meth = $self->wrappers->{$wrapper};
   die "wrapper method '$wrapper' not found" unless $wrapper_meth;
@@ -123,6 +131,10 @@ sub render_compound {
     foreach my $field ( @$fields ) {
         $out .= $field->render;
     }
+    # don't always wrap? what should be standard
+    if ( $rargs->{wrapper} ) {
+        $out = $self->wrap_field($rargs, $out);
+    }
     return $out;
 }
 
@@ -130,11 +142,12 @@ sub render_repeatable {
     my ( $self, $rargs, $fields ) = @_;
     my $out = '';
     foreach my $field ( @$fields ) {
-        my $id = $field->id;
+        my $id = $field->id . '.inst';
         $out .= qq{\n<div class="repinst" id="$id">};
         $out .= $field->render;
         $out .= qq{</div>};
     }
+    $out = $self->wrap_field($rargs, $out);
     return $out;
 }
 
@@ -207,8 +220,8 @@ sub render_input {
   return $self->render_checkbox($rargs) if $input_type eq 'checkbox';
 
   my $name = $rargs->{name};
-  my $id = $rargs->{name};
-  my $fif = $rargs->{fif};
+  my $id = $rargs->{id};
+  my $fif = html_filter($rargs->{fif});
 
   my $out = qq{\n<input type="$input_type" };
   $out .= qq{name="$name" };
@@ -269,7 +282,7 @@ sub render_textarea {
 
   my $name = $rargs->{name};
   my $id = $rargs->{id};
-  my $fif = $rargs->{fif};
+  my $fif = html_filter($rargs->{fif});
 
   my $out = "\n<textarea ";
   $out .= qq{name="$name" };
@@ -428,7 +441,7 @@ sub render_checkbox {
   my $name = $rargs->{name};
   my $id = $rargs->{name};
   my $checkbox_value = $rargs->{checkbox_value};
-  my $fif = $rargs->{fif};
+  my $fif = html_filter($rargs->{fif});
 
   my $out = qq{<input };
   $out .= qq{type="checkbox" };
@@ -512,14 +525,16 @@ sub build_layouts {
 sub layout_standard {
     my ( $self, $rargs ) = @_;
 
-    if ( $rargs->{form_element} eq 'input' && $rargs->{input_type} eq 'checkbox' ) {
+    my $form_element = $rargs->{form_element};
+    my $input_type = $rargs->{input_type};
+
+    if ( $form_element eq 'input' && $input_type eq 'checkbox' ) {
        return $self->render_layout_checkbox($rargs);
     }
-    elsif ( $rargs->{form_element} eq 'radiogroup' ) {
+    elsif ( $form_element eq 'radiogroup' ) {
        return $self->render_layout_radiogroup($rargs);
     }
-    elsif ( $rargs->{form_element} eq 'input' &&
-            ( $rargs->{input_type} eq 'submit' || $rargs->{input_type} eq 'reset' ) ) {
+    elsif ( $form_element eq 'input' &&  any { $input_type eq $_ } ('submit', 'reset', 'hidden' )) {
        return $self->render_element($rargs);
     }
     else {
@@ -545,27 +560,48 @@ sub layout_no_label {
     return $out;
 }
 
+sub layout_no_label {
+    my ( $self, $rargs ) = @_;
+    my $out = '';
+    $out .= $self->render_element($rargs);
+    $out .= $self->render_errors($rargs);
+    return $out;
+}
+
 #==============================
 #  Wrappers
 #==============================
-
-sub wrapper_simple {
-    my ( $self, $rargs, $rendered ) = @_;
-
-    my $tag = $rargs->{wrapper_attr}{tag} || 'div';
-    my $out = qq{\n<div };
-    $out .= process_attrs($rargs->{wrapper_attr}, ['tag']);
-    $out .= qq{>};
-    $out .= $rendered;
-    $out .= qq{\n</div>};
-}
 
 sub build_wrappers {
     my $self = shift;
     my $wrappers = {
         simple => *wrapper_simple,
+        fieldset => *wrapper_fieldset,
    };
    return $wrappers;
+}
+
+sub wrapper_simple {
+    my ( $self, $rargs, $rendered ) = @_;
+
+    my $tag = $rargs->{wrapper_attr}{tag} || $self->default_wrapper_tag;
+    my $out = qq{\n<$tag };
+    $out .= process_attrs($rargs->{wrapper_attr}, ['tag']);
+    $out .= qq{>};
+    $out .= $rendered;
+    $out .= qq{\n</$tag>};
+    return $out;
+}
+
+sub wrapper_fieldset {
+    my ( $self, $rargs, $rendered ) = @_;
+
+    my $id = $rargs->{id};
+    my $label = $self->localize($rargs->{label});
+    my $out = qq{\n<fieldset id="$id"><legend class="label">$label</legend>};
+    $out .= $rendered;
+    $out .= qq{\n</fieldset>};
+    return $out;
 }
 
 1;

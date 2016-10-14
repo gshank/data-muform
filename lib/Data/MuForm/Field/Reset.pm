@@ -17,7 +17,7 @@ Uses the 'reset' widget.
 has 'value' => ( is => 'rw', default => 'Reset' );
 has '+noupdate'  => ( default => 1 );
 
-sub build_input_type { 'submit' }
+sub build_input_type { 'reset' }
 
 sub no_fif {1}
 sub fif { shift->value }

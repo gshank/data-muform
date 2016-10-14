@@ -118,8 +118,12 @@ around BUILDARGS => sub {
      my $inactive = delete $args{inactive};
      $args{active} = $inactive ? 0 : 1;
   }
+  if ( grep { $_ =~ /ra\./ } keys %args ) {
+      mangle_args(\%args);
+  }
   return $class->$orig(%args);
 };
+
 
 sub BUILD {
     my $self = shift;
@@ -144,6 +148,39 @@ sub _install_methods {
             }
         }
     }
+}
+
+sub mangle_args {
+    my $args = shift;
+
+    my $translate = {
+         ea => 'element_attr',
+         la => 'label_attr',
+         wa => 'wrapper_attr',
+         era => 'error_attr',
+    };
+    my $render_args = $args->{render_args};
+    my $ra = delete $args->{ra};
+    if ( $render_args && $ra ) {
+        $render_args = merge($render_args, $ra);
+    }
+    else {
+        $render_args = $render_args || $ra || {};
+    }
+    my @ra_keys = grep { $_ =~ /ra\./ } keys %$args;
+    foreach my $key ( @ra_keys ) {
+        my @seg = split('\.', $key);
+        shift @seg;
+        my $new_key = $translate->{$seg[0]} || $seg[0];
+        if ( $seg[1] ) {
+            $render_args->{$new_key}{$seg[1]} = $args->{$key};
+        }
+        else {
+            $render_args->{$new_key} = $args->{$key};
+        }
+        delete $args->{$key};
+    }
+    $args->{render_args} = $render_args;
 }
 
 sub fif {
@@ -243,7 +280,6 @@ has 'html5_type_attr' => ( is => 'rw' );
 sub base_render_args {
   my $self = shift;
   my $args = {
-#   form => $self->form,  # in theory we shouldn't need this
     name => $self->prefixed_name,
     field_name => $self->name,
     type => $self->type,
