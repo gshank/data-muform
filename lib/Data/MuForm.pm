@@ -547,7 +547,7 @@ sub is_form {1}
 sub parent { }
 has 'ctx' => ( is => 'rw', weak_ref => 1 );
 # init_values can be a blessed object or a hashref
-has 'init_values' => ( is => 'rw' );
+has 'init_values' => ( is => 'rw', alias => 'init_object' );
 sub clear_init_values { $_[0]->{init_values} = undef }
 sub has_init_values {
     my $self = shift;
