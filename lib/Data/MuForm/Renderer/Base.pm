@@ -32,6 +32,8 @@ has 'default_cb_layout' => ( is => 'rw', default => 'cbwrll' );
 
 has 'default_rd_layout' => ( is => 'rw', default => 'labels_right' );
 
+has 'default_error_tag' => ( is => 'rw', default => 'span' );
+
 sub render_hook {
     my $self = shift;
     return $self->form->render_hook($self, @_);
@@ -341,8 +343,9 @@ sub render_errors {
   $self->render_hook($rargs);
   my $errors = $rargs->{errors} || [];
   my $out = '';
+  my $tag = $rargs->{error_tag} || $self->default_error_tag;
   foreach my $error (@$errors) {
-    $out .= qq{\n<span>$error</span>};
+    $out .= qq{\n<$tag>$error</$tag>};
   }
   return $out;
 }
