@@ -177,10 +177,10 @@ is_deeply( $value, $init_values, 'correct value');
 $form = Test::Form3->new;
 ok( $form, 'form 3 built' );
 my $expected = [ map { label => $_, value => $_ }, qw(apricot banana cherry) ];
-is_deeply [ $form->field('fruit')->options ], $expected,
-    'Form 3 has expected options';
+#my $expected = [ { value => 'apricot', label => 'apricot'}, { value => 'banana', label => 'banana' }, { value => 'cherry', label => 'cherry' }];
+is_deeply ( $form->field('fruit')->options, $expected, 'Form 3 has expected options' );
 my $rendered_field = $form->field('fruit')->render;
-like $rendered_field, qr/<option value="cherry"/, 'rendered a field';
+like ( $rendered_field, qr/<option value="cherry"/, 'rendered a field');
 
 
 # test single options in a double arrayref: [['one', 'two', 'three']]
@@ -202,7 +202,7 @@ ok( $form, 'form 4 built' );
 my @expected_days = map { label => $_, value => $_ }, @day_options;
 is_deeply(  $form->field('day')->options, \@expected_days,
     'Form 4 has expected options' );
-my $rendered_field = $form->field('day')->render;
+$rendered_field = $form->field('day')->render;
 like( $rendered_field, qr/<option value="Tuesday"/, 'rendered a field' );
 
 done_testing;

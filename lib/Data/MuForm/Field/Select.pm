@@ -19,10 +19,16 @@ has 'options' => (
         my @options = @$options;
         return [] unless scalar @options;
         return \@options if ref $options[0] eq 'HASH';
-        die "Options array must contain an even number of elements"
-            if @options % 2;
         my @opts;
-        push @opts, { value => shift @options, label => shift @options } while @options;
+        if ( scalar @options == 1 && ref($options[0]) eq 'ARRAY' ) {
+            @options = @{ $options[0] };
+            push @opts, { value => $_, label => $_ } foreach @options;
+        }
+        else {
+            die "Options array must contain an even number of elements"
+              if @options % 2;
+            push @opts, { value => shift @options, label => shift @options } while @options;
+        }
         return \@opts;
     },
 );
@@ -119,6 +125,9 @@ sub _load_options {
     return
         if ( $self->options_from eq 'build' ||
         ( $self->has_options && $self->do_not_reload ) );
+
+    # we allow returning an array instead of an arrayref from a build method
+    # and it's the usual thing from the DBIC model
     my @options;
     if( my $meth = $self->get_method('build_options') ) {
         @options = $meth->($self);
@@ -133,22 +142,15 @@ sub _load_options {
     return unless @options;    # so if there isn't an options method and no options
                                # from a table, already set options attributes stays put
 
-    # allow returning arrayref
-    if ( ref $options[0] eq 'ARRAY' ) {
-        @options = @{ $options[0] };
-    }
-    return unless @options;
-    my $opts;
-    # if options_<field_name> is returning an already constructed array of hashrefs
-    if ( ref $options[0] eq 'HASH' ) {
-        $opts = \@options;
-    }
-    else {
-        warn "Options array must contain an even number of elements for field " . $self->name
-            if @options % 2;
-        push @{$opts}, { value => shift @options, label => shift @options } while @options;
-    }
-    if ($opts) {
+    # possibilities:
+    #  @options = ( 1 => 'one', 2 => 'two' );
+    #  @options = ([ 1 => 'one', 2 => 'tw' ]);
+    #  @options = ([ { value => 1, label => 'one'}, { value => 2, label => 'two'}]);
+    #  @options = ([[ 'one', 'two' ]]);
+    my $opts = ref $options[0] ? $options[0] : \@options;;
+    $opts = $self->options($opts);  # coerce will re-format
+
+    if (scalar @$opts) {
         # sort options if sort method exists
         $opts = $self->sort_options($opts) if $self->methods->{sort};
         $self->options($opts);
