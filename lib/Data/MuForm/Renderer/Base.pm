@@ -563,14 +563,6 @@ sub layout_no_label {
     return $out;
 }
 
-sub layout_no_label {
-    my ( $self, $rargs ) = @_;
-    my $out = '';
-    $out .= $self->render_element($rargs);
-    $out .= $self->render_errors($rargs);
-    return $out;
-}
-
 #==============================
 #  Wrappers
 #==============================

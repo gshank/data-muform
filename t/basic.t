@@ -169,6 +169,7 @@ my $expected_value = {
    optname => 'Over Again',
    must_select => 1,
    my_selected => 0,
+   fruit => undef,
 };
 
 is_deeply( $form->value, $expected_value, 'value init obj' );

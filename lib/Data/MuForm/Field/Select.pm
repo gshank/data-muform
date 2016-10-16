@@ -29,12 +29,13 @@ has 'options' => (
 sub build_options {[]}
 sub has_options { shift->num_options }
 sub num_options { scalar @{$_[0]->options} }
+sub all_options { @{$_[0]->options} }
 has 'options_from' => ( isa => Str, is => 'rw', default => 'none' );
 has 'do_not_reload' => ( isa => Bool, is => 'ro' );
 has 'no_option_validation' => ( isa => Bool, is => 'rw' );
 
 has 'multiple' => ( is => 'ro', isa => Bool, default => 0 );
-has 'empty_select' => ( is => 'rw', isa => Str );
+has 'empty_select' => ( is => 'rw', isa => Str, predicate => 'has_empty_select' );
 
 # add trigger to 'value' so we can enforce arrayref value for multiple
 has '+value' => ( trigger => 1 );
@@ -50,8 +51,8 @@ sub _trigger_value {
     $self->{value} = $value;
 }
 
-# this is necessary because if a Select field is unselected, no param will be
-# submitted
+# This is necessary because if a Select field is unselected, no param will be
+# submitted. Needs to be lazy because it checks 'multiple'. Needs to be vivified in BUILD.
 has '+input_without_param' => ( lazy => 1, builder => 'build_input_without_param' );
 sub build_input_without_param {
     my $self = shift;
@@ -71,6 +72,9 @@ has 'sort_column' => ( is => 'rw' );
 
 sub BUILD {
     my $self = shift;
+
+    # vivify, so predicate works
+    $self->input_without_param;
 
     if( $self->options && $self->has_options ) {
         $self->options_from('build');
@@ -161,7 +165,7 @@ sub base_render_args {
     my $args = $self->next::method(@_);
     $args->{multiple} = $self->multiple;
     $args->{options} = $self->options;
-    $args->{empty_select} = $self->empty_select;
+    $args->{empty_select} = $self->empty_select if $self->has_empty_select;
     return $args;
 }
 
@@ -215,5 +219,42 @@ sub base_validate {
     return 1;
 }
 
+sub as_label {
+    my ( $self, $value ) = @_;
+
+    $value = $self->value unless defined $value;
+    return unless defined $value;
+    if ( $self->multiple ) {
+        unless ( ref($value) eq 'ARRAY' ) {
+            if( $self->has_transform_default_to_value ) {
+                my @values = $self->transform_default_to_value->($self, $value);
+                $value = \@values;
+            }
+            else {
+                # not sure under what circumstances this would happen, but
+                # just in case
+                return $value;
+            }
+        }
+        my @labels;
+        my %value_hash;
+        @value_hash{@$value} = ();
+        for ( $self->all_options ) {
+            if ( exists $value_hash{$_->{value}} ) {
+                push @labels, $_->{label};
+                delete $value_hash{$_->{value}};
+                last unless keys %value_hash;
+            }
+        }
+        my $str = join(', ', @labels);
+        return $str;
+    }
+    else {
+        for ( $self->all_options ) {
+            return $_->{label} if $_->{value} eq $value;
+        }
+    }
+    return;
+}
 
 1;

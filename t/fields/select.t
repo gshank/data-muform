@@ -118,10 +118,9 @@ is_deeply( $form->field('vegetables')->value, [2,4], 'vegetables value is correc
 
 is_deeply( $form->fif, { fruit => 2, vegetables => [2, 4], empty => ['test'], test_field => '', build_attr => '' },
     'fif is correct');
-is_deeply( $form->values, { fruit => 2, vegetables => [2, 4], empty => ['test'] },
+is_deeply( $form->values, { fruit => 2, vegetables => [2, 4], empty => ['test'], build_attr => undef },
     'values are correct');
 
-=comment
 is( $form->field('vegetables')->as_label, 'broccoli, peas', 'multiple as_label works');
 is( $form->field('vegetables')->as_label([3,4]), 'carrots, peas', 'pass in multiple as_label works');
 
@@ -158,10 +157,52 @@ is_deeply( $form->field('vegetables')->fif, [4], 'fif for vegetables correct' );
 $form = Test::Multiple::InitObject->new;
 my $init_values = { foo => 'new_foo', bar => [3,4] };
 $form->process(init_values => $init_values, params => {} );
-my $rendered = $form->render;
-like($rendered, qr/<option value="4" id="bar.1" selected="selected">four<\/option>/, 'rendered option');
 my $value = $form->value;
 is_deeply( $value, $init_values, 'correct value');
-=cut
+
+# test single options in a double arrayref: [['one', 'two', 'three']]
+# specified in the field definition
+{
+    package Test::Form3;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    has_field fruit => (
+        type => 'Select',
+        options => [ [ qw(apricot banana cherry) ] ],
+    );
+}
+
+$form = Test::Form3->new;
+ok( $form, 'form 3 built' );
+my $expected = [ map { label => $_, value => $_ }, qw(apricot banana cherry) ];
+is_deeply [ $form->field('fruit')->options ], $expected,
+    'Form 3 has expected options';
+my $rendered_field = $form->field('fruit')->render;
+like $rendered_field, qr/<option value="cherry"/, 'rendered a field';
+
+
+# test single options in a double arrayref: [['one', 'two', 'three']]
+# specified in an options method
+my @day_options = qw(Monday Tuesday Wednesday);
+{
+    package Test::Form4;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+
+    has_field day => ( type => 'Select' );
+    sub options_day { return [[ @day_options ]] }
+}
+
+$form = Test::Form4->new;
+ok( $form, 'form 4 built' );
+my @expected_days = map { label => $_, value => $_ }, @day_options;
+is_deeply(  $form->field('day')->options, \@expected_days,
+    'Form 4 has expected options' );
+my $rendered_field = $form->field('day')->render;
+like( $rendered_field, qr/<option value="Tuesday"/, 'rendered a field' );
 
 done_testing;
