@@ -147,7 +147,7 @@ sub _load_options {
     #  @options = ([ 1 => 'one', 2 => 'tw' ]);
     #  @options = ([ { value => 1, label => 'one'}, { value => 2, label => 'two'}]);
     #  @options = ([[ 'one', 'two' ]]);
-    my $opts = ref $options[0] ? $options[0] : \@options;;
+    my $opts = ref $options[0] eq 'ARRAY' ? $options[0] : \@options;
     $opts = $self->options($opts);  # coerce will re-format
 
     if (scalar @$opts) {
