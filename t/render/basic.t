@@ -72,7 +72,7 @@ use HTML::FormHandler::Test;
         extends 'Data::MuForm';
 
         has '+name' => ( default => 'test_rep' );
-        has_field 'my_rep' => ( type => 'Repeatable' );
+        has_field 'my_rep' => ( type => 'Repeatable', 'ra.wrapper' => 'none' );
         has_field 'my_rep.one';
         has_field 'my_rep.two';
     }

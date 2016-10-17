@@ -12,5 +12,11 @@ sub build_input_type { 'submit' }
 sub no_fif {1}
 sub fif { shift->value }
 
+sub base_render_args {
+    my $self = shift;
+    my $args = $self->next::method(@_);
+    $args->{layout_type} = 'element';
+    return $args;
+}
 
 1;

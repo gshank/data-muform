@@ -11,7 +11,7 @@ use Data::MuForm::Test;
 
     has_field 'opt_in'     => (
         type    => 'Select',
-        form_element  => 'radiogroup',
+        'ra.layout_type'  => 'radiogroup',
         options => [
             { value => 'no & never', label => 'No & Never', id => 'opt1' },
             { value => '"yes"', label => 'Yes', id => 'opt2' },
@@ -58,7 +58,6 @@ my $expected = q{
   <label class="radio" for="opt2"><input name="opt_in" id="opt2" type="radio" value="&quot;yes&quot;" />Yes</label>
 </div>
 };
-
 my $rendered = $form->field('opt_in')->render;
 is_html( $rendered, $expected, 'radio group rendered ok' );
 

@@ -14,6 +14,13 @@ This is a 'convenience' text field that uses the 'hidden' type.
 
 =cut
 
+sub base_render_args {
+    my $self = shift;
+    my $args = $self->next::method(@_);
+    $args->{layout_type} = 'element';
+    return $args;
+}
+
 __PACKAGE__->meta->make_immutable;
 use namespace::autoclean;
 1;

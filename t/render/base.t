@@ -95,7 +95,7 @@ is_html( $rendered, $expected, 'got expected output for submit element' );
 
 
 # render simple div wrapper around label, input and errors
-$rendered = $form->field('foo')->render({ layout => 'standard', wrapper_attr => { class => 'tpt'} });
+$rendered = $form->field('foo')->render({ layout => 'lbl_ele_err', wrapper_attr => { class => 'tpt'} });
 $expected = q{
   <div class="tpt">
   <label for="foo">Foo</label>

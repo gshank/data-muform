@@ -22,15 +22,15 @@ has 'layouts' => ( is => 'rw', builder => 'build_layouts' );
 
 has 'wrappers' => ( is => 'rw', builder => 'build_wrappers' );
 
-has 'default_field_layout' => ( is => 'rw', default => 'standard' );
-
-has 'default_field_wrapper' => ( is => 'rw', default => 'simple' );
-
-has 'default_wrapper_tag' => ( is => 'rw', default => 'div' );
+has 'default_standard_layout' => ( is => 'rw', default => 'lbl_ele_err' );
 
 has 'default_cb_layout' => ( is => 'rw', default => 'cbwrll' );
 
 has 'default_rd_layout' => ( is => 'rw', default => 'labels_right' );
+
+has 'default_field_wrapper' => ( is => 'rw', default => 'simple' );
+
+has 'default_wrapper_tag' => ( is => 'rw', default => 'div' );
 
 has 'default_error_tag' => ( is => 'rw', default => 'span' );
 
@@ -104,12 +104,21 @@ sub render_field {
   $rargs->{rendering} = 'field';
   $self->render_hook($rargs);
 
-  # render the field layout
-  my $layout = $rargs->{layout} || $self->default_field_layout;
-  my $layout_meth = $self->layouts->{$layout};
-  die "layout method '$layout' not found" unless $layout_meth;
-  my $out = '';
-  $out .= $layout_meth->($self, $rargs);
+  my $layout_type = $rargs->{layout_type};
+
+  my $out;
+  if ( $layout_type eq 'checkbox' ) {
+     $out = $self->render_layout_checkbox($rargs);
+  }
+  elsif ( $layout_type eq 'radiogroup' ) {
+     $out = $self->render_layout_radiogroup($rargs);
+  }
+  elsif ( $layout_type eq 'element' ) { # submit, reset, hidden
+     $out = $self->render_element($rargs);
+  }
+  else {  # $layout_type eq 'standard'
+     $out = $self->render_layout_standard($rargs);
+  }
 
   return $self->wrap_field($rargs, $out);
 }
@@ -343,12 +352,22 @@ sub render_errors {
   $self->render_hook($rargs);
   my $errors = $rargs->{errors} || [];
   my $out = '';
-  my $tag = $rargs->{error_tag} || $self->default_error_tag;
+  my $error_tag = $rargs->{error_tag} || $self->default_error_tag;
   foreach my $error (@$errors) {
-    $out .= qq{\n<$tag>$error</$tag>};
+    $out .= qq{\n<$error_tag>$error</$error_tag>};
   }
+   # TODO - should the errors be wrapped?
+#  $out = qq{\n<div class="field-errors">$out</div>};
   return $out;
 }
+
+=comment
+   <ul class="errors">     # error container
+     <li>                # error message
+       This field must contain an email address
+     </li>
+   </ul>
+=cut
 
 sub html_filter {
     my $string = shift;
@@ -519,33 +538,25 @@ sub cb2l {
 sub build_layouts {
     my $self = shift;
     my $layouts = {
-        standard => *layout_standard,
+        lbl_ele_err => *layout_lbl_ele_err,,
         no_label => *layout_no_label,
     };
     return $layouts;
 }
 
-sub layout_standard {
-    my ( $self, $rargs ) = @_;
+sub render_layout_standard {
+  my ( $self, $rargs ) = @_;
 
-    my $form_element = $rargs->{form_element};
-    my $input_type = $rargs->{input_type};
-
-    if ( $form_element eq 'input' && $input_type eq 'checkbox' ) {
-       return $self->render_layout_checkbox($rargs);
-    }
-    elsif ( $form_element eq 'radiogroup' ) {
-       return $self->render_layout_radiogroup($rargs);
-    }
-    elsif ( $form_element eq 'input' &&  any { $input_type eq $_ } ('submit', 'reset', 'hidden' )) {
-       return $self->render_element($rargs);
-    }
-    else {
-       return $self->render_layout_standard($rargs);
-    }
+  # render the field layout
+  my $layout = $rargs->{layout} || $self->default_standard_layout;
+  my $layout_meth = $self->layouts->{$layout};
+  die "layout method '$layout' not found" unless $layout_meth;
+  my $out = '';
+  $out .= $layout_meth->($self, $rargs);
+  return $out;
 }
 
-sub render_layout_standard {
+sub layout_lbl_ele_err {
     my ( $self, $rargs ) = @_;
 
     my $out = '';

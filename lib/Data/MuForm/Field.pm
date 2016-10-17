@@ -290,6 +290,7 @@ sub base_render_args {
     required => $self->required,
     errors => $self->errors || [],
     fif => $self->fif,
+    layout_type => 'standard',
   };
   return $args;
 }
@@ -310,8 +311,8 @@ sub build_renderer {
 
 sub get_render_args {
   my ( $self, %args ) = @_;
-  my $render_args = merge( $self->base_render_args, $self->render_args );
-  $render_args = merge( $render_args, \%args );
+  my $render_args = merge( $self->render_args, $self->base_render_args );
+  $render_args = merge( \%args, $render_args );
   return $render_args;
 }
 

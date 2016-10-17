@@ -28,6 +28,7 @@ sub base_render_args {
     my $self = shift;
     my $args = $self->next::method(@_);
     $args->{checkbox_value} = $self->checkbox_value;
+    $args->{layout_type} = 'checkbox';
     return $args;
 }
 
