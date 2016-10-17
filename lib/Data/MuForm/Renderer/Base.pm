@@ -110,6 +110,9 @@ sub render_field {
   if ( $layout_type eq 'checkbox' ) {
      $out = $self->render_layout_checkbox($rargs);
   }
+  elsif ( $layout_type eq 'checkboxgroup' ) {
+     $out = $self->render_layout_checkboxgroup($rargs);
+  }
   elsif ( $layout_type eq 'radiogroup' ) {
      $out = $self->render_layout_radiogroup($rargs);
   }
@@ -475,6 +478,10 @@ sub render_checkbox {
   $out .= process_attrs($rargs->{element_attr});
   $out .= "/>";
   return $out;
+}
+
+sub render_layout_checkboxgroup {
+  my ( $self, $rargs ) = @_;
 }
 
 =head2 cbwrll

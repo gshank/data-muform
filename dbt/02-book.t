@@ -109,7 +109,7 @@ my $values = $form->value;
 $values->{year} = 1999;
 $values->{pages} = 101;
 $values->{format} = 2;
-my $validated = $form->process( model => $book, params => $values );
+my $validated = $form->check( model => $book, params => $values );
 ok( $validated, 'now form validates' );
 
 $form->process( model => $book, params => {} );
