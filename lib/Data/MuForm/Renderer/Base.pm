@@ -341,7 +341,7 @@ sub render_select_option {
     my $label = $self->localize($option->{label});
     my $out = '';
     $out .= qq{\n<option };
-    $out .= process_attrs($option, ['label']);
+    $out .= process_attrs($option, ['label', 'order']);
     $out .= qq{>$label</option>};
     return $out;
 }
@@ -485,7 +485,7 @@ sub render_radio_option {
     my $name = $rargs->{name};
     my $out = qq{<input type="radio" };
     $out .= qq{name="$name" };
-    $out .= process_attrs($option, ['label']);
+    $out .= process_attrs($option, ['label', 'order']);
     if ( $rargs->{fif} eq $option->{value} ) {
         $out .= qq{checked="checked" };
     }
@@ -570,7 +570,7 @@ sub render_checkbox_option {
   if ( defined $fif && ( ($multiple && exists $fif_lookup{$value}) || ( $fif eq $value ) ) ) {
       $out .= q{checked="checked" };
   }
-  $out .= process_attrs($option, ['label']);
+  $out .= process_attrs($option, ['label', 'order']);
   $out .= "/>";
   return $out;
 }

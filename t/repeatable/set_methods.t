@@ -36,9 +36,9 @@ ok( $form );
 $form->process;
 my $options = $form->field('my_array.0.two')->options;
 my $expected_options = [
-   {  'label' => 'one', 'value' => 1 },
-   {  'label' => 'two', 'value' => 2 },
-   {  'label' => 'three', 'value' => 3 },
+   {  'label' => 'one', 'value' => 1, order => 0 },
+   {  'label' => 'two', 'value' => 2, order => 1 },
+   {  'label' => 'three', 'value' => 3, order => 2 },
 ];
 is_deeply( $options, $expected_options, 'options built ok' );
 my $default = $form->field('my_array.0.three')->value;

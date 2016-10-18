@@ -17,13 +17,13 @@ use Test::More;
 my $form = MyApp::Form::Test1->new;
 ok( $form );
 
-my $expected = [{ value => 1, label => 'aref1' }, { value => 2, label => 'aref2' }, { value => 3, label => 'aref3' }];
+my $expected = [{ value => 1, label => 'aref1', order => 0 }, { value => 2, label => 'aref2', order => 1 }, { value => 3, label => 'aref3', order => 2 }];
 is_deeply( $form->field('foo')->options, $expected, 'got expected options for arrayref options' );
 
-$expected = [ { value => 1, label => 'href1' }, { value => 2, label => 'href2' }];
+$expected = [ { value => 1, label => 'href1', order => 0 }, { value => 2, label => 'href2', order => 1 }];
 is_deeply( $form->field('bar')->options, $expected, 'got expected options for arrayref of hashref options' );
 
-$expected = [{ value => 'daref1', label => 'daref1' }, { value => 'daref2', label => 'daref2' }, { value => 'daref3', label => 'daref3' }];
+$expected = [{ value => 'daref1', label => 'daref1', order => 0 }, { value => 'daref2', label => 'daref2', order => 1 }, { value => 'daref3', label => 'daref3', order => 2 }];
 is_deeply( $form->field('jix')->options, $expected, 'got expected options for double arrayref options' );
 
 {
@@ -55,16 +55,16 @@ is_deeply( $form->field('jix')->options, $expected, 'got expected options for do
 $form = MyApp::Form::Test2->new;
 ok( $form );
 
-$expected = [{ value => 1, label => 'aref1' }, { value => 2, label => 'aref2' }, { value => 3, label => 'aref3' }];
+$expected = [{ value => 1, label => 'aref1', order => 0 }, { value => 2, label => 'aref2', order => 1 }, { value => 3, label => 'aref3', order => 2 }];
 is_deeply( $form->field('foo')->options, $expected, 'got expected options for arrayref options' );
 
-$expected = [ { value => 1, label => 'href1' }, { value => 2, label => 'href2' }];
+$expected = [ { value => 1, label => 'href1', order => 0 }, { value => 2, label => 'href2', order => 1 }];
 is_deeply( $form->field('bar')->options, $expected, 'got expected options for arrayref of hashref options' );
 
-$expected = [{ value => 'daref1', label => 'daref1' }, { value => 'daref2', label => 'daref2' }, { value => 'daref3', label => 'daref3' }];
+$expected = [{ value => 'daref1', label => 'daref1', order => 0 }, { value => 'daref2', label => 'daref2', order => 1 }, { value => 'daref3', label => 'daref3', order => 2 }];
 is_deeply( $form->field('jix')->options, $expected, 'got expected options for double arrayref options' );
 
-$expected = [{ value => 1, label => 'array1' }, { value => 2, label => 'array2' }, { value => 3, label => 'array3' }];
+$expected = [{ value => 1, label => 'array1', order => 0 }, { value => 2, label => 'array2', order => 1 }, { value => 3, label => 'array3', order => 2 }];
 is_deeply( $form->field('mox')->options, $expected, 'got expected options for array from sub' );
 
 done_testing;

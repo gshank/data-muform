@@ -256,16 +256,20 @@ has 'options' => (
         my $options = shift;
         my @options = @$options;
         return [] unless scalar @options;
-        return \@options if ref $options[0] eq 'HASH';
         my @opts;
-        if ( scalar @options == 1 && ref($options[0]) eq 'ARRAY' ) {
+        my $order = 0;
+        if ( ref $options[0] eq 'HASH' ) {
+            @opts = @options;
+            $_->{order} = $order++ foreach @opts;
+        }
+        elsif ( scalar @options == 1 && ref($options[0]) eq 'ARRAY' ) {
             @options = @{ $options[0] };
-            push @opts, { value => $_, label => $_ } foreach @options;
+            push @opts, { value => $_, label => $_, order => $order++ } foreach @options;
         }
         else {
             die "Options array must contain an even number of elements"
               if @options % 2;
-            push @opts, { value => shift @options, label => shift @options } while @options;
+            push @opts, { value => shift @options, label => shift @options, order => $order++ } while @options;
         }
         return \@opts;
     },

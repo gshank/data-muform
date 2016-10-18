@@ -73,24 +73,21 @@ is( $field->num_options, 3, 'right number of options');
 my $form = Test::Form->new;
 ok( $form, 'create form');
 
-my $veg_options =   [ {'label' => 'lettuce',
-      'value' => 1 },
-     {'label' => 'broccoli',
-      'value' => 2 },
-     {'label' => 'carrots',
-      'value' => 3 },
-     {'label' => 'peas',
-      'value' => 4 } ];
+my $veg_options =   [
+  {'label' => 'lettuce', 'value' => 1, order => 0 },
+  {'label' => 'broccoli', 'value' => 2, order => 1 },
+  {'label' => 'carrots', 'value' => 3, order => 2 },
+  {'label' => 'peas', 'value' => 4, order => 3 }
+];
 my $field_options = $form->field('vegetables')->options;
 is_deeply( $field_options, $veg_options,
    'get options for vegetables' );
 
-my $fruit_options = [ {'label' => 'apples',
-       'value' => 1 },
-      {'label' => 'oranges',
-       'value' => 2 },
-      {'label' => 'kiwi',
-       'value' => 3 } ];
+my $fruit_options = [
+  {'label' => 'apples', 'value' => 1, order => 0 },
+  {'label' => 'oranges', 'value' => 2, order => 1 },
+  {'label' => 'kiwi', 'value' => 3, order => 2 }
+];
 $field_options = $form->field('fruit')->options;
 is_deeply( $field_options, $fruit_options,
     'get options for fruit' );
@@ -176,7 +173,8 @@ is_deeply( $value, $init_values, 'correct value');
 
 $form = Test::Form3->new;
 ok( $form, 'form 3 built' );
-my $expected = [ map { label => $_, value => $_ }, qw(apricot banana cherry) ];
+my $order = 0;
+my $expected = [ map { label => $_, value => $_, order => $order++ }, qw(apricot banana cherry) ];
 #my $expected = [ { value => 'apricot', label => 'apricot'}, { value => 'banana', label => 'banana' }, { value => 'cherry', label => 'cherry' }];
 is_deeply ( $form->field('fruit')->options, $expected, 'Form 3 has expected options' );
 my $rendered_field = $form->field('fruit')->render;
@@ -199,7 +197,8 @@ my @day_options = qw(Monday Tuesday Wednesday);
 
 $form = Test::Form4->new;
 ok( $form, 'form 4 built' );
-my @expected_days = map { label => $_, value => $_ }, @day_options;
+$order = 0;
+my @expected_days = map { label => $_, value => $_ , order => $order++}, @day_options;
 is_deeply(  $form->field('day')->options, \@expected_days,
     'Form 4 has expected options' );
 $rendered_field = $form->field('day')->render;

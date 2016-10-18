@@ -40,7 +40,7 @@ $form->process( params => {} );
 
 my $options = $form->field('bar')->options;
 
-is_deeply( $options, [ { value => 1 => label => 'apples' }, { value => 2, label => 'oranges' }, { value => 3, label => 'kiwi' } ], 'right options' );
+is_deeply( $options, [ { value => 1 => label => 'apples', order => 0 }, { value => 2, label => 'oranges', order => 1 }, { value => 3, label => 'kiwi', order => 2 } ], 'right options' );
 
 
 done_testing;
