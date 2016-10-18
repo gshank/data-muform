@@ -50,21 +50,38 @@ and have it just work.
 
   [% form.render %]
 
+=head1 Layouts
+
+The 'standard' layouts are for all fields that don't have another layout type.
+This includes text fields, selects, and textareas. Create a new layout with 'layout_<layout-name'.
+Included layouts are 'lbl_ele_err' and 'no_label'. The default is 'lbl_ele_err', which renders
+a label, the form control, and then error messages.
+
+The 'radiogroup' layouts are for radiogroups, which is a 'Select' field layout type.
+Create a new layout with 'rd_layout_<layout name>'.
+Radiogroup option layouts are named 'rdgo_layout_<layout name>'. The provided layouts
+are 'right_label' and 'left_label'.
+
+Checkbox layout methods are named 'cb_layout_<layout name>'. The provided layouts are
+'cbwrll' - checkbox wrapped, label left, 'cbwrlr' - checkbox wrapped, label right,
+'cb2l' - checkbox with two labels, 'cbnowrll' - checkbox unwrapped, label left.
+
+The checkbox group layouts are another 'Select' field layout type.
+Checkbox group options layouts are named 'cbgo_layout_<layout name>'.
+
 =cut
 
 has 'form' => ( is => 'ro' );
 
 has 'localizer' => ( is => 'ro' );
 
-has 'layouts' => ( is => 'rw', builder => 'build_layouts' );
-
-has 'wrappers' => ( is => 'rw', builder => 'build_wrappers' );
-
 has 'default_standard_layout' => ( is => 'rw', default => 'lbl_ele_err' );
 
 has 'default_cb_layout' => ( is => 'rw', default => 'cbwrlr' );
 
-has 'default_rd_layout' => ( is => 'rw', default => 'labels_right' );
+has 'default_rdgo_layout' => ( is => 'rw', default => 'labels_right' );
+
+has 'default_cbgo_layout' => ( is => 'rw', default => 'labels_right' );
 
 has 'default_field_wrapper' => ( is => 'rw', default => 'simple' );
 
@@ -170,7 +187,7 @@ sub wrap_field {
   # wrap the field
   my $wrapper = $rargs->{wrapper} || $self->default_field_wrapper;
   return $out if $wrapper eq 'none';
-  my $wrapper_meth = $self->wrappers->{$wrapper} || die "wrapper method '$wrapper' not found";
+  my $wrapper_meth = $self->can("wrapper_$wrapper") || die "wrapper method '$wrapper' not found";
   $out = $wrapper_meth->($self, $rargs, $out);
   return $out;
 }
@@ -464,15 +481,14 @@ sub render_option {
 sub render_layout_radiogroup {
   my ( $self, $rargs ) = @_;
 
-  my $label_layout = $rargs->{rd_layout} || $self->default_rd_layout;
+  my $rdgo_layout = $rargs->{rdgo_layout} || $self->default_rdgo_layout;
+  my $rdgo_layout_meth = $self->can("rdgo_layout_$rdgo_layout") or die "Radio layout '$rdgo_layout' not found";
 
   my $out = $self->render_label($rargs);
   # render options
   my $options = $rargs->{options};
   foreach my $option ( @$options ) {
-    my $rd_element = $self->render_radio_option($rargs, $option);
-    my $rd_elements = $label_layout eq 'labels_left' ? ['', $rd_element] : [$rd_element, ''];
-    $out .= $self->render_radio_label($rargs, $option, @$rd_elements);
+    $out .= $rdgo_layout_meth->($self, $rargs, $option);
   }
   # TODO - is this the best place for error messages for radiogroups?
   $out .= $self->render_errors($rargs);
@@ -492,6 +508,20 @@ sub render_radio_option {
         $out .= qq{checked="checked" };
     }
     $out .= q{/>};
+}
+
+sub rdgo_layout_labels_left {
+    my ( $self, $rargs, $option ) = @_;
+    my $rd_element = $self->render_radio_option($rargs, $option);
+    my $out = $self->render_radio_label($rargs, $option, '', $rd_element);
+    return $out;
+}
+
+sub rdgo_layout_labels_right {
+    my ( $self, $rargs, $option ) = @_;
+    my $rd_element = $self->render_radio_option($rargs, $option);
+    my $out = $self->render_radio_label($rargs, $option, $rd_element, '');
+    return $out;
 }
 
 sub render_radio_label {
@@ -521,8 +551,8 @@ sub render_layout_checkbox {
 
   my $cb_element = $self->render_checkbox($rargs);
   my $cb_layout = $rargs->{cb_layout} || $self->default_cb_layout;
+  my $meth = $self->can("cb_layout_$cb_layout") || die "Checkbox layout '$cb_layout' not found";
   my $out = '';
-  my $meth = $self->can($cb_layout) || die "Checkbox layout '$cb_layout' not found";
   $out = $meth->($self, $rargs, $cb_element);
   $out .= $self->render_errors($rargs);
 
@@ -583,17 +613,33 @@ sub render_layout_checkboxgroup {
   my ( $self, $rargs ) = @_;
 
   my $out = $self->render_label($rargs);
-  my $label_layout = $rargs->{cbg_layout} || 'labels_right';
+  my $cbgo_layout = $rargs->{cbgo_layout} || $self->default_cbgo_layout;
+  my $cbgo_layout_meth = $self->can("cbgo_layout_$cbgo_layout")
+     || die "Checkbox group option layout '$cbgo_layout' not found";;
   # render options
   my $options = $rargs->{options};
   foreach my $option ( @$options ) {
-      my $cb_element = $self->render_checkbox_option($rargs, $option);
-      my $cb_elements = $label_layout eq 'labels_left' ? ['', $cb_element] : [$cb_element, ''];
-      my $cb = $self->render_checkbox_label($rargs, $option, @$cb_elements);
-      $out .= $self->wrapper_div($rargs, $cb);
+      $out .= $cbgo_layout_meth->($self, $rargs, $option);
   }
-  # TODO - is this the best place for error messages for radiogroups?
+  # TODO - is this the best place for error messages?
   $out .= $self->render_errors($rargs);
+  return $out;
+}
+
+sub cbgo_layout_labels_right {
+  my ( $self, $rargs, $option ) = @_;
+
+  my $cb_element = $self->render_checkbox_option($rargs, $option);
+  my $cb = $self->render_checkbox_label($rargs, $option, $cb_element, '');
+  my $out .= $self->wrapper_div($rargs, $cb);
+  return $out;
+}
+
+sub cbgo_layout_labels_left {
+  my ( $self, $rargs, $option ) = @_;
+  my $cb_element = $self->render_checkbox_option($rargs, $option);
+  my $cb = $self->render_checkbox_label($rargs, $option, '', $cb_element);
+  my $out .= $self->wrapper_div($rargs, $cb);
   return $out;
 }
 
@@ -623,7 +669,7 @@ Checkbox, wrapped, label left
 
 =cut
 
-sub cbwrll {
+sub cb_layout_cbwrll {
   my ( $self, $rargs, $cb_element ) = @_;
 
   my $out = $self->render_label($rargs, '', $cb_element);
@@ -637,7 +683,7 @@ Checkbox wrapped, label right
 
 =cut
 
-sub cbwrlr {
+sub cb_layout_cbwrlr {
   my ( $self, $rargs, $cb_element ) = @_;
 
   my $out = $self->render_label($rargs, $cb_element, '' );
@@ -650,7 +696,7 @@ Checkbox not wrapped, label left
 
 =cut
 
-sub cbnowrll {
+sub cb_layout_cbnowrll {
   my ( $self, $rargs, $cb_element ) = @_;
 
   my $out = $self->render_label($rargs);
@@ -658,7 +704,7 @@ sub cbnowrll {
   return $out;
 }
 
-sub cb2l {
+sub cb_layout_cb2l {
   my ( $self, $rargs, $cb_element ) = @_;
 
   my $out = $self->render_label($rargs);
@@ -673,21 +719,12 @@ sub cb2l {
 #  Layouts
 #==============================
 
-sub build_layouts {
-    my $self = shift;
-    my $layouts = {
-        lbl_ele_err => *layout_lbl_ele_err,,
-        no_label => *layout_no_label,
-    };
-    return $layouts;
-}
-
 sub render_layout_standard {
   my ( $self, $rargs ) = @_;
 
   # render the field layout
   my $layout = $rargs->{layout} || $self->default_standard_layout;
-  my $layout_meth = $self->layouts->{$layout};
+  my $layout_meth = $self->can("layout_$layout");
   die "layout method '$layout' not found" unless $layout_meth;
   my $out = '';
   $out .= $layout_meth->($self, $rargs);
@@ -715,15 +752,6 @@ sub layout_no_label {
 #==============================
 #  Wrappers
 #==============================
-
-sub build_wrappers {
-    my $self = shift;
-    my $wrappers = {
-        simple => *wrapper_simple,
-        fieldset => *wrapper_fieldset,
-   };
-   return $wrappers;
-}
 
 sub wrapper_simple {
     my ( $self, $rargs, $rendered ) = @_;
