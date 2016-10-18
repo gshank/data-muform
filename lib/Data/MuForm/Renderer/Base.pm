@@ -483,8 +483,10 @@ sub render_radio_option {
     my ( $self, $rargs, $option ) = @_;
 
     my $name = $rargs->{name};
+    my $order = $option->{order};
     my $out = qq{<input type="radio" };
     $out .= qq{name="$name" };
+    $out .= qq{id="$name$order" } unless $option->{id};
     $out .= process_attrs($option, ['label', 'order']);
     if ( $rargs->{fif} eq $option->{value} ) {
         $out .= qq{checked="checked" };
@@ -500,7 +502,7 @@ sub render_radio_label {
   my $label = $self->localize($option->{label});
 
   my $attrs = { class => ['radio'] };
-  $attrs->{for} = $option->{id} if $option->{id};
+  $attrs->{for} = $option->{id} ? $option->{id} : $rargs->{name} . $option->{order};
   add_to_class( $attrs, $rargs->{radio_label_class} );
 
   my $out = qq{\n<label };
@@ -564,9 +566,11 @@ sub render_checkbox_option {
 
   my $name = $rargs->{name};
   my $value = $option->{value};
+  my $order = $option->{order};
   my $out = qq{<input };
   $out .= qq{type="checkbox" };
   $out .= qq{name="$name" };
+  $out .= qq{id="$name$order" } unless $option->{id};
   if ( defined $fif && ( ($multiple && exists $fif_lookup{$value}) || ( $fif eq $value ) ) ) {
       $out .= q{checked="checked" };
   }
@@ -601,7 +605,7 @@ sub render_checkbox_label {
   my $label = $self->localize($option->{label});
 
   my $attrs = { class => ['checkbox'] };
-  $attrs->{for} = $option->{id} if $option->{id};
+  $attrs->{for} = $option->{id} ? $option->{id} : $rargs->{name} . $option->{order};
   add_to_class( $attrs, $rargs->{checkbox_label_class} );
 
   my $out = qq{\n<label };
