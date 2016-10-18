@@ -1,4 +1,5 @@
 package Data::MuForm::Field::Select;
+
 # ABSTRACT: Select field
 
 use Moo;
@@ -6,6 +7,243 @@ extends 'Data::MuForm::Field';
 use Types::Standard -types;
 use HTML::Entities;
 use Data::Dump ('pp');
+
+=head1 DESCRIPTION
+
+This is a field that includes a list of possible valid options.
+This can be used for select and multiple-select fields.
+The field can be rendered as a select, a checkbox group (when
+'multiple' is turned on), or a radiogroup.
+
+Because select lists and checkbox_groups do not return an HTTP
+parameter when the entire list is unselected, the Select field
+must assume that the lack of a param means unselection. So to
+avoid setting a Select field with the 'skip_fields_without_input'
+flag, it must be set to inactive, not merely not included in the
+submitted params.
+
+=head2 options
+
+The 'options' attribute returns an arrayref. (In FH it used to return
+an array.)
+
+The 'options' array can come from a number of different places, but
+a coercion will reformat from one of the valid options formats to
+the standard arrayref of hashrefs.
+
+=over 4
+
+=item From a field declaration
+
+In a field declaration:
+
+   has_field 'opt_in' => ( type => 'Select',
+      options => [{ value => 0, label => 'No'}, { value => 1, label => 'Yes'} ] );
+
+=item From a coderef supplied to the field definition
+
+   has_field 'flim' => ( type => 'Select', methods => { build_options => *flim_options );
+   sub flim_options {  <return options arrayref> }
+
+=item From a form 'options_<field_name>' method or attribute
+
+   has_field 'fruit' => ( type => 'Select' );
+   sub options_fruit { <returns options arraryef> }
+       OR
+   has 'options_fruit' => ( is => 'rw',
+       default => sub { [1 => 'apples', 2 => 'oranges', 3 => 'kiwi'] } );
+
+The 'attribute' version is mostly useful when you want to be able to pass the
+options in on ->new or ->process.
+
+=item From a field class 'build_options' method
+
+In a custom field class:
+
+   package MyApp::Field::WeekDay;
+   use Moose;
+   extends 'HTML::FormHandler::Field::Select';
+   ....
+   sub build_options { <returns a valid options arrayref> }
+
+=item From the database
+
+The final source of the options array is a database when the name of the
+accessor is a relation to the table holding the information used to construct
+the select list.  The primary key is used as the value. The other columns used are:
+
+    label_column  --  Used for the labels in the options (default 'name')
+    active_column --  The name of the column to be used in the query (default 'active')
+                      that allows the rows retrieved to be restricted
+    sort_column   --  The name or arrayref of names of the column(s) used to sort the options
+
+See also L<Data::MuForm::Model::DBIC>, the 'lookup_options' method.
+
+=back
+
+The options field should contain one of the following valid data structures:
+
+=over
+
+=item ArrayRef of HashRefs
+
+Each hash reference defines an option, with the label and value
+attributes corresponding to those of the HTML field. This is the only
+structure in which you can supply additional attributes to be rendered.
+This is the format to which the other accepted formats will be coerced.
+
+   [{ value => 1, label => 'one' }, { value => 2, label => 'two' }]]
+
+=item ArrayRef
+
+A list of key/value pairs corresponding to HTML field values and labels.
+
+   [ 1 => 'one', 2 => 'two' ]
+
+=item ArrayRef containing one ArrayRef
+
+Each item inside the inner ArrayRef defines both the label and value of
+an option.
+
+   [[ 'one', 'two' ]]
+
+=back
+
+=head2 Customizing options
+
+Additional attributes can be added in the options array hashref.
+
+  [{ value => 1, label => 'one', id => 'first' }, { value => 1, label => 'two', id => 'second' }]
+
+Note that you should *not* set 'checked' or 'selected' attributes in options.
+That is handled by setting a field default.
+
+    has_field 'my_select' => ( type => 'Select', default => 2 );
+
+You can also divide the options up into option groups. See the section on
+rendering.
+
+=head2 Reloading options
+
+If the options come from the options_<fieldname> method or the database, they
+will be reloaded every time the form is reloaded because the available options
+may have changed. To prevent this from happening when the available options are
+known to be static, set the 'do_not_reload' flag, and the options will not be
+reloaded after the first time
+
+=head2 Sorting options
+
+The sorting of the options may be changed using a 'sort_options' method in a
+custom field class. The 'Multiple' field uses this method to put the already
+selected options at the top of the list. Note that this won't work with
+option groups.
+
+=head1 Other Attributes and Methods
+
+=head2 multiple
+
+If true allows multiple input values
+
+=head2 size
+
+This can be used to store how many items should be offered in the UI
+at a given time.  Defaults to 0.
+
+=head2 empty_select
+
+Set to the string value of the select label if you want the renderer
+to create an empty select value. This only affects rendering - it does
+not add an entry to the list of options.
+
+   has_field 'fruit' => ( type => 'Select',
+        empty_select => '---Choose a Fruit---' );
+
+=head2 label_column
+
+Sets or returns the name of the method to call on the foreign class
+to fetch the text to use for the select list.
+
+Refers to the method (or column) name to use in a related
+object class for the label for select lists.
+
+Defaults to "name".
+
+=head2 active_column
+
+Sets or returns the name of a boolean column that is used as a flag to indicate that
+a row is active or not.  Rows that are not active are ignored.
+
+The default is "active".
+
+If this column exists on the class then the list of options will included only
+rows that are marked "active".
+
+The exception is any columns that are marked inactive, but are also part of the
+input data will be included with brackets around the label.  This allows
+updating records that might have data that is now considered inactive.
+
+=head2 sort_column
+
+Sets or returns the column or arrayref of columns used in the foreign class
+for sorting the options labels.  Default is undefined.
+
+If not defined the label_column is used as the sort condition.
+
+=head2 as_label
+
+Returns the option label for the option value that matches the field's current value.
+Can be helpful for displaying information about the field in a more friendly format.
+
+=head2 no_option_validation
+
+Set this flag to true if you don't want to validate the options that are submitted.
+This would generally only happen if the options are generated via javascript, and
+you would presumably have some other kind of validation.
+
+=head2 error messages
+
+Customize 'select_invalid_value' and 'select_not_multiple'. Though neither of these
+messages should really be seen by users in a properly constructed select.
+
+=head1 Rendering
+
+The 'select' field can be rendered as a 'select', 'radiogroup', and 'checkboxgroup'.
+You change the 'layout_type' from 'standard' (for select) to 'radiogroup' or
+'checkboxgroup' in the render args.
+
+Option groups can be rendered by providing an options arrays with 'group' elements
+containing options:
+
+    sub options_testop { [
+        {
+            group => 'First Group',
+            options => [
+                { value => 1, label => 'One' },
+                { value => 2, label => 'Two' },
+                { value => 3, label => 'Three' },
+            ],
+        },
+        {
+            group => 'Second Group',
+            options => [
+                { value => 4, label => 'Four' },
+                { value => 5, label => 'Five' },
+                { value => 6, label => 'Six' },
+            ],
+        },
+    ] }
+
+You can use the 'render_option' method to render the options individually in
+a template.
+
+=head1 Database relations
+
+Also see L<DBIC::MuForm::Role::Model::DBIC>.
+
+The single select is for a DBIC 'belongs_to' relation. The multiple select is for
+a 'many_to_many' relation.
+
+=cut
 
 sub build_form_element { 'select' }
 
@@ -41,6 +279,7 @@ has 'do_not_reload' => ( isa => Bool, is => 'ro' );
 has 'no_option_validation' => ( isa => Bool, is => 'rw' );
 
 has 'multiple' => ( is => 'ro', isa => Bool, default => 0 );
+has 'size' => ( is => 'rw' );
 has 'empty_select' => ( is => 'rw', isa => Str, predicate => 'has_empty_select' );
 
 # add trigger to 'value' so we can enforce arrayref value for multiple
@@ -144,6 +383,7 @@ sub _load_options {
 
     # possibilities:
     #  @options = ( 1 => 'one', 2 => 'two' );
+    #  @options = ({ value => 1, label => 'one', { value => 2, label => 'two'})
     #  @options = ([ 1 => 'one', 2 => 'tw' ]);
     #  @options = ([ { value => 1, label => 'one'}, { value => 2, label => 'two'}]);
     #  @options = ([[ 'one', 'two' ]]);
@@ -168,9 +408,15 @@ sub base_render_args {
     $args->{multiple} = $self->multiple;
     $args->{options} = $self->options;
     $args->{empty_select} = $self->empty_select if $self->has_empty_select;
+    $args->{size} = $self->size if defined $self->size;
     return $args;
 }
 
+sub render_option {
+  my ( $self, $option ) = @_;
+  my $render_args = $self->get_render_args;
+  return $self->renderer->render_option($render_args, $option);
+}
 
 sub get_class_messages  {
     my $self = shift;

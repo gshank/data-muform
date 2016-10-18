@@ -20,7 +20,7 @@ use_ok('Data::MuForm::Renderer::Standard');
             2 => 'two',
         ],
     );
-    has_field 'jax' => ( type => 'Checkbox', checkbox_value => 'yes' );
+    has_field 'jax' => ( type => 'Checkbox', checkbox_value => 'yes', 'ra.cb_layout' => 'cbwrll' );
     has_field 'sol' => ( type => 'Textarea', cols => 50, rows => 3 );
 
     has_field 'submitted' => ( type => 'Submit', value => 'Save' );
