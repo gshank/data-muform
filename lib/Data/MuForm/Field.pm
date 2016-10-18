@@ -529,7 +529,6 @@ sub apply_actions {
     };
 
     my @actions;
-#   push @actions, $self->trim if $self->trim;
     push @actions, @{ $self->base_apply }, @{ $self->apply };
     for my $action ( @actions ) {
         $error_message = undef;

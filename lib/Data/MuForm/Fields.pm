@@ -32,7 +32,7 @@ has 'meta_fields' => ( is => 'rw' );
 has 'field_list' => ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 'build_field_list' );
 sub build_field_list {[]}
 has 'fields' => ( is => 'rw', isa => ArrayRef, default => sub {[]});
-sub add_field { my ( $self, @fields ) = @_; push @{$self->{fields}}, @fields; }
+sub push_field { my ( $self, @fields ) = @_; push @{$self->{fields}}, @fields; }
 sub clear_fields { my $self = shift; $self->{fields} = undef; }
 sub all_fields { my $self = shift; return @{$self->{fields}}; }
 sub set_field_at { my ( $self, $index, $field ) = @_; @{$self->{fields}}[$index] = $field; }
@@ -363,7 +363,7 @@ sub _update_or_create {
     }
     else { # new field
         $field = $self->new_field_with_roles( $class, $field_attr);
-        $parent->add_field($field);
+        $parent->push_field($field);
     }
     $field->form->add_repeatable_field($field)
         if ( $field->form && $field->is_repeatable);

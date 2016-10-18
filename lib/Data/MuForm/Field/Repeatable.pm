@@ -215,7 +215,7 @@ sub create_element {
         $instance = Instance->new( %$instance_attr );
     }
     # copy the fields from this field into the instance
-    $instance->add_field( $self->all_fields );
+    $instance->push_field( $self->all_fields );
     foreach my $fld ( $instance->all_fields ) {
         $fld->parent($instance);
     }
@@ -254,7 +254,7 @@ sub clone_fields {
             $self->clone_fields( $new_field, [ $new_field->all_fields ] );
         }
         $new_field->parent($parent);
-        $parent->add_field($new_field);
+        $parent->push_field($new_field);
     }
 }
 
@@ -273,7 +273,7 @@ sub fill_from_params {
             next if not defined $element; # skip empty slots
             my $field  = $self->clone_element($index);
             $field->fill_from_params( $element, 1 );
-            $self->add_field($field);
+            $self->push_field($field);
             $index++;
         }
     }
@@ -321,7 +321,7 @@ sub fill_from_object {
         }
         $field->fill_from_object( $element );
         push @new_values, $field->value;
-        $self->add_field($field);
+        $self->push_field($field);
         $index++;
     }
     if( my $num_extra = $self->num_extra ) {
@@ -343,7 +343,7 @@ sub _add_extra {
 
     my $field = $self->clone_element($index);
     $field->fill_from_fields();
-    $self->add_field($field);
+    $self->push_field($field);
     return $field;
 }
 
@@ -375,7 +375,7 @@ sub fill_from_fields {
     while ( $count > 0 ) {
         my $field = $self->clone_element($index);
         $field->fill_from_fields();
-        $self->add_field($field);
+        $self->push_field($field);
         $index++;
         $count--;
     }

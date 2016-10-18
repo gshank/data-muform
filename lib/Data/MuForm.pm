@@ -939,16 +939,12 @@ sub after_update_model {
             my @names = split( /\./, $field->full_name );
             my $rep_model = $self->find_sub_obj( $self->model, \@names );
             # $rep_model is a single row or an array of rows or undef
-            # If we found a database model for the repeatable, replace
-            # the existing result with a result derived from the model.
+            # If we found a database model for the repeatable, initialize
+            # with 'fill_from_object'
             if ( ref $rep_model ) {
                 my $parent = $field->parent;
                 $field->init_state;
                 $field->fill_from_object( $rep_model );
-                # find index of existing result
-               #my $index = $parent->result->find_result_index( sub { $_ == $result } );
-                # replace existing result with new result
-               #$parent->result->set_result_at_index( $index, $new_result );
             }
         }
     }
