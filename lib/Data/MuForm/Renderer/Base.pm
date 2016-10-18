@@ -174,6 +174,9 @@ sub render_field {
   elsif ( $layout_type eq 'element' ) { # submit, reset, hidden
      $out = $self->render_element($rargs);
   }
+  elsif ( $layout_type eq 'list' ) { # list
+     $out = $self->render_layout_list($rargs);
+  }
   else {  # $layout_type eq 'standard'
      $out = $self->render_layout_standard($rargs);
   }
@@ -780,6 +783,25 @@ sub wrapper_fieldset {
 sub wrapper_div {
     my ( $self, $rargs, $rendered ) = @_;
     my $out = qq{\n<div>$rendered</div>};
+    return $out;
+}
+
+sub render_layout_list {
+    my ( $self, $rargs ) = @_;
+$DB::single=1;
+    my $fif = $rargs->{fif} || [];
+    my $size = $rargs->{size};
+    $size ||= (scalar @{$fif} || 0) + ($rargs->{num_extra} || 0);
+    $size ||= 2;
+    my $out = $self->render_label($rargs);
+    my $index = 0;
+    while ( $size ) {
+       my $value = shift @$fif;
+       $value = defined $value ? $value : '';
+       my $element = $self->render_input({%$rargs, fif => $value, id => $rargs->{id} . $index++ });
+       $out .= $self->wrapper_div($rargs, $element);
+       $size--;
+    }
     return $out;
 }
 

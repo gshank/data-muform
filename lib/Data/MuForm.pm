@@ -722,6 +722,11 @@ sub check {
     $self->after_setup;
     $self->validate_form if $self->submitted;
     $self->processed(1);
+    return $self->check_result;
+}
+
+sub check_result {
+    my $self = shift;
     return $self->validated;
 }
 

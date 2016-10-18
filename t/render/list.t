@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Data::MuForm::Test;
 
 {
     package MyApp::Form::Test;
@@ -20,8 +21,20 @@ my $params = {
     bar => ['fruit', 'vegetable', 'meat'],
 };
 $form->process( params => $params );
-is_deeply( $form->fif, $params, 'right fif' );
-is_deeply( $form->values, $params, 'right values' );
-ok( $form->has_errors, 'form has errors' );
+my $expected = q{
+<div>
+  <label for="bar">Bar</label>
+  <div>
+    <input type="text" name="bar" id="bar0" value="fruit"/>
+  </div>
+  <div>
+    <input type="text" name="bar" id="bar1" value="vegetable"/>
+  </div>
+  <div>
+    <input type="text" name="bar" id="bar2" value="meat"/>
+  </div>
+</div>
+};
+is_html( $form->field('bar')->render, $expected, 'bar field rendered ok' );
 
 done_testing;

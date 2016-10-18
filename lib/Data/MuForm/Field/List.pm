@@ -1,6 +1,6 @@
 package Data::MuForm::Field::List;
 use Moo;
-extends 'Data::MuForm::Field';
+extends 'Data::MuForm::Field::Text';
 use Types::Standard -types;
 
 =head2 NAME
@@ -12,6 +12,9 @@ Data::MuForm::Field::List
 =cut
 
 sub multiple {1}
+
+has 'size' => ( is => 'rw' );
+has 'num_extra' => ( is => 'rw' );
 
 # add trigger to 'value' so we can enforce arrayref value for multiple
 has '+value' => ( trigger => 1 );
@@ -58,4 +61,12 @@ sub base_validate {
     }
 }
 
+sub base_render_args {
+    my $self = shift;
+    my $args = $self->next::method(@_);
+    $args->{layout_type} = 'list';
+    $args->{size} = $self->size if $self->size;
+    $args->{num_extra} = $self->num_extra if $self->num_extra;
+    return $args;
+}
 1;
