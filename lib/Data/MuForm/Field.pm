@@ -3,7 +3,7 @@ package Data::MuForm::Field;
 use Moo;
 use Types::Standard -types;
 use Try::Tiny;
-use Scalar::Util 'blessed';
+use Scalar::Util ('blessed', 'weaken');
 use Data::Clone ('data_clone');
 use Data::MuForm::Localizer;
 use Data::MuForm::Merge ('merge');
@@ -127,6 +127,18 @@ around BUILDARGS => sub {
 
 sub BUILD {
     my $self = shift;
+
+    if ( $self->form ) {
+        # To avoid memory cycles it needs to be weakened when
+        # it's set through a form.
+        weaken($self->{localizer});
+        weaken($self->{renderer});
+    }
+    else {
+        # Vivify. This would generally only happen in a standalone field, in tests.
+        $self->localizer;
+        $self->renderer;
+    }
 
     $self->_install_methods;
 }

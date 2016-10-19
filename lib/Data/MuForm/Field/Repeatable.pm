@@ -198,6 +198,8 @@ sub create_element {
         parent => $self,
         type   => 'Repeatable::Instance',
         is_contains => 1,
+        localizer => $self->localizer,
+        renderer => $self->renderer,
     };
     # primary_key array is used for reloading after database update
     $instance_attr->{primary_key} = $self->primary_key

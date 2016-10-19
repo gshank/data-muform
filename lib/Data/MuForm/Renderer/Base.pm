@@ -3,6 +3,7 @@ package Data::MuForm::Renderer::Base;
 
 use Moo;
 use List::Util ('any');
+use Scalar::Util ('weaken');
 
 =head1 NAME
 
@@ -107,7 +108,7 @@ In the form:
 
 =cut
 
-has 'form' => ( is => 'ro' );
+has 'form' => ( is => 'ro', weak_ref => 1 );
 
 has 'localizer' => ( is => 'ro' );
 
@@ -124,6 +125,13 @@ has 'default_field_wrapper' => ( is => 'rw', default => 'simple' );
 has 'default_wrapper_tag' => ( is => 'rw', default => 'div' );
 
 has 'default_error_tag' => ( is => 'rw', default => 'span' );
+
+sub BUILD {
+    my $self = shift;
+    if ( $self->form ) {
+        weaken($self->{localizer});
+    }
+}
 
 sub render_hook {
     my $self = shift;
