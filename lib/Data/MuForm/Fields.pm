@@ -381,16 +381,11 @@ sub new_field_with_roles {
 sub _order_fields {
     my $self = shift;
 
-    # get highest order number
-    my $order = 0;
-    foreach my $field ( $self->all_fields ) {
-        $order++ if $field->order > $order;
-    }
-    $order++;
-    # number all unordered fields
+    # number all unordered fields by 5
+    my $order = 5;
     foreach my $field ( $self->all_fields ) {
         $field->order($order) unless $field->order;
-        $order++;
+        $order = $order + 5;
     }
 
 }
