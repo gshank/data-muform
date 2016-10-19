@@ -10,16 +10,18 @@ Data::MuForm::Renderer::Base
 
 =head1 DESCRIPTION
 
-Base functionality for renderers, including rendering standard form elements.
+Base functionality for renderers, including rendering standard form controls.
 
 Generally you should always create your own custom renderer class which inherits
 from this one. In it you should set the various standard defaults for your
 rendering, and override some of the methods, like 'render_errors'. You should
-also create custom layouts and add them to the various 'layouts' hashrefs.
+also create custom layouts using the layout sub naming convention so they can
+be found.
 
 There is a 'render_hook' which can be used to customize things like classes and
 attributes. It is called on every 'render_field', 'render_element', 'render_errors',
-and 'render_label' call.
+and 'render_label' call. The hook can be used in the renderer or in the form class,
+whichever is most appropriate.
 
 This is Perl code, and can be customized however you want. This base renderer is
 supplied as a library of useful routines. You could replace it entirely if you want,
@@ -31,7 +33,8 @@ rendering is always done using a 'render_args' hashref of the pieces of the form
 and field that are needed for rendering.  Most of the rendering settings are set
 as keys in the render_args hashref, with some exceptions. This means that you
 can just start using a new render_args hashref key in your custom rendering code
-without having to do anything special to get it there.
+without having to do anything special to get it there. You have to set it somewhere
+of course, either in the field definition or passed in on the rendering calls.
 
 For a particular field, the field class will supply a 'base_render_args', which is
 merged with the 'render_args' from the field definition, which is merged with
@@ -43,7 +46,19 @@ of the complicated divs and classes that are necessary for recent 'responsive'
 CSS frameworks can be done in the templates under the control of the frontend
 programmers.
 
-  [% form.field('foo').render_element({ class => 'mb10 tye', placeholder => 'Type...}) %]
+  [% form.field('foo').render_element({ class => 'mb10 tye', placeholder => 'Type...'}) %]
+
+Or render the element, the errors and the labels, and do all of the other formatting
+in the template:
+
+   [% field = form.field('foo') %]
+   <div class="sm tx10">
+      [% field.render_label({ class="cxx" }) %]
+      <div class="xxx">
+        [% field.render_element({ class => 'mb10 tye', placeholder => 'Type...'}) %]
+      </div>
+      <div class="field-errors">[% field.render_errors %]</div>
+   </div>
 
 And yet another goal has been to make it possible to render a form automatically
 and have it just work.
@@ -68,6 +83,27 @@ Checkbox layout methods are named 'cb_layout_<layout name>'. The provided layout
 
 The checkbox group layouts are another 'Select' field layout type.
 Checkbox group options layouts are named 'cbgo_layout_<layout name>'.
+
+=head1 Form and Field methods
+
+In the field:
+
+    render (render_field, render_compound or render_repeatable in the renderer)
+    render_element
+    render_label
+    render_errors
+
+In the Select field:
+
+    render_option (for select, radio group and checkbox group)
+
+In the form:
+
+    render (render_form in the renderer)
+    render_start
+    render_end
+    render_errors (render_form_errors in the renderer)
+
 
 =cut
 
@@ -788,7 +824,7 @@ sub wrapper_div {
 
 sub render_layout_list {
     my ( $self, $rargs ) = @_;
-$DB::single=1;
+
     my $fif = $rargs->{fif} || [];
     my $size = $rargs->{size};
     $size ||= (scalar @{$fif} || 0) + ($rargs->{num_extra} || 0);

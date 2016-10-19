@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Data::MuForm::Test;
 
-use_ok('Data::MuForm::Renderer::Standard');
+use_ok('Data::MuForm::Renderer::Base');
 
 {
     package MyApp::Form::Test;

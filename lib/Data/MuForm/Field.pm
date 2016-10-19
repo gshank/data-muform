@@ -305,8 +305,8 @@ has 'renderer' => (
 );
 sub build_renderer {
   my $self = shift;
-  require Data::MuForm::Renderer::Standard;
-  return Data::MuForm::Renderer::Standard->new( localizer => $self->localizer );
+  require Data::MuForm::Renderer::Base;
+  return Data::MuForm::Renderer::Base->new( localizer => $self->localizer );
 }
 
 sub get_render_args {
@@ -335,10 +335,10 @@ sub render_errors {
 }
 
 sub render_label {
-  my ( $self, $rargs ) = @_;
+  my ( $self, $rargs, @args ) = @_;
   my $render_args = $self->get_render_args( label_attr => $rargs );
   $self->form->render_hook($render_args) if $self->form;
-  return $self->renderer->render_label($render_args);
+  return $self->renderer->render_label($render_args, @args);
 }
 
 
