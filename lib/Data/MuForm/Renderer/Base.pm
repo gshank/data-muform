@@ -246,10 +246,7 @@ sub render_compound {
     foreach my $field ( @$fields ) {
         $out .= $field->render;
     }
-    # don't always wrap? what should be standard
-    if ( $rargs->{wrapper} ) {
-        $out = $self->wrap_field($rargs, $out);
-    }
+    $out = $self->wrap_field($rargs, $out);
     return $out;
 }
 

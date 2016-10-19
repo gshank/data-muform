@@ -116,6 +116,12 @@ around 'fill_from_params' => sub {
     }
 };
 
+sub base_render_args {
+    my $self = shift;
+    my $args = $self->next::method(@_);
+    $args->{wrapper} = 'none';
+    return $args;
+}
 sub render {
   my ( $self, $rargs ) = @_;
   my $render_args = $self->get_render_args(%$rargs);

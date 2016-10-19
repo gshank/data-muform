@@ -16,6 +16,7 @@ sub base_render_args {
     my $self = shift;
     my $args = $self->next::method(@_);
     $args->{layout_type} = 'element';
+    $args->{wrapper} = 'none';
     return $args;
 }
 

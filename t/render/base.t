@@ -127,9 +127,7 @@ $expected = q{
     <label for="sol">Sol</label>
     <textarea cols="50" id="sol" name="sol" rows="3">Some text</textarea>
   </div>
-  <div>
-    <input id="submitted" name="submitted" type="submit" value="Save" />
-  </div>
+  <input id="submitted" name="submitted" type="submit" value="Save" />
 </form>
 };
 is_html( $rendered, $expected, 'form rendered correctly' );

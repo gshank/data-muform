@@ -27,8 +27,8 @@ use HTML::FormHandler::Test;
     </div>
     <div><label for="bar">Bar</label><input type="text" name="bar" id="bar" value="" />
     </div>
-    <div><input type="submit" name="save" id="save" value="Save" />
-    </div></form>';
+    <input type="submit" name="save" id="save" value="Save" />
+    </form>';
     is_html($rendered, $expected, 'simple form renders ok' );
 }
 

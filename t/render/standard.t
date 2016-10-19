@@ -177,10 +177,8 @@ is_html( $rendered,
 
 $rendered = $form->field('hidden')->render;
 is_html( $rendered,
-'<div>
-  <input type="hidden" name="hidden" id="hidden" value="1234" />
-</div>',
-    'output from hidden field'
+  '<input type="hidden" name="hidden" id="hidden" value="1234" />',
+  'output from hidden field'
 );
 
 
@@ -215,15 +213,13 @@ is_html( $rendered, $expected, 'output from Compound start_date field');
 
 $rendered = $form->field('submit')->render;
 is_html( $rendered,
-'<div>
-  <input type="submit" name="submit" id="submit" value="&gt;&gt;&gt; Update" />
-</div>', 'output from Submit' );
+  '<input type="submit" name="submit" id="submit" value="&gt;&gt;&gt; Update" />',
+  'output from Submit' );
 
 $rendered = $form->field('reset')->render;
 is_html( $rendered,
-'<div>
-  <input type="reset" name="reset" id="reset" value="&lt;&lt;&lt; Reset" />
-</div>', 'output from Reset'
+  '<input type="reset" name="reset" id="reset" value="&lt;&lt;&lt; Reset" />',
+  'output from Reset'
 );
 
 $rendered = $form->render_start;
