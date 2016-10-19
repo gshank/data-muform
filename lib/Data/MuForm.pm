@@ -122,7 +122,11 @@ L<Data::MuForm::Model::DBIC>.
 
 Use the 'check' method to perform validation on your data:
 
-    $validator->check( data => { ... } );
+    my $result = $validator->check( data => { ... } );
+
+The 'result' returned from 'check' is $form->validated, but you can
+override the 'check_result' method in the form to return data in
+whatever format you wish.
 
 =head3 process
 
@@ -296,6 +300,19 @@ you can also create all the fields and set some of them inactive.
       return \@field_list;
    }
 
+=head2 add_field
+
+You can add an additional field with $form->add_field.
+
+    my $order = $form->field('foo')->order + 1;
+    $form->add_field(
+       name => 'my_cb',
+       type => 'Checkbox',
+       order => $order,
+    );
+
+It will be ordered as the last field unless you set the 'order'
+attribute. Form fields are automatically ordered by 5 (i.e. 5, 10, 15, etc).
 
 =head3 active/inactive
 
@@ -340,8 +357,9 @@ so this is a tree structure.
 
 =head3 sorted_fields
 
-Returns those fields from the fields array which are currently active. This
-is the method that returns the fields that are looped through when rendering.
+Returns those fields from the fields array which are currently active, ordered
+by the 'order' attribute. This is the method that returns the fields that are
+looped through when rendering.
 
 =head3 field($name), subfield($name)
 
@@ -351,8 +369,6 @@ is the method that returns the fields that are looped through when rendering.
     [% f = form.field('title') %]
 
     my $city = $form->field('addresses.0.city')->value;
-
-Pass a second true value to die on errors.
 
 Since fields are searched for using the form as a base, if you want to find
 a sub field in a compound field method, the 'subfield' method may be more
@@ -911,6 +927,16 @@ sub get_result {
 
 sub results { shift->fields_get_results }
 
+sub add_field {
+    my ( $self, %field_attr ) = @_;
+    my $field = $self->_make_field( \%field_attr );
+    # make it the last field.
+    unless ( exists $field_attr{order} ) {
+      my $order = $field->parent->_get_highest_field_order;
+      $field->order($order + 5);
+    }
+    return $field;
+}
 
 sub after_update_model {
     my $self = shift;

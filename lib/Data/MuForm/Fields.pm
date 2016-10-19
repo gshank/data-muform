@@ -191,7 +191,6 @@ sub build_fields {
 
     return unless $self->has_fields;
     $self->_order_fields;
-#   $self->_install_methods unless $self->is_form;
 }
 
 sub convert_field_list_to_hashes {
@@ -270,6 +269,8 @@ sub _make_field {
     my $field = $self->_update_or_create( $parent, $field_attr, $class, $do_update );
 
     $self->form->add_to_index( $field->full_name => $field ) if $self->form;
+
+    return $field;
 }
 
 sub _find_field_class {
@@ -357,12 +358,12 @@ sub _update_or_create {
             }
         }
         else { # replace existing field
-            $field = $self->new_field_with_roles( $class, $field_attr);
+            $field = $self->new_field( $class, $field_attr);
             $parent->set_field_at( $index, $field );
         }
     }
     else { # new field
-        $field = $self->new_field_with_roles( $class, $field_attr);
+        $field = $self->new_field( $class, $field_attr);
         $parent->push_field($field);
     }
     $field->form->add_repeatable_field($field)
@@ -371,7 +372,7 @@ sub _update_or_create {
     return $field;
 }
 
-sub new_field_with_roles {
+sub new_field {
     my ( $self, $class, $field_attr ) = @_;
     # not handling roles
     my $field = $class->new(%$field_attr);
@@ -387,20 +388,23 @@ sub _order_fields {
         $field->order($order) unless $field->order;
         $order = $order + 5;
     }
-
 }
 
+sub _get_highest_field_order {
+    my $self = shift;
+    my $order = 0;
+    foreach my $field ( $self->all_fields ) {
+        $order = $field->order if $field->order > $order;
+    }
+    return $order;
+}
+
+# This is a special make field that's used in the Repeatable field to
+# create repeatable instances. It skips some of the overhead of _make_field
+# because some of the info can be hardcoded and we don't want to index it.
 sub _make_adhoc_field {
     my ( $self, $class, $field_attr ) = @_;
-
-    # remove and save form & parent, because if the form class has a 'clone'
-    # method, Data::Clone::clone will clone the form
-    my $parent = delete $field_attr->{parent};
-    my $form = delete $field_attr->{form};
-#   $field_attr = $self->_merge_updates( $field_attr, $class );
-    $field_attr->{parent} = $parent;
-    $field_attr->{form} = $form;
-    my $field = $self->new_field_with_roles( $class, $field_attr );
+    my $field = $self->new_field( $class, $field_attr );
     return $field;
 }
 
