@@ -101,6 +101,9 @@ field definitions.
 The 'posted' flag has been renamed to 'submitted', because you also need on a 'get'. Also
 a params hashref with no field name keys will not need the submitted => 0 flag.
 
+Removed 'update_subfields'. The code was complicated and not worth the overhead. If you
+want to do something like this, see the cookbook.
+
 Removed 'use_fields_for_input_without_param'. Can be implemented in other ways.
 
 Removed flag 'use_init_obj_when_no_accessor_in_item'. This should happen automatically now.

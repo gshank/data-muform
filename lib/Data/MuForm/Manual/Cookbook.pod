@@ -1,0 +1,73 @@
+package Data::MuForm::Manual::Cookbook;
+# ABSTRACT: Cookbook recipes for using MuForm
+
+=head1 NAME
+
+Data::MuForm::Manual::Cookbook
+
+=head1 RECIPES
+
+=head2 Update all fields
+
+In FormHandler you can do something like:
+
+    sub build_update_subfields {{
+        by_flag => { contains => { wrapper_class => ['rep_elem'] } },
+        by_type => { 'Select' => { wrapper_class => ['sel_wrapper'] },
+                     'Boolean' => { element_class => ['sel_elem'] },
+        },
+    }}
+
+You can achieve the equivalent in MuForm with:
+
+    sub after_build_fields {
+        my $self = shift;
+        foreach my $field ( $self->all_repeatable_fields ) {
+            $field->init_contains({ 'ra.wa.class' => ['rep_elem'] });
+        }
+        foreach my $field ( $self->all_fields ) {
+            if ( $field->type eq 'Select' ) {
+                $field->render_args->{wrapper_attr}{class} = ['sel_wrapper'];
+            }
+            elsif ( $field->type eq 'Boolean' ) {
+                $field->render_args->{element_attr}{class} = ['sel_elem'];
+            }
+        }
+    }
+
+=head2 apply roles to fields
+
+A role to overide the 'id' attribute:
+
+    package My::DynamicFieldId;
+    use Moo::Role;
+    around 'id' => sub {
+        my $orig = shift;
+        my $self = shift;
+        my $form_name = $self->form->name;
+        return $form_name . "." . $self->full_name;
+    };
+
+Apply to the fields in an 'after_build_fields' sub.
+
+    package My::CustomIdForm2;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    has '+name' => ( default => 'D123' );
+
+    has_field 'foo';
+    has_field 'bar';
+
+    sub after_build_fields {
+        my $self = shift;
+        # the 'index' contains all fields, not just top level fields
+        foreach my $field ( values %{$self->index} ) {
+            Role::Tiny->apply_roles_to_object($field, 'My::DynamicFieldId');
+        }
+    }
+
+=cut
+
+1;
