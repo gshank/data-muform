@@ -338,7 +338,7 @@ flag cleared when the form is cleared (on the next process/check call).
 The 'sorted_fields' method returns only active fields, sorted according to the
 'order' attribute. The 'fields' method returns all fields.
 
-   foreach my $field ( $self->sorted_fields ) { ... }
+   foreach my $field ( $self->all_sorted_fields ) { ... }
 
 You can test whether a field is active by using the field 'is_active' and 'is_inactive'
 methods.
@@ -449,7 +449,8 @@ Compound fields also have an array of error_fields.
 The clear method is called at the beginning of 'process' if the form
 object is reused, such as when it is persistent,
 or in tests.  If you add other attributes to your form that are set on
-each request, you may need to clear those yourself.
+each request, you may need to either clear those yourself or ensure that
+they are always set on each process call.
 
 =head2 Miscellaneous attributes
 
@@ -510,7 +511,7 @@ validation is not run until FormHandler has params to validate.
 
 =head3 field_prefix
 
-String to be used as a prefix for field id's and names
+String to be used as a prefix for field ids and names
 in an HTML form. Useful for multiple forms
 on the same HTML page. The prefix is stripped off of the fields
 before creating the internal field name, and added back in when
