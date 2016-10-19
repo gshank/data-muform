@@ -42,7 +42,7 @@ In a field declaration:
 
 =item From a coderef supplied to the field definition
 
-   has_field 'flim' => ( type => 'Select', methods => { build_options => *flim_options );
+   has_field 'flim' => ( type => 'Select', methods => { build_options => \&flim_options );
    sub flim_options {  <return options arrayref> }
 
 =item From a form 'options_<field_name>' method or attribute

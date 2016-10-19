@@ -10,8 +10,14 @@ Since this is an entirely new package I have taken the opportunity to
 make all of the changes and improvements that you can't do when you
 have actual users, including renaming things, removing features, changing
 behavior, and removing cruft. A very large part of the core FormHandler
-code and functionality has stood the test of time and use very well, and has been moved
-to MuForm with only minor changes.
+code and functionality has stood the test of time and use very well,
+and has been moved to MuForm with only minor changes.
+
+Form construction is substantially faster in MuForm, for a number of reasons:
+Moo instead of Moose, fewer attributes, no results, and dropped some complicated
+only marginally helpful features. Processing is somewhat faster. Rendering
+takes about the same amount of time (most of extra rendering related time in FH is
+actually at form construction time).
 
 Note: this is still a work in process, so please contact me if your
 favorite feature has gone missing. Some features may be supplied via
@@ -41,7 +47,8 @@ The 'result' objects have been removed because there was too much overhead
 and complication for low payout. Some rendering tasks were practically
 impossible to support using the results.
 
-The 'item' has been renamed to 'model' and is now cleared on process like the other attributes.
+The 'item', 'item_id', and 'item_class' have been renamed to 'model', 'model_id',
+'model_class'. The 'model' is now cleared on process like the other attributes.
 
 The 'init_object' has been renamed to 'init_values'.
 
@@ -55,7 +62,10 @@ the overhead of form construction. I attempted to make it easier to render
 in templates with 'render_element' while still allowing full-automatic rendering.
 See the rendering documentation. There will be 'layouts'.
 
-No 'has_block', since that's purely a rendering thing. There will some way of
+Set options attributes directly in the 'options' hashrefs, instead of in a separate
+'attributes' hashref, i.e. { value => 1, label => 'one', class => 'xxx' }
+
+No 'has_block', since that's purely a rendering thing. There will be some way of
 doing something similar in the renderer, but it's not been developed yet.
 
 Localization now uses a gettext style .po file and a gettext type localizer,
@@ -70,7 +80,7 @@ non-form type validation.
 
 Added 'data' alias for 'params', for better naming when doing simple validation
 
-Renamed 'field_name_space' to 'field_namespace'
+Renamed 'field_name_space' to 'field_namespace'. ('widget_name_space' is gone)
 
 Standardized returns from attributes to arrayref, instead of array. If an array return
 is available it will be in the 'all_' version. The important ones are 'options' and 'fields'.
@@ -81,7 +91,7 @@ The trim method is a separate coderef and is not added to the apply actions. Nee
 be defined as a simple coderef instead of an apply-style action.
 
 The 'render_filter_method' has been removed. The 'html_filter' is defined in the Renderer.
-If you want a different filter, create your own renderer.
+If you want a different filter, create your own renderer (recommended anyway) and replace it.
 
 The active => [] and inactive => [] no longer have a permanent build (on new) effect.
 Do in your own form code if you want this. They still work the same on ->process.
@@ -111,7 +121,7 @@ The inflate/deflate transforms have been renamed: 'inflate_method' = 'transform_
 
 Removed 'deflation'. Many other ways of doing this.
 
-Removed 'missing'.
+Removed 'missing'. I never used this. Did anybody?
 
 Various methods that could be set in a field definition have been moved into a 'methods' hashref:
 'build_id', 'build_options', 'build_label', 'validate', 'default'.

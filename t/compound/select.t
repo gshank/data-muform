@@ -8,8 +8,8 @@ use Test::More;
     use Data::MuForm::Meta;
     extends 'Data::MuForm::Field::Compound';
 
-    has_field 'flim' => ( type => 'Select', methods => { build_options => *options_flim } );
-    has_field 'flam' => ( type => 'Multiple', methods => { build_options => *options_flam } );
+    has_field 'flim' => ( type => 'Select', methods => { build_options => \&options_flim } );
+    has_field 'flam' => ( type => 'Multiple', methods => { build_options => \&options_flam } );
     has_field 'flot';
 
     sub options_flim {

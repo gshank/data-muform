@@ -408,7 +408,7 @@ If the field name has dots they should be replaced with underscores.
 
 Note that you can also provide a coderef which will be a method on the field:
 
-   has_field 'foo' => ( methods => { validate => *validate_foo } );
+   has_field 'foo' => ( methods => { validate => \&validate_foo } );
 
 =head3 validate
 

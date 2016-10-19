@@ -157,7 +157,7 @@ You can validate a field with a method in the form 'validate_<field_name>':
 
 You can provide a validation coderef that will be a field method:
 
-    has_field 'foo' => ( methods => { validate => *check_foo } );
+    has_field 'foo' => ( methods => { validate => \&check_foo } );
     sub check_foo {
         my $self = shift; # self is field
         unless( $self->value == ... ) {
@@ -179,7 +179,7 @@ Or create validators with check:
 
 Or use a validate coderef:
 
-    has_field 'foo' => ( methods => { validate => *check_foo } );
+    has_field 'foo' => ( methods => { validate => \&check_foo } );
     sub check_foo {
         my $self = shift;
         if ( $self->value =~ s/..../ ) {

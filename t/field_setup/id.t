@@ -18,7 +18,7 @@ use Test::More;
     sub after_build_fields {
         my $self = shift;
         foreach my $field ( values %{$self->index} ) {
-            $field->{methods}->{build_id} = *build_id;
+            $field->{methods}->{build_id} = \&build_id;
         }
     }
     sub build_id {
