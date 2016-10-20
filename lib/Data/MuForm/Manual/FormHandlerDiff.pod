@@ -101,6 +101,8 @@ field definitions.
 The 'posted' flag has been renamed to 'submitted', because you also need on a 'get'. Also
 a params hashref with no field name keys will not need the submitted => 0 flag.
 
+You no longer need to use C<$field->_set_value($value)>. Just use C<$field->value($value)>.
+
 Removed 'update_subfields'. The code was complicated and not worth the overhead. If you
 want to do something like this, see the cookbook.
 

@@ -11,12 +11,6 @@ use Scalar::Util ('blessed');
 use Types::Standard -types;
 
 has 'schema' => ( is => 'rw', );
-has 'source_name' => (
-#   isa     => 'Str',
-    is      => 'rw',
-    lazy    => 1,
-    builder => 'build_source_name'
-);
 
 has unique_constraints => (
     is         => 'ro',
@@ -329,21 +323,16 @@ sub set_model_id {
     }
 }
 
-sub build_source_name {
-    my $self = shift;
-    return $self->model_class;
-}
-
 sub source {
     my ( $self, $f_class ) = @_;
-    return $self->schema->source( $self->source_name || $self->model_class );
+    return $self->schema->source( $self->model_class );
 }
 
 sub resultset {
     my ( $self, $f_class ) = @_;
     die "You must supply a schema for your MuForm form"
         unless $self->schema;
-    return $self->schema->resultset( $self->source_name || $self->model_class );
+    return $self->schema->resultset( $self->model_class );
 }
 
 sub get_source {

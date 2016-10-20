@@ -13,7 +13,7 @@ has_field 'occupation';
 has_field 'country' => ( type => 'Select' );
 has_field 'license' => ( type => 'Select' );
 has_field 'opt_in' => ( type => 'Checkbox' );
-has_field 'birthdate' => ( type => 'Date' );
+has_field 'birthdate' => ( type => 'CompoundDateTime' );
 has_field 'birthdate.year' => ( type => 'Text', );
 has_field 'birthdate.month' => ( type => 'Text', );
 has_field 'birthdate.day' => ( type => 'Text', );
@@ -38,7 +38,7 @@ sub options_opt_in
    );
 }
 
-sub init_value_license
+sub default_license
 {
    my ( $self, $field, $item ) = @_;
 
