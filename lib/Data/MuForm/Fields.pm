@@ -124,7 +124,7 @@ sub fields_validate {
         # Validate each field and "inflate" input -> value.
         $field->validate_field;    # this calls the field's 'validate' routine
         $value_hash{ $field->accessor } = $field->value
-            if ( $field->has_value && !$field->noupdate );
+            if ( $field->has_value && !$field->no_update );
     }
     $self->value( \%value_hash );
 }
@@ -595,7 +595,7 @@ sub fields_set_value {
     foreach my $field ( $self->all_fields ) {
         next if ! $field->is_active;
         $value_hash{ $field->accessor } = $field->value
-            if ( $field->has_value && !$field->noupdate );
+            if ( $field->has_value && !$field->no_update );
     }
     $self->value( \%value_hash );
 }

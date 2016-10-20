@@ -135,11 +135,12 @@ TextArea field renamed to Textarea for consistency.
 
 A number of trivial fields are no longer supplied by the distribution. If you need these fields
 it should be pretty easy to create your own. Some fields not supplied: Hour, Minute, Month,
-MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Duration, DateTime,
-Password, PasswordConf, IntRange.  Could possibly be supplied in a compatibility library. Let me
-know if you want this.
+MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Duration,
+Password, PasswordConf, IntRange. The DateTime field has been renamed to 'CompoundDateTime'.
 
 Renamed html_prefix to field_prefix and it should be set to the string used to prefix fields.
+
+Renamed field 'noupdate' to 'no_update'.
 
 =cut
 

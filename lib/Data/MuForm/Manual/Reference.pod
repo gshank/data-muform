@@ -147,7 +147,7 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
 
    accessor      Database accessor name if different than field name
    unique        Field should be unique in the database
-   noupdate      Don't update this field in the database
+   no_update      Don't update this field in the database
    writeonly     Do not retrieve initial values
 
    Also see the select field _columns attributes

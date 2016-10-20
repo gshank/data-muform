@@ -77,7 +77,7 @@ sub is_active {
 }
 sub is_inactive { ! $_[0]->is_active }
 has 'disabled' => ( is => 'rw', default => 0 );
-has 'noupdate' => ( is => 'rw', default => 0 );
+has 'no_update' => ( is => 'rw', default => 0 );
 has 'writeonly' => ( is => 'rw', default => 0 );
 has 'is_contains' => ( is => 'rw', isa => Bool );
 has 'apply' => ( is => 'rw', default => sub {[]} ); # for field defnitions

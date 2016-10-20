@@ -15,7 +15,7 @@ Uses the 'reset' widget.
 =cut
 
 has 'value' => ( is => 'rw', default => 'Reset' );
-has '+noupdate'  => ( default => 1 );
+has '+no_update'  => ( default => 1 );
 
 sub build_input_type { 'reset' }
 
