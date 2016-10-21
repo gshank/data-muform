@@ -142,6 +142,8 @@ Renamed html_prefix to field_prefix and it should be set to the string used to p
 
 Renamed field 'noupdate' to 'no_update'.
 
+Added 'build_field_id' as a possible form method to build fields ids.
+
 =cut
 
 1;

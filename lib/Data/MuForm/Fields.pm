@@ -58,8 +58,13 @@ has 'field_namespace' => (
 );
 sub build_field_namespace { [] }
 
+sub subfield {
+    my ( $self, $name ) = @_;
+    return $self->field($name, $self);
+}
+
 sub field {
-    my ( $self, $name, $die, $f ) = @_;
+    my ( $self, $name, $f ) = @_;
 
     my $index;
     # if this is a full_name for a compound field
@@ -84,8 +89,7 @@ sub field {
             return $field if ( $field->name eq $name );
         }
     }
-    return unless $die;
-    die "Field '$name' not found in '$self'";
+    return;
 }
 
 sub all_sorted_fields {

@@ -95,9 +95,9 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
 
 =head2 Field attributes
 
-   name          Field name. Must be the same as database column name or rel
+   name          Field name. Usually the same as database column name or rel
    type          Field type. From a Field class: 'Text', 'Select', etc
-   order         Set the order for fields. Default order is set by FH.
+   order         Set the order for fields. Default order is set by MuForm, by 5.
 
    active        Arrayref of fields to set active
    is_active
@@ -147,7 +147,7 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
 
    accessor      Database accessor name if different than field name
    unique        Field should be unique in the database
-   no_update      Don't update this field in the database
+   no_update     Don't include this field in ->values hash. It won't be updated in the database.
    writeonly     Do not retrieve initial values
 
    Also see the select field _columns attributes

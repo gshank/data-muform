@@ -17,18 +17,471 @@ with 'Data::MuForm::Common';
 
 Data::MuForm::Field
 
+=head1 SYNOPSIS
+
+Instances of Field subclasses are generally built by L<Data::MuForm>
+from 'has_field' declarations or the field_list.
+
+   has_field 'my_field' => ( type => 'Integer' );
+   field_list => [
+      my_field => { type => 'Integer' }
+   ]
+
+Fields can also be added with add_field:
+
+    $form->add_field( name => 'my_field', type => 'Integer' );
+
+You can create custom field classes:
+
+    package MyApp::Field::MyText;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm::Field::Text';
+
+    has 'my_attribute' => ( isa => 'Str', is => 'rw' );
+
+    sub validate { <perform validation> }
+
+    1;
+
 =head1 DESCRIPTION
 
-Base field for MuForm fields.
+This is the base class for form fields. The 'type' of a field class
+is used in the MuForm field_list or has_field to identify which field class to
+load from the 'field_namespace' (or directly, when prefixed with '+').
+If the type is not specified, it defaults to Text.
+
+See L<Data::MuForm::Manual::Fields> for a list of the fields and brief
+descriptions of their structure.
+
+=head1 ATTRIBUTES
+
+=head2 Names, types, accessor
+
+=over
+
+=item name
+
+The name of the field. Used in the HTML form. Often a db accessor.
+The only required attribute.
+
+=item type
+
+The class or type of the field. The 'type' of L<Data::MuForm::Field::Currency>
+is 'Currency'. Classes that you define yourself are prefixed with '+'.
+
+=item id
+
+The id to use when rendering.
+
+=item accessor
+
+If the name of your field is different than your database accessor, use
+this attribute to provide the accessor.
+
+=item full_name
+
+The name of the field with all parents:
+
+   'event.start_date.month'
+
+=item full_accessor
+
+The field accessor with all parents.
+
+=item prefixed_name
+
+The full_name plus the prefix provided in 'field_prefix'. Useful for multiple
+forms on the same page.
+
+=item input_param
+
+By default we expect an input parameter based on the field name.  This allows
+you to look for a different input parameter.
+
+=back
+
+=head2 Field data
+
+=over
+
+=item active, inactive, is_active, is_inactive
+
+Determines which fields will be processed and rendered.
+
+Can be changed on a process call, and cleared afterward:
+
+    $form->process( active => [ 'foo', 'bar' ], params => $params );
+
+You can use the is_inactive and is_active methods to check whether this particular
+field is active. May be necessary to use in templates if you're changing the
+active/inactive of some fields.
+
+   if( $form->field('foo')->is_active ) { ... }
+
+=item input
+
+The input string from the parameters passed in. This is not usually set by
+the user.
+
+=item value
+
+The value as it would come from or go into the database, after being
+acted on by transforms and validation code. Used to construct the
+C<< $form->values >> hash. Before validation is performed, the input is
+copied to the 'value', and validation and constraints should act on 'value'.
+After validation, C<< $form->value >> will get a hashref of the values.
+
+See also L<Data::MuForm::Manual::Transforms>.
+
+=item fif
+
+Values used to fill in the form. Read only.
+
+   [% form.field('title').fif %]
+
+=item init_value
+
+Initial value populated by fill_from_object. You can tell if a field
+has changed by comparing 'init_value' and 'value'. You wouldn't normally
+change this.
+
+=item input_without_param
+
+Input for this field if there is no param. Set by default for Checkbox,
+and Select, since an unchecked checkbox or unselected pulldown
+does not return a parameter.
+
+=back
+
+=head2 Form, parent, etc
+
+=over
+
+=item form
+
+A reference to the containing form.
+
+=item parent
+
+A reference to the parent of this field. Compound fields are the
+parents for the fields they contain.
+
+=item localizer
+
+Set from the form when fields are created.
+
+=item renderer
+
+Set from the form when fields are created.
+
+=back
+
+=head2 Errors
+
+=over
+
+=item errors
+
+Returns the error list (arrayref) for the field. Also provides
+'all_errors', 'num_errors', 'has_errors', 'push_errors' and 'clear_errors'.
+Use 'add_error' to add an error to the array if you
+want to localize the error message, or 'push_error' to skip
+the localization.
+
+=item add_error
+
+Add an error to the list of errors. Error message will be localized
+using 'localize' method, and the Localizer (default is
+Data::MuForm::Localizer, which use a gettext style .po file).
+
+    return $field->add_error( 'bad data' ) if $bad;
+
+=item push_error
+
+Adds an error to the list of errors without localization.
+
+=item error_fields
+
+The form and Compound fields will have an array of errors from the subfields.
+
+=back
+
+=head2 methods
+
+A 'methods' hashref allows setting various coderefs, 'build_id', 'build_label',
+'build_options', 'validate', 'default'.
+
+   methods => { build_id => \&my_build_id } - coderef for constructing the id
+   methods => { build_label => \&my_build_label } - coderef for constructing the label
+
+=over
+
+=item build_id
+
+A coderef to build the field's id. If one doesn't exist, will use a form 'build_field_id'
+method. Fallback is to use the field's full name.
+
+=item build_label
+
+=item build_options
+
+=item validate
+
+=item default
+
+=back
+
+=head2 render_args
+
+The 'render_args' hashref contains keys which are used in rendering, with shortcuts
+for easier specification in a field definition.
+
+   element_attr - ea - hashref
+   label_attr   - la - hashref
+   wrapper_attr - wa - hashref
+   errors_attr  - era - hashref
+
+   has_field 'foo' => ( render_args => { element_attr => { readonly => 1, my_attr => 'abc' }} );
+   has_field 'foo' => ( 'ra.ea' => { readonly => 1, my_attr => 'abc' } );
+   has_field 'foo' => ( 'ra'.wa.class' => ['mb10', 'wr66'] );
+
+Note the the 'name', 'id', and 'value' of fields is set by field attributes. Though
+it is possible to override the id in render_args, it then won't be available for
+other code such as 'errors_by_id'. There is some behavior associated with the 'disabled'
+flag too.
+
+   label       - Text label for this field. Defaults to ucfirst field name.
+   id          - Used in 'id="<id>"' in HTML
+   disabled    - Boolean to set field disabled
+
+The order attribute may be used to set the order in which fields are rendered.
+
+   order       - Used for sorting errors and fields. Built automatically,
+                 but may also be explicitly set. Auto sequence is by 5: 5, 10, 15, etc
+
+=head2 Flags
+
+=over
+
+=item password
+
+Prevents the entered value from being displayed in the form
+
+=item writeonly
+
+The initial value is not taken from the database
+
+=item no_update
+
+Do not include this field in C<< $form->values >>, and so it won't be updated in the database.
+
+=item not_nullable
+
+Fields that contain 'empty' values such as '' are changed to undef in the validation process.
+If this flag is set, the value is not changed to undef. If your database column requires
+an empty string instead of a null value (such as a NOT NULL column), set this attribute.
+
+    has_field 'description' => (
+        type => 'TextArea',
+        not_nullable => 1,
+    );
+
+This attribute is also used when you want an empty array to stay an empty array and not
+be set to undef.
+
+It's also used when you have a compound field and you want the 'value' returned
+to contain subfields with undef, instead of the whole field to be undef.
+
+=back
+
+=head2 Defaults
+
+See also the documentation on L<Data::MuForm::Manual::Defaults>.
+
+=over
+
+=item default method
+
+Note: do *not* set defaults by setting the 'checked' or 'selected' attributes
+in options. The code will be unaware that defaults have been set.
+
+  has_field 'foo' => (  methods => { default => \&my_default } );
+  sub my_default { }
+  OR
+  has_field 'foo';
+  sub default_foo { }
+
+Supply a coderef (which will be a method on the field).
+If not specified and a form method with a name of
+C<< default_<field_name> >> exists, it will be used.
+
+=item default
+
+Provide an initial value in the field declaration:
+
+  has_field 'bax' => ( default => 'Default bax' );
+
+=back
+
+=head1 Constraints and Validations
+
+See also L<Data::MuForm::Manual::Validation>.
+
+=head2 Constraints set in attributes
+
+=over
+
+=item required
+
+Flag indicating whether this field must have a value
+
+=item unique
+
+For DB field - check for uniqueness. Action is performed by
+the DB model.
+
+=item apply
+
+Use the 'apply' keyword to specify an ArrayRef of constraints and coercions to
+be executed on the field at validate_field time.
+
+   has_field 'test' => (
+      apply => [ TinyType,
+                 { check => sub {...}, message => { } },
+                 { transform => sub { ... lc(shift) ... } }
+               ],
+   );
+
+=back
+
+=head2 messages
+
+    has_field 'foo' => ( messages => { required => '...', unique => '...' } );
+    or
+    has_field 'foo' => ( 'msg.required' => '...' );
+
+Set messages created by MuForm by setting in the 'messages'
+hashref or with the 'msg.<msg_name>' shortcut. Some field subclasses have additional
+settable messages.
+
+required:  Error message text added to errors if required field is not present.
+The default is "Field <field label> is required".
+
+=head2 Transforms
+
+There are a number of methods to provide finely tuned transformation of the
+input or value.
+
+See also L<Data::MuForm::Manual::Transforms>.
+
+=over 4
+
+=item  transform_input_to_value
+
+In FH was 'inflate_method'.
+
+Transforms the string that was submitted in params (and copied to 'input') when
+it's stored in the 'value' attribute during validation.
+
+=item transform_value_to_fif
+
+In FH was 'deflate_method'.
+
+When you get 'fif' for the field and the 'value' is used (as opposed to input)
+transforms the value to a string suitable for filling in a form field.
+
+=item transform_default_to_value
+
+In FH was inflate_default_method.
+
+Transform the 'default' provided by an 'model' or 'init_values' or 'default' when it's stored
+in the 'value'.
+
+=item transform_value_after_validate
+
+In FH was 'deflate_value_method';
+
+Transform the value after validation has been performs, in order to return
+a different form in C<< $form->value >>.
+
+=item transform_param_to_input
+
+Transform the param when it's stored in 'input'. Will change what the user sees
+in a re-presented form.
+
+=item trim
+
+A transform to trim the field. The default 'trim' sub
+strips beginning and trailing spaces.
+Set this attribute to null to skip trimming, or supply a different
+sub.
+
+  trim => sub {
+      my $string = shift;
+      <do something>
+      return $string;
+  }
+
+Trimming is performed before any other defined actions.
+
+=back
+
+=head1 Processing and validating the field
+
+See also L<Data::MuForm::Manual::Validation>.
+
+=head2 Validate method
+
+   has_field 'foo' => ( methods => { validate => \&foo_validation } );
+   sub foo_validation { }
+   OR
+   has_field 'foo';
+   sub validate_foo { }
+
+Supply a coderef (which will be a method on the field).
+If not specified and a form method with a name of
+C<< validate_<field_name> >> exists, it will be used instead.
+
+Periods in field names will be replaced by underscores, so that the field
+'addresses.city' will use the 'validate_addresses_city' method for validation.
+
+   has_field 'my_foo' => ( validate_method => \&my_foo_validation );
+   sub my_foo_validation { ... }
+   has_field 'title' => ( isa => 'Str', set_validate => 'check_title' );
+
+=head2 apply actions
+
+Use Type::Tiny types;
+
+   has_field 'foo' => ( apply => [ PosInteger ] );
+
+
+
+=head2 validate
+
+This field method can be used in addition to or instead of 'apply' actions
+in custom field classes.
+It should validate the field data and set error messages on
+errors with C<< $field->add_error >>.
+
+    sub validate {
+        my $field = shift;
+        my $value = $field->value;
+        return $field->add_error( ... ) if ( ... );
+    }
+
 
 =cut
-
 has 'name' => ( is => 'rw', required => 1 );
 has 'id' => ( is => 'rw', lazy => 1, builder => 'build_id' );
 sub build_id {
    my $self = shift;
    if ( my $meth = $self->get_method('build_id') ) {
        return $meth->($self, @_);
+   }
+   elsif ( $self->form && $self->form->can('build_field_id') ) {
+       return $self->form->build_field_id($self);
    }
    return $self->prefixed_name;
 }
@@ -120,6 +573,12 @@ around BUILDARGS => sub {
   }
   if ( grep { $_ =~ /ra\./ } keys %args ) {
       mangle_args(\%args);
+  }
+  if ( my @keys = grep { $_ =~ /msg\./ } keys %args ) {
+     foreach my $key ( @keys ) {
+         my $value = delete $args{$key};
+         $args{messages}{$key} = $value;
+     }
   }
   return $class->$orig(%args);
 };

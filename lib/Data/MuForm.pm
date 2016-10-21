@@ -149,10 +149,7 @@ for using to fill in the form from C<< $form->fif >>.
 A hash of inflated values (that would be used to update the database for
 a database form) can be retrieved with C<< $form->value >>.
 
-If you don't want to update the database on this process call, you can
-set the 'no_update' flag:
-
-   $form->process( model => $book, params => $params, no_update => 1 );
+If you don't want to update the database, you can use the 'check' method instead.
 
 =head3 params
 
