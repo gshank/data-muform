@@ -455,7 +455,7 @@ sub render_label {
   $left_of_label ||= '';
 
   my $id = $rargs->{id};
-  my $label = $self->localize($rargs->{label});
+  my $label = $rargs->{display_label} || $self->localize($rargs->{label});
   my $out = qq{\n<label };
   $out .= qq{for="$id"};
   $out .= process_attrs($rargs->{label_attr});
