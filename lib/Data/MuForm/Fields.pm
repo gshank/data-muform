@@ -313,7 +313,7 @@ sub _find_parent {
         # use special 'field' method call that starts from
         # $self, because names aren't always starting from
         # the form
-        $parent      = $self->field($parent_name, undef, $self);
+        $parent      = $self->field($parent_name, $self);
         if ($parent) {
             die "The parent of field " . $field_attr->{name} . " is not a Compound Field"
                 unless $parent->isa('Data::MuForm::Field::Compound');
