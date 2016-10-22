@@ -577,6 +577,7 @@ around BUILDARGS => sub {
   if ( my @keys = grep { $_ =~ /msg\./ } keys %args ) {
      foreach my $key ( @keys ) {
          my $value = delete $args{$key};
+         $key =~ s/msg\.//;
          $args{messages}{$key} = $value;
      }
   }
@@ -657,6 +658,7 @@ sub mangle_args {
 sub fif {
     my $self = shift;
     return unless $self->is_active;
+    return '' if $self->password;
     return $self->input if $self->has_input;
     if ( $self->has_value ) {
       my $value = $self->value;
