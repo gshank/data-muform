@@ -25,7 +25,8 @@ You can achieve the equivalent in MuForm with:
         foreach my $field ( $self->all_repeatable_fields ) {
             $field->init_contains({ 'ra.wa.class' => ['rep_elem'] });
         }
-        foreach my $field ( $self->all_fields ) {
+        # the 'index' contains all fields, not just top level fields
+        foreach my $field ( values %{$self->index} ) {
             if ( $field->type eq 'Select' ) {
                 $field->render_args->{wrapper_attr}{class} = ['sel_wrapper'];
             }
