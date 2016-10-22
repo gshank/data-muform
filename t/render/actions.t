@@ -11,7 +11,7 @@ use HTML::FormHandler::Test;
 
     has '+name' => ( default => 'action_form' );
     has_field 'foo';
-    has_field 'actions' => ( type => 'Compound', 'ra.wa.class' => 'form-actions', 'ra.wrapper' => 'simple' );
+    has_field 'actions' => ( type => 'Compound', 'ra.wa.class' => 'form-actions', 'ra.wrapper' => 'simple', 'ra.no_label' => 1 );
     has_field 'actions.save' => ( type => 'Submit' );
     has_field 'actions.cancel' => ( type => 'Reset' );
 }

@@ -26,7 +26,7 @@ use Test::More;
     sub after_build_fields {
         my $self = shift;
         foreach my $field ( $self->all_repeatable_fields ) {
-            $field->init_contains({ 'ra.wa.class' => ['rep_elem'] });
+            $field->init_instance({ 'ra.wa.class' => ['rep_elem'] });
         }
         foreach my $field ( $self->all_fields ) {
             if ( $field->type eq 'Select' ) {

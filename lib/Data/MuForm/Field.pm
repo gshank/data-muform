@@ -764,6 +764,7 @@ sub base_render_args {
     errors => $self->errors || [],
     fif => $self->fif,
     layout_type => 'standard',
+    is_contains => $self->is_contains,
   };
   return $args;
 }

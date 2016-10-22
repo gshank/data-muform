@@ -62,6 +62,14 @@ the overhead of form construction. I attempted to make it easier to render
 in templates with 'render_element' while still allowing full-automatic rendering.
 See the rendering documentation. There will be 'layouts'.
 
+In particular, the defaults for wrapping fields have changed, for compound and
+repeatable fields, etc. I advise you to make a test case, like the ones in the
+t/render directory, and ensure that the output matches, if you are converting
+from FormHandler to MuForm. Compounds and repeatables have wrappers and labels
+by default. Repeatable instances do not have labels but do have wrappers.
+
+Renamed 'init_contains' to 'init_instance'
+
 Set options attributes directly in the 'options' hashrefs, instead of in a separate
 'attributes' hashref, i.e. { value => 1, label => 'one', class => 'xxx' }
 

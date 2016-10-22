@@ -229,13 +229,13 @@ sub render_field {
 }
 
 sub wrap_field {
-  my ( $self, $rargs, $out ) = @_;
+  my ( $self, $rargs, $rendered ) = @_;
 
   # wrap the field
   my $wrapper = $rargs->{wrapper} || $self->default_field_wrapper;
-  return $out if $wrapper eq 'none';
+  return $rendered if $wrapper eq 'none';
   my $wrapper_meth = $self->can("wrapper_$wrapper") || die "wrapper method '$wrapper' not found";
-  $out = $wrapper_meth->($self, $rargs, $out);
+  my $out = $wrapper_meth->($self, $rargs, $rendered);
   return $out;
 }
 
@@ -243,6 +243,10 @@ sub render_compound {
     my ( $self, $rargs, $fields ) = @_;
 
     my $out = '';
+    if ( $rargs->{is_instance} ) {
+        add_to_class($rargs, 'wrapper_attr', 'repinst');
+    }
+    $out .= $self->render_label($rargs);
     foreach my $field ( @$fields ) {
         $out .= $field->render;
     }
@@ -253,11 +257,13 @@ sub render_compound {
 sub render_repeatable {
     my ( $self, $rargs, $fields ) = @_;
     my $out = '';
+    $out .= $self->render_label($rargs);
+
     foreach my $field ( @$fields ) {
-        my $id = $field->id . '.inst';
-        $out .= qq{\n<div class="repinst" id="$id">};
+#       my $id = $field->id . '.inst';
+#       $out .= qq{\n<div class="repinst" id="$id">};
         $out .= $field->render;
-        $out .= qq{</div>};
+#       $out .= qq{</div>};
     }
     $out = $self->wrap_field($rargs, $out);
     return $out;
@@ -276,18 +282,18 @@ classes.
 =cut
 
 sub add_to_class {
-  my ( $href, $class ) = @_;
+  my ( $href, $attr_key, $class ) = @_;
 
   return unless defined $class;
-  if ( exists $href->{class} && ref $href->{class} ne 'ARRAY' ) {
-     my @classes = split(' ', $href->{class});
-     $href->{class} = \@classes;
+  if ( exists $href->{$attr_key}{class} && ref $href->{$attr_key}{class} ne 'ARRAY' ) {
+     my @classes = split(' ', $href->{$attr_key}{class});
+     $href->{$attr_key}{class} = \@classes;
   }
   if ( $class && ref $class eq 'ARRAY' ) {
-     push @{$href->{class}}, @$class;
+     push @{$href->{$attr_key}{class}}, @$class;
   }
   else {
-      push @{$href->{class}}, $class;
+      push @{$href->{$attr_key}{class}}, $class;
   }
 }
 
@@ -352,7 +358,7 @@ sub render_input {
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
   $out .= qq{value="$fif" };
-  add_to_class( $rargs->{element_attr}, 'error' ) if @{$rargs->{errors}};
+  add_to_class( $rargs, 'element_attr', 'error' ) if @{$rargs->{errors}};
   $out .= process_attrs($rargs->{element_attr});
   $out .= "/>";
   return $out;
@@ -375,7 +381,7 @@ sub render_select {
   $out .= qq{id="$id" };
   $out .= qq{multiple="multiple" } if $rargs->{multiple};
   $out .= qq{size="$size" } if $size;
-  add_to_class( $rargs->{element_attr}, 'error' ) if @{$rargs->{errors}};
+  add_to_class( $rargs, 'element_attr', 'error' ) if @{$rargs->{errors}};
   $out .= process_attrs($rargs->{element_attr});
   $out .= ">";
 
@@ -422,7 +428,7 @@ sub render_textarea {
   my $out = "\n<textarea ";
   $out .= qq{name="$name" };
   $out .= qq{id="$id" };
-  add_to_class( $rargs->{element_attr}, 'error' ) if @{$rargs->{errors}};
+  add_to_class( $rargs, 'element_attr', 'error' ) if @{$rargs->{errors}};
   $out .= process_attrs($rargs->{element_attr});
   $out .= ">$fif</textarea>";
   return $out;
@@ -449,6 +455,9 @@ sub render_element {
 sub render_label {
   my ( $self, $rargs, $left_of_label, $right_of_label ) = @_;
 
+  return '' if $rargs->{no_label};
+  return '' if $rargs->{is_contains};
+  return '' if $rargs->{wrapper} && $rargs->{wrapper} eq 'fieldset'; # this is kludgy :(
   $rargs->{rendering} = 'label';
   $self->render_hook($rargs);
   $right_of_label ||= '';
@@ -577,7 +586,7 @@ sub render_radio_label {
 
   my $attrs = { class => ['radio'] };
   $attrs->{for} = $option->{id} ? $option->{id} : $rargs->{name} . $option->{order};
-  add_to_class( $attrs, $rargs->{radio_label_class} );
+# add_to_class( $attrs, $rargs->{radio_label_class} );
 
   my $out = qq{\n<label };
   $out.= process_attrs($attrs);
@@ -622,7 +631,7 @@ sub render_checkbox {
   $out .= qq{id="$id" };
   $out .= qq{value="$checkbox_value" };
   $out .= qq{checked="checked" } if $fif eq $checkbox_value;
-  add_to_class( $rargs->{element_attr}, 'error' ) if @{$rargs->{errors}};
+  add_to_class( $rargs, 'element_attr', 'error' ) if @{$rargs->{errors}};
   $out .= process_attrs($rargs->{element_attr});
   $out .= "/>";
   return $out;
@@ -696,7 +705,7 @@ sub render_checkbox_label {
 
   my $attrs = { class => ['checkbox'] };
   $attrs->{for} = $option->{id} ? $option->{id} : $rargs->{name} . $option->{order};
-  add_to_class( $attrs, $rargs->{checkbox_label_class} );
+# add_to_class( $attrs, $rargs->{checkbox_label_class} );
 
   my $out = qq{\n<label };
   $out.= process_attrs($attrs);

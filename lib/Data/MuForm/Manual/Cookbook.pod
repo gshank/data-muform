@@ -23,7 +23,7 @@ You can achieve the equivalent in MuForm with:
     sub after_build_fields {
         my $self = shift;
         foreach my $field ( $self->all_repeatable_fields ) {
-            $field->init_contains({ 'ra.wa.class' => ['rep_elem'] });
+            $field->init_instance({ 'ra.wa.class' => ['rep_elem'] });
         }
         # the 'index' contains all fields, not just top level fields
         foreach my $field ( values %{$self->index} ) {

@@ -34,11 +34,11 @@ use lib 't/lib';
         'ra.wrapper' => 'fieldset',
         num_when_empty => 1,
     );
-
     has_field 'hobbies.contains' => (
         type => 'Text',
         tabindex => 2,
     );
+
     has_field 'active'     => ( type => 'Checkbox' );
     has_field 'comments'   => ( type => 'Textarea', cols => 40, rows => 3 );
     has_field 'hidden'     => ( type => 'Hidden' );
@@ -85,22 +85,18 @@ use lib 't/lib';
 my $form = Test::Form->new;
 ok( $form, 'create form' );
 
-# TODO - there's something wrong here... leaving this for later inspection
-# It's not clear which is the repeatable instance and which is the repeatable wrapper
-
+# repeatable with 'contains'
 my $expected = q{
 <fieldset id="hobbies"><legend class="label">Hobbies</legend>
-  <div class="repinst" id="hobbies.0.inst">
-    <div>
-      <label for="hobbies.0">0</label>
-      <input id="hobbies.0" name="hobbies.0" type="text" value="" />
-    </div>
+  <div>
+    <input id="hobbies.0" name="hobbies.0" type="text" value="" />
   </div>
 </fieldset>
 };
 is_html( $form->field('hobbies')->render, $expected, 'output from repeatable with num_when_empty == 1'
 );
 
+=comment
 my $params = {
     test_field         => 'something',
     number             => 0,
@@ -144,18 +140,6 @@ is_html( $rendered,
     '<input type="text" name="test_field" id="f99" size="20" value="something" class="test123" />',
     'output from render_element is correct'
 );
-
-
-=comment
-# this was the default checkbox rendering? what was I thinking?
-$expected =
-'<div>
-  <label for="active">Active</label>
-    <label class="checkbox" for="active">
-      <input id="active" name="active" type="checkbox" value="1" />
-    </label>
-</div>';
-=cut
 
 $expected = q{
 <div>

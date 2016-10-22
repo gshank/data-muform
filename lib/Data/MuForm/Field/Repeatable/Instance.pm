@@ -18,6 +18,12 @@ sub BUILD {
 
 has '+no_value_if_empty' => ( default => 1 );
 
-__PACKAGE__->meta->make_immutable;
-use namespace::autoclean;
+sub base_render_args {
+    my $self = shift;
+    my $args = $self->next::method(@_);
+    $args->{no_label} = 1;
+    $args->{is_instance} = 1;
+    return $args;
+}
+
 1;

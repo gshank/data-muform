@@ -40,7 +40,7 @@ use HTML::FormHandler::Test;
         extends 'Data::MuForm';
 
         has '+name' => ( default => 'test_compound' );
-        has_field 'my_comp' => ( type => 'Compound' );
+        has_field 'my_comp' => ( type => 'Compound', label => 'My Compound' );
         has_field 'my_comp.one';
         has_field 'my_comp.two';
     }
@@ -53,12 +53,15 @@ use HTML::FormHandler::Test;
     my $expected =
     '<form id="test_compound" method="post">
        <div>
-        <label for="my_comp.one">One</label>
-        <input id="my_comp.one" name="my_comp.one" type="text" value="" />
-      </div>
-      <div>
-        <label for="my_comp.two">Two</label>
-        <input id="my_comp.two" name="my_comp.two" type="text" value="" />
+         <label for="my_comp">My Compound</label>
+         <div>
+          <label for="my_comp.one">One</label>
+          <input id="my_comp.one" name="my_comp.one" type="text" value="" />
+        </div>
+        <div>
+          <label for="my_comp.two">Two</label>
+          <input id="my_comp.two" name="my_comp.two" type="text" value="" />
+        </div>
       </div>
     </form>';
     is_html( $rendered, $expected, 'got expected rendering for compound' );
@@ -72,7 +75,7 @@ use HTML::FormHandler::Test;
         extends 'Data::MuForm';
 
         has '+name' => ( default => 'test_rep' );
-        has_field 'my_rep' => ( type => 'Repeatable', 'ra.wrapper' => 'none' );
+        has_field 'my_rep' => ( type => 'Repeatable', label => 'My Repeatable' );
         has_field 'my_rep.one';
         has_field 'my_rep.two';
     }
@@ -84,14 +87,17 @@ use HTML::FormHandler::Test;
     # 'hfh-repinst'
     my $expected =
     '<form id="test_rep" method="post">
-      <div class="repinst" id="my_rep.0.inst">
-        <div>
-          <label for="my_rep.0.one">One</label>
-          <input id="my_rep.0.one" name="my_rep.0.one" type="text" value="" />
-        </div>
-        <div>
-          <label for="my_rep.0.two">Two</label>
-          <input id="my_rep.0.two" name="my_rep.0.two" type="text" value="" />
+      <div>
+        <label for="my_rep">My Repeatable</label>
+        <div class="repinst">
+          <div>
+            <label for="my_rep.0.one">One</label>
+            <input id="my_rep.0.one" name="my_rep.0.one" type="text" value="" />
+          </div>
+          <div>
+            <label for="my_rep.0.two">Two</label>
+            <input id="my_rep.0.two" name="my_rep.0.two" type="text" value="" />
+          </div>
         </div>
       </div>
     </form>';

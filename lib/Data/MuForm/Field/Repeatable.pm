@@ -40,10 +40,10 @@ If the MyAddress field contains fields 'address_id', 'street', 'city', and
 'state', then this syntax is functionally equivalent to the first method
 where the fields are declared with dots ('addresses.city');
 
-You can pass attributes to the 'contains' field by supplying an 'init_contains' hashref.
+You can pass attributes to the 'contains' field by supplying an 'init_instance' hashref.
 
     has_field 'addresses' => ( type => 'Repeatable,
-       init_contains => { wrapper_attr => { class => ['hfh', 'repinst'] } },
+       init_instance => { wrapper_attr => { class => ['hfh', 'repinst'] } },
     );
 
 =head1 DESCRIPTION
@@ -146,12 +146,10 @@ has 'contains' => (
     predicate => 'has_contains',
 );
 
-has 'init_contains' => ( is => 'rw', isa => HashRef,
-#    traits => ['Hash'],
+has 'init_instance' => ( is => 'rw', isa => HashRef,
     default => sub {{}},
-#   handles => { has_init_contains => 'count' },
 );
-sub  has_init_contains { exists $_[0]->{init_contains} && scalar keys %{$_[0]->{init_contains}} }
+sub  has_init_instance { exists $_[0]->{init_instance} && scalar keys %{$_[0]->{init_instance}} }
 
 has 'num_when_empty' => ( isa => Int,  is => 'rw', default => 1 );
 has 'num_extra'      => ( isa => Int,  is => 'rw', default => 0 );
@@ -204,8 +202,8 @@ sub create_element {
     # primary_key array is used for reloading after database update
     $instance_attr->{primary_key} = $self->primary_key
         if $self->has_primary_key;
-    if( $self->has_init_contains ) {
-        $instance_attr = merge( $self->init_contains, $instance_attr );
+    if( $self->has_init_instance ) {
+        $instance_attr = merge( $self->init_instance, $instance_attr );
     }
     if( $self->form ) {
         $instance_attr->{form} = $self->form;
