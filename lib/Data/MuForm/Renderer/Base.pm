@@ -821,9 +821,13 @@ sub wrapper_simple {
 sub wrapper_fieldset {
     my ( $self, $rargs, $rendered ) = @_;
 
-    my $id = $rargs->{id};
+    my $id = $rargs->{id} if ($rargs->{is_compound});
     my $label = $self->localize($rargs->{label});
-    my $out = qq{\n<fieldset id="$id"><legend class="label">$label</legend>};
+    my $out = qq{\n<fieldset };
+    $out .= qq{id="$id" } if $id;
+    $out .= process_attrs($rargs->{wrapper_attr});
+    $out .= qq{>};
+    $out .= qq{<legend class="label">$label</legend>};
     $out .= $rendered;
     $out .= qq{\n</fieldset>};
     return $out;

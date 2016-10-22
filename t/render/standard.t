@@ -70,14 +70,8 @@ use lib 't/lib';
     has_field 'submit' => ( type => 'Submit', value => '>>> Update' );
     has_field 'reset' => ( type => 'Reset', value => '<<< Reset' );
 
-#   has '+dependency' => (
-#       default => sub {
-#           [ [ 'start_date.month', 'start_date.day', 'start_date.year' ] ];
-#       }
-#   );
-    has_field 'no_render' => ( widget => 'NoRender' );
     has_field 'plain' => ( 'ra.wrapper' => 'none', 'ra.layout' => 'no_label' );
-    has_field 'boxed' => ( widget_wrapper => 'Fieldset', wrapper_attr => { class => 'boxed' } );
+    has_field 'boxed' => ( 'ra.wrapper' => 'fieldset', 'ra.wa.class' => 'boxed' );
     has_field 'element_wrapper_field' => ( element_wrapper_class => 'large' );
 
 }
@@ -96,7 +90,6 @@ my $expected = q{
 is_html( $form->field('hobbies')->render, $expected, 'output from repeatable with num_when_empty == 1'
 );
 
-=comment
 my $params = {
     test_field         => 'something',
     number             => 0,
@@ -218,40 +211,13 @@ $rendered = $form->field('hobbies')->render;
 $expected = q{
 <fieldset id="hobbies"><legend class="label">Hobbies</legend>
   <div>
-    <label for="hobbies.0">0</label>
-    <input type="text" name="hobbies.0" id="hobbies.0" value="eating" tabindex="2" />
+    <input id="hobbies.0" name="hobbies.0" type="text" value="eating" />
   </div>
   <div>
-    <label for="hobbies.1">1</label>
-    <input type="text" name="hobbies.1" id="hobbies.1" value="sleeping" tabindex="2" />
+    <input id="hobbies.1" name="hobbies.1" type="text" value="sleeping" />
   </div>
   <div>
-    <label for="hobbies.2">2</label>
-    <input type="text" name="hobbies.2" id="hobbies.2" value="not chasing mice" tabindex="2" />
-  </div>
-</fieldset>
-};
-
-# TODO - leaving old rendering here. not sure which is "correct"
-$expected = q{
-<fieldset id="hobbies"><legend class="label">Hobbies</legend>
-  <div class="repinst" id="hobbies.0.inst">
-    <div>
-      <label for="hobbies.0">0</label>
-      <input id="hobbies.0" name="hobbies.0" type="text" value="eating" />
-    </div>
-  </div>
-  <div class="repinst" id="hobbies.1.inst">
-    <div>
-      <label for="hobbies.1">1</label>
-      <input id="hobbies.1" name="hobbies.1" type="text" value="sleeping" />
-    </div>
-  </div>
-  <div class="repinst" id="hobbies.2.inst">
-    <div>
-      <label for="hobbies.2">2</label>
-      <input id="hobbies.2" name="hobbies.2" type="text" value="not chasing mice" />
-    </div>
+    <input id="hobbies.2" name="hobbies.2" type="text" value="not chasing mice" />
   </div>
 </fieldset>
 };
@@ -260,13 +226,14 @@ is_html($rendered, $expected, 'hobbies compound field render ok');
 
 is_html( $form->field('plain')->render, '<input type="text" name="plain" id="plain" value="No divs!!" />', 'renders without wrapper');
 
-=comment
 
 is_html( $form->field('boxed')->render,
-'<fieldset class="boxed"><legend>Boxed</legend>
+'<fieldset class="boxed"><legend class="label">Boxed</legend>
   <input type="text" name="boxed" id="boxed" value="Testing single fieldset" />
 </fieldset>', 'fieldset wrapper renders' );
 
+=comment
+# TODO - element_wrapper... sigh
 is_html( $form->field('element_wrapper_field')->render,
 '<div>
   <label for="element_wrapper_field">Element wrapper field</label>
@@ -275,14 +242,6 @@ is_html( $form->field('element_wrapper_field')->render,
   </div>
 </div>',
    'element wrapper renders ok' );
-
-# table widget
-$form = Test::Form->new( widget_form => 'Table', widget_wrapper => 'Table' );
-like( $form->render, qr/<table/, 'rendered form contains table' );
-like( $form->field('number')->render, qr/<td>/, 'field has table wrapper');
-$form->process($params);
-my $outputT = $form->render;
-ok( $outputT, 'output from table rendering' );
 =cut
 
 done_testing;

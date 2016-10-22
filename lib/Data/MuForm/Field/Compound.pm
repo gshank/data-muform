@@ -119,6 +119,7 @@ around 'fill_from_params' => sub {
 sub base_render_args {
     my $self = shift;
     my $args = $self->next::method(@_);
+    $args->{is_compound} = 1;
     return $args;
 }
 sub render {
