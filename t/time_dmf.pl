@@ -40,11 +40,13 @@ use Time::HiRes ('gettimeofday', 'tv_interval');
 
 my $start_run = [gettimeofday];
 
+# my $form = My::Form->new;
 my $index = 0;
 while ( $index < 1000 ) {
   my $form = My::Form->new;
   my $params = $form->fif;
   $form->process( params => $params );
+  $form->render;
   $index++;
 }
 
