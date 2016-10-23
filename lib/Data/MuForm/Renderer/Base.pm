@@ -796,6 +796,17 @@ sub layout_lbl_ele_err {
     return $out;
 }
 
+sub layout_lbl_wrele_err {
+    my ( $self, $rargs ) = @_;
+
+    my $out = '';
+    $out .= $self->render_label($rargs);
+    my $ele .= $self->render_element($rargs);
+    $out .= $self->element_wrapper($rargs, $ele);
+    $out .= $self->render_errors($rargs);
+    return $out;
+}
+
 sub layout_no_label {
     my ( $self, $rargs ) = @_;
     my $out = '';

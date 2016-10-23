@@ -14,6 +14,7 @@ use HTML::FormHandler::Test;
         has '+name' => ( default => 'test_text' );
         has_field 'foo';
         has_field 'bar';
+        has_field 'fix' => ( 'ra.layout' => 'lbl_wrele_err', 'ra.ewa.class' => 'fixfield' );
         has_field 'save' => ( type => 'Submit' );
 
     }
@@ -23,11 +24,21 @@ use HTML::FormHandler::Test;
     my $rendered = $form->render;
     my $expected =
     '<form id="test_text" method="post">
-    <div><label for="foo">Foo</label><input type="text" name="foo" id="foo" value="" />
-    </div>
-    <div><label for="bar">Bar</label><input type="text" name="bar" id="bar" value="" />
-    </div>
-    <input type="submit" name="save" id="save" value="Save" />
+      <div>
+        <label for="foo">Foo</label>
+        <input type="text" name="foo" id="foo" value="" />
+      </div>
+      <div>
+        <label for="bar">Bar</label>
+        <input type="text" name="bar" id="bar" value="" />
+      </div>
+      <div>
+        <label for="fix">Fix</label>
+        <div class="fixfield">
+          <input type="text" name="fix" id="fix" value="" />
+        </div>
+      </div>
+      <input type="submit" name="save" id="save" value="Save" />
     </form>';
     is_html($rendered, $expected, 'simple form renders ok' );
 }
