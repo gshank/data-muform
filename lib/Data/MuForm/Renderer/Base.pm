@@ -566,14 +566,16 @@ sub render_radio_option {
 sub rdgo_layout_labels_left {
     my ( $self, $rargs, $option ) = @_;
     my $rd_element = $self->render_radio_option($rargs, $option);
-    my $out = $self->render_radio_label($rargs, $option, '', $rd_element);
+    my $rd = $self->render_radio_label($rargs, $option, '', $rd_element);
+    my $out = $self->element_wrapper($rargs, $rd);
     return $out;
 }
 
 sub rdgo_layout_labels_right {
     my ( $self, $rargs, $option ) = @_;
     my $rd_element = $self->render_radio_option($rargs, $option);
-    my $out = $self->render_radio_label($rargs, $option, $rd_element, '');
+    my $rd = $self->render_radio_label($rargs, $option, $rd_element, '');
+    my $out = $self->element_wrapper($rargs, $rd);
     return $out;
 }
 
@@ -684,7 +686,7 @@ sub cbgo_layout_labels_right {
 
   my $cb_element = $self->render_checkbox_option($rargs, $option);
   my $cb = $self->render_checkbox_label($rargs, $option, $cb_element, '');
-  my $out .= $self->wrapper_div($rargs, $cb);
+  my $out .= $self->element_wrapper($rargs, $cb);
   return $out;
 }
 
@@ -692,7 +694,7 @@ sub cbgo_layout_labels_left {
   my ( $self, $rargs, $option ) = @_;
   my $cb_element = $self->render_checkbox_option($rargs, $option);
   my $cb = $self->render_checkbox_label($rargs, $option, '', $cb_element);
-  my $out .= $self->wrapper_div($rargs, $cb);
+  my $out .= $self->element_wrapper($rargs, $cb);
   return $out;
 }
 
@@ -834,7 +836,7 @@ sub wrapper_fieldset {
 }
 
 # this is not orthogonal. get working and straighten up later
-sub wrapper_div {
+sub element_wrapper {
     my ( $self, $rargs, $rendered ) = @_;
     my $out = qq{\n<div>$rendered</div>};
     return $out;
@@ -853,7 +855,7 @@ sub render_layout_list {
        my $value = shift @$fif;
        $value = defined $value ? $value : '';
        my $element = $self->render_input({%$rargs, fif => $value, id => $rargs->{id} . $index++ });
-       $out .= $self->wrapper_div($rargs, $element);
+       $out .= $self->element_wrapper($rargs, $element);
        $size--;
     }
     return $out;
