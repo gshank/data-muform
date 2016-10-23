@@ -54,8 +54,13 @@ my $expected =
 my $expected = q{
 <div>
   <label for="opt_in">Opt in</label>
-  <label class="radio" for="opt1"><input name="opt_in" id="opt1" type="radio" value="no &amp; never" />No &amp; Never</label>
-  <label class="radio" for="opt2"><input name="opt_in" id="opt2" type="radio" value="&quot;yes&quot;" />Yes</label>
+  <label class="radio" for="opt1">
+    <input name="opt_in" id="opt1" type="radio" value="no &amp; never" />
+    No &amp; Never
+  </label>
+  <label class="radio" for="opt2"><input name="opt_in" id="opt2" type="radio" value="&quot;yes&quot;" />
+    Yes
+  </label>
 </div>
 };
 my $rendered = $form->field('opt_in')->render;

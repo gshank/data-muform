@@ -62,36 +62,26 @@ use Data::MuForm::Test;
 my $form = Test::Form->new;
 $form->process;
 
-my $expected = '
-<div>
-  <label for="comedians">Comedians</label>
-  <label class="checkbox" for="comedians0">
-    <input type="checkbox" value="keaton" name="comedians" id="comedians.0" />
-    Buster Keaton
-  </label>
-  <label class="checkbox" for="comedians1">
-    <input type="checkbox" value="chaplin" name="comedians" id="comedians.1" />
-    Charly Chaplin
-  </label>
-  <label class="checkbox" for="comedians2">
-    <input type="checkbox" value="laurel &amp; hardy" name="comedians" id="comedians.2" />
-    Stan Laurel &amp; Oliver Hardy
-  </label>
-</div>';
-$expected = q{
+my $expected = q{
 <div>
   <label for="comedians">Comedians</label>
   <div>
     <label class="checkbox" for="comedians0">
-    <input name="comedians" type="checkbox" value="keaton" id="comedians0" />Buster Keaton</label>
+    <input name="comedians" type="checkbox" value="keaton" id="comedians0" />
+      Buster Keaton
+    </label>
   </div>
   <div>
     <label class="checkbox" for="comedians1">
-    <input name="comedians" type="checkbox" value="chaplin" id="comedians1" />Charly Chaplin</label>
+    <input name="comedians" type="checkbox" value="chaplin" id="comedians1" />
+      Charly Chaplin
+    </label>
   </div>
   <div>
     <label class="checkbox" for="comedians2">
-    <input name="comedians" type="checkbox" value="laurel &amp; hardy" id="comedians2" />Stan Laurel &amp; Oliver Hardy</label>
+    <input name="comedians" type="checkbox" value="laurel &amp; hardy" id="comedians2" />
+      Stan Laurel &amp; Oliver Hardy
+    </label>
   </div>
 </div>
 };

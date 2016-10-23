@@ -591,7 +591,7 @@ sub render_radio_label {
   my $out = qq{\n<label };
   $out.= process_attrs($attrs);
   $out .= q{>};
-  $out .= qq{$left_of_label$label$right_of_label};
+  $out .= qq{$left_of_label $label $right_of_label};
   $out .= qq{</label>};
 }
 
@@ -710,7 +710,7 @@ sub render_checkbox_label {
   my $out = qq{\n<label };
   $out.= process_attrs($attrs);
   $out .= q{>};
-  $out .= qq{$left_of_label$label$right_of_label};
+  $out .= qq{$left_of_label $label $right_of_label};
   $out .= qq{</label>};
 }
 
