@@ -394,7 +394,17 @@ sub render_select {
   # render options
   my $options = $rargs->{options};
   foreach my $option ( @$options ) {
-     $out .= $self->render_select_option($rargs, $option);
+      if ( my $label = $option->{group} ) {
+          $label = $self->localize( $label );
+          $out .= qq{\n<optgroup label="$label">};
+          foreach my $group_opt ( @{ $option->{options} } ) {
+              $out .= $self->render_select_option($rargs, $group_opt);
+          }
+          $out .= qq{\n</optgroup>};
+      }
+      else {
+         $out .= $self->render_select_option($rargs, $option);
+      }
   }
 
   # end of select
@@ -405,10 +415,20 @@ sub render_select {
 sub render_select_option {
     my ( $self, $rargs, $option ) = @_;
 
+    # prepare for selected attribute
+    my $value = $option->{value};
+    my $multiple = $rargs->{multiple};
+    my $fif = $rargs->{fif} || [];
+    my %fif_lookup;
+    @fif_lookup{@$fif} = () if $multiple;
+
     my $label = $self->localize($option->{label});
     my $out = '';
     $out .= qq{\n<option };
     $out .= process_attrs($option, ['label', 'order']);
+    if ( defined $fif && ( ($multiple && exists $fif_lookup{$value}) || ( $fif eq $value ) ) ) {
+        $out .= q{selected="selected" };
+    }
     $out .= qq{>$label</option>};
     return $out;
 }
@@ -489,18 +509,8 @@ sub render_errors {
   foreach my $error (@$errors) {
     $out .= qq{\n<$error_tag>$error</$error_tag>};
   }
-   # TODO - should the errors be wrapped?
-#  $out = qq{\n<div class="field-errors">$out</div>};
   return $out;
 }
-
-=comment
-   <ul class="errors">     # error container
-     <li>                # error message
-       This field must contain an email address
-     </li>
-   </ul>
-=cut
 
 sub html_filter {
     my $string = shift;
