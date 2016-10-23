@@ -630,6 +630,7 @@ sub mangle_args {
          la => 'label_attr',
          wa => 'wrapper_attr',
          era => 'error_attr',
+         ewa => 'element_wrapper_attr',
     };
     my $render_args = $args->{render_args};
     my $ra = delete $args->{ra};

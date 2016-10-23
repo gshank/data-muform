@@ -835,10 +835,11 @@ sub wrapper_fieldset {
     return $out;
 }
 
-# this is not orthogonal. get working and straighten up later
 sub element_wrapper {
     my ( $self, $rargs, $rendered ) = @_;
-    my $out = qq{\n<div>$rendered</div>};
+    my $out = qq{\n<div };
+    $out .= process_attrs($rargs->{element_wrapper_attr});
+    $out .= qq{>$rendered</div>};
     return $out;
 }
 

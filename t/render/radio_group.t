@@ -12,6 +12,7 @@ use Data::MuForm::Test;
     has_field 'opt_in'     => (
         type    => 'Select',
         'ra.layout_type'  => 'radiogroup',
+        'ra.ewa.class' => 'my_radio',
         options => [
             { value => 'no & never', label => 'No & Never', id => 'opt1' },
             { value => '"yes"', label => 'Yes', id => 'opt2' },
@@ -54,13 +55,13 @@ my $expected =
 my $expected = q{
 <div>
   <label for="opt_in">Opt in</label>
-  <div>
+  <div class="my_radio">
     <label class="radio" for="opt1">
       <input name="opt_in" id="opt1" type="radio" value="no &amp; never" />
       No &amp; Never
     </label>
   </div>
-  <div>
+  <div class="my_radio">
     <label class="radio" for="opt2"><input name="opt_in" id="opt2" type="radio" value="&quot;yes&quot;" />
       Yes
     </label>
