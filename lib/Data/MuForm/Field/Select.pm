@@ -356,7 +356,7 @@ sub fill_from_object {
     $self->_load_options;
 }
 
-sub fill_from_field {
+sub fill_from_fields {
     my ( $self ) = @_;
     $self->next::method();
     $self->_load_options;

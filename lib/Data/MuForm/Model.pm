@@ -30,6 +30,8 @@ has 'model_class' => (
     is  => 'rw',
 );
 
+sub use_model_for_defaults {1}
+
 sub validate_model { }
 
 sub update_model { }

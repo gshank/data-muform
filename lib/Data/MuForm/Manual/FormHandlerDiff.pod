@@ -16,7 +16,7 @@ and has been moved to MuForm with only minor changes.
 Form construction is substantially faster in MuForm, for a number of reasons:
 Moo instead of Moose, fewer attributes, no results, and dropped some complicated
 only marginally helpful features. Processing is somewhat faster. Rendering
-takes about the same amount of time (most of extra rendering related time in FH is
+takes about the same amount of time (most of the extra rendering related time in FH is
 actually at form construction time).
 
 Note: this is still a work in process, so please contact me if your
@@ -50,6 +50,9 @@ impossible to support using the results.
 The 'item', 'item_id', and 'item_class' have been renamed to 'model', 'model_id',
 'model_class'. The 'model' is now cleared on process like the other attributes.
 
+When a DBIC row created with 'new_result' is used as a model, it will not be used
+for defaults unless explicitly overridden in the form with a 'use_model_for_defaults' sub.
+
 The 'init_object' has been renamed to 'init_values'.
 
 Note: the rendering is entirely different, so much that there's no point in
@@ -60,7 +63,7 @@ were rendering specific have been mostly moved into a render_args hashref
 that will be passed to a renderer, in order to allow more flexibility and reduce
 the overhead of form construction. I attempted to make it easier to render
 in templates with 'render_element' while still allowing full-automatic rendering.
-See the rendering documentation. There will be 'layouts'.
+There are 'layouts' for some form controls.
 
 In particular, the defaults for wrapping fields have changed, for compound and
 repeatable fields, etc. I advise you to make a test case, like the ones in the
@@ -68,13 +71,15 @@ t/render directory, and ensure that the output matches, if you are converting
 from FormHandler to MuForm. Compounds and repeatables have wrappers and labels
 by default. Repeatable instances do not have labels but do have wrappers.
 
-Renamed 'init_contains' to 'init_instance'
+See L<Data::MuForm::Manual::Rendering> for more rendering information.
+
+Renamed 'init_contains' to 'init_instance' which is more accurate.
 
 Set options attributes directly in the 'options' hashrefs, instead of in a separate
 'attributes' hashref, i.e. { value => 1, label => 'one', class => 'xxx' }
 
 No 'has_block', since that's purely a rendering thing. There will be some way of
-doing something similar in the renderer, but it's not been developed yet.
+doing something similar in the renderer.
 
 Localization now uses a gettext style .po file and a gettext type localizer,
 with named parameters.
@@ -109,18 +114,21 @@ field definitions.
 The 'posted' flag has been renamed to 'submitted', because you also need on a 'get'. Also
 a params hashref with no field name keys will not need the submitted => 0 flag.
 
-You no longer need to use C<$field->_set_value($value)>. Just use C<$field->value($value)>.
+You no longer need to use C<< $field->_set_value($value) >> or C<< $field->_set_input($input) >>.
+Just use C<< $field->value($value) >> and C<< $field->input($input) >>
 
 Removed 'update_subfields'. The code was complicated and not worth the overhead. If you
 want to do something like this, see the cookbook.
 
-Removed 'use_fields_for_input_without_param'. Can be implemented in other ways.
+Removed 'use_fields_for_input_without_param'. Happens normally now, since the default is to
+process all active fields unless the 'skip_fields_without_input' flag is set.
 
 Removed flag 'use_init_obj_when_no_accessor_in_item'. This should happen automatically now.
 
-Removed flag 'use_init_obj_over_item'. Just use init_values in your process call instead.
+Removed flag 'use_init_obj_over_item'. Just use init_values in your process call instead. Also
+a 'new_result' model will not be used for defaults now, so it's not as likely to be necessary.
 
-Removed flag 'use_defaults_over_obj'. Use a transform instead.
+Removed flag 'use_defaults_over_obj'. Use transform_default_to_value instead.
 
 Removed 'no_update' flag on form. Use 'check' method instead.
 
@@ -144,13 +152,15 @@ TextArea field renamed to Textarea for consistency.
 A number of trivial fields are no longer supplied by the distribution. If you need these fields
 it should be pretty easy to create your own. Some fields not supplied: Hour, Minute, Month,
 MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Duration,
-Password, PasswordConf, IntRange. The DateTime field has been renamed to 'CompoundDateTime'.
+PasswordConf, IntRange. The DateTime field has been renamed to 'CompoundDateTime'.
 
 Renamed html_prefix to field_prefix and it should be set to the string used to prefix fields.
 
 Renamed field 'noupdate' to 'no_update'.
 
-Added 'build_field_id' as a possible form method to build fields ids.
+Added 'build_field_id' as a possible form method to build field ids.
+
+Renamed push_errors and push_form_errors to push_error and push_form_error.
 
 =cut
 

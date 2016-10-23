@@ -5,7 +5,6 @@ package Data::MuForm::Manual::Intro;
 
 L<Manual Index|Data::MuForm::Manual>
 
-
 Data::MuForm is a data validation and form handling package written in Moo.
 It is a conversion of FormHandler to Moo. The core behavior is the same,
 but things have been regularized, simplified and in some cases re-written.
@@ -74,20 +73,19 @@ One useful feature is that you can activate or inactivate fields:
 
     $form->process( params => $params, active => ['field1', 'field2'] );
 
+The return value of C<< $form->process >> is the 'validated' flag, or
+the same as C<< $form->validated >>.
+
 See also L<Data::MuForm>.
 
 =head2 Or process a database form
 
 A database form inherits from L<Data::MuForm::Model::DBIC> instead of
-L<Data::MuForm>. You must either pass in the DBIC row object or give
-FormHandler information to retrieve the row object.
+L<Data::MuForm>.  You pass in the DBIC row object on 'process':
 
     $form->process( model => $row, params => $params );
-    -- or --
-    $form->process( model_id => $id, schema => $schema,
-        model_class => 'MyRow', params => $params );
 
-'model_class' is often set in the form class.
+The 'model' is used for defaults, unless it's a new_result row.
 
 See also L<Data::MuForm::Manual::Database> and
 L<Data::MuForm::Role::Model::DBIC>.
@@ -96,7 +94,7 @@ L<Data::MuForm::Role::Model::DBIC>.
 
 A database form will have saved the data or created a new row, so often no
 more processing is necessary. You can get the structured field values from
-C<< $form->value >>, and do whatever you want with them.
+C<< $form->values >>, and do whatever you want with them.
 
 If the validation succeeded, you may want to redirect:
 
@@ -177,16 +175,6 @@ Or create validators with check:
     has_field 'quux' => (
         apply => [ { check => qr/abc/, message => 'Not a valid quux' } ] );
 
-Or use a validate coderef:
-
-    has_field 'foo' => ( methods => { validate => \&check_foo } );
-    sub check_foo {
-        my $self = shift;
-        if ( $self->value =~ s/..../ ) {
-            $self->add_error('....');
-        }
-    }
-
 You can also create custom fields with custom validation, or use an
 existing field that does the validation you need.
 
@@ -238,11 +226,13 @@ MuForm's built-in errors are added to the form fields with
 C<< $field->add_error >>, and to the form with C<< $form->add_form_error >>.
 
 If you wish to skip localization for a particular message (such as for system errors)
-you can use C<< $field->push_errors >> or C<< $form->push_form_errors >>.
+you can use C<< $field->push_error >> or C<< $form->push_form_error >>.
+
+See L<Data::MuForm::Localizer>.
 
 =head1 Performance
 
-MuForm uses Moo, and is significantly faster than FormHandler. To make validation or
+MuForm uses Moo, and is significantly faster than FormHandler on form creation. To make validation or
 form processing even faster, use a persistent form class in order to skip the object
 construction overhead. A 'clear' method is called at the beginning of each 'check' or
 process' call, but non-internal state added to the object will have to be cleared

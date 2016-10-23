@@ -184,7 +184,7 @@ Set from the form when fields are created.
 =item errors
 
 Returns the error list (arrayref) for the field. Also provides
-'all_errors', 'num_errors', 'has_errors', 'push_errors' and 'clear_errors'.
+'all_errors', 'num_errors', 'has_errors', 'push_error' and 'clear_errors'.
 Use 'add_error' to add an error to the array if you
 want to localize the error message, or 'push_error' to skip
 the localization.
@@ -831,30 +831,30 @@ sub add_error {
     else {
         $out = $self->localizer->loc_x(@message);
     }
-    return $self->push_errors($out);
+    return $self->push_error($out);
 }
 
 sub add_error_px {
     my ( $self, @message ) = @_;
     my $out = $self->localizer->loc_px(@message);
-    return $self->push_errors($out);;
+    return $self->push_error($out);;
 }
 
 sub add_error_nx {
     my ( $self, @message ) = @_;
     my $out = $self->localizer->loc_nx(@message);
-    return $self->push_errors($out);
+    return $self->push_error($out);
 }
 
 sub add_error_npx {
     my ( $self, @message ) = @_;
     my $out = $self->localizer->loc_npx(@message);
-    return $self->push_errors($out);;
+    return $self->push_error($out);;
 }
 
 
 
-sub push_errors {
+sub push_error {
     my $self = shift;
     push @{$self->{errors}}, @_;
     if ( $self->parent ) {

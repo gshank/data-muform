@@ -31,6 +31,10 @@ has unique_messages => (
     default => sub { +{} },
 );
 
+sub use_model_for_defaults {
+    my $self = shift;
+    return ( $self->model && $self->model->in_storage ? 1 : 0 );
+}
 
 sub validate_model {
     my ($self) = @_;

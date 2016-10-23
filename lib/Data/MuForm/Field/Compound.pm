@@ -86,7 +86,7 @@ sub test_validate_field {
     $self->validate_field;
     unless( $self->form ) {
         foreach my $err_fld (@{$self->error_fields}) {
-            $self->push_errors($err_fld->all_errors);
+            $self->push_error($err_fld->all_errors);
         }
     }
 }

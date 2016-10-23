@@ -426,7 +426,7 @@ Set an error in a field with C<< $field->add_error('some error string'); >>.
 Set a form error not tied to a specific field with
 C<< $self->add_form_error('another error string'); >>.
 The 'add_error' and 'add_form_error' methods call localization. If you
-want to skip localization for a particular error, you can use 'push_errors'
+want to skip localization for a particular error, you can use 'push_error'
 or 'push_form_errors' instead.
 
   has_errors - returns true or false
@@ -632,8 +632,19 @@ sub clear_form_errors { $_[0]->{form_errors} = []; }
 sub all_form_errors { return @{$_[0]->form_errors}; }
 sub has_form_errors { scalar @{$_[0]->form_errors} }
 sub num_form_errors { scalar @{$_[0]->form_errors} }
-# TODO
-sub add_form_error { }
+sub push_form_error { push @{$_[0]->form_errors}, $_[1] }
+sub add_form_error {
+    my ( $self, @message ) = @_;
+    my $out;
+    if ( $message[0] !~ /{/ ) {
+        $out = $self->localizer->loc_($message[0]);
+    }
+    else {
+        $out = $self->localizer->loc_x(@message);
+    }
+    return $self->push_form_error($out);
+}
+
 sub has_errors {
     my $self = shift;
     return $self->has_error_fields || $self->has_form_errors;
@@ -643,7 +654,6 @@ sub num_errors {
     return $self->num_error_fields + $self->num_form_errors;
 }
 sub get_errors { shift->errors }
-
 
 sub all_errors {
     my $self         = shift;
@@ -811,7 +821,7 @@ sub fill_values {
     my $self = shift;
 
     # these fill the 'value' attributes
-    if ( $self->model ) {
+    if ( $self->model && $self->use_model_for_defaults ) {
       $self->fill_from_object_source('model');
       $self->fill_from_object($self->model);
     }
