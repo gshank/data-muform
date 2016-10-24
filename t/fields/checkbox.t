@@ -9,19 +9,19 @@ my $field = $class->new( name => 'test', );
 
 ok( defined $field, 'new() called' );
 $field->input(1);
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'Test for errors 1' );
 is( $field->value, 1, 'input 1 is 1' );
 $field->input(0);
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'Test for errors 2' );
 is( $field->value, 0, 'input 0 is 0' );
 $field->input('checked');
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'Test for errors 3' );
 is( $field->value, 'checked', 'value is "checked"' );
 $field->input(undef);
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'Test for errors 4' );
 is( $field->value, undef, 'input undef is 0' );
 $field = $class->new(
@@ -29,7 +29,7 @@ $field = $class->new(
    required => 1
 );
 $field->input(0);
-$field->validate_field;
+$field->field_validate;
 ok( $field->has_errors, 'required field fails with 0' );
 
 {

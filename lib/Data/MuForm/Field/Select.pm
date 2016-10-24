@@ -430,25 +430,27 @@ sub get_class_messages  {
     }
 }
 
-sub base_validate {
+sub normalize_input {
     my ($self) = @_;
 
-    my $value = $self->value;
-    return unless defined $value;    # nothing to check
+    my $input = $self->input;
+    return unless defined $input;    # nothing to check
 
-    if ( ref $value eq 'ARRAY' &&
-        !( $self->can('multiple') && $self->multiple ) )
-    {
+    if ( ref $input eq 'ARRAY' && !( $self->can('multiple') && $self->multiple ) ) {
         $self->add_error( $self->get_message('select_not_multiple') );
-        return;
     }
-    elsif ( ref $value ne 'ARRAY' && $self->multiple ) {
-        $value = [$value];
-        $self->value($value);
+    elsif ( ref $input ne 'ARRAY' && $self->multiple ) {
+        $input = [$input];
+        $self->input($input);
     }
+}
+
+sub validate {
+    my $self = shift;
 
     return if $self->no_option_validation;
 
+    my $value = $self->value;
     # create a lookup hash
     my %options;
     foreach my $opt ( @{ $self->options } ) {

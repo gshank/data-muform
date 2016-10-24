@@ -18,22 +18,22 @@ $field->options([
 ok( $field->options,  'options method called' );
 
 $field->input( 1 );
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'Test for errors 1' );
 is_deeply( $field->value, [1], 'Test 1 => [1]' );
 
 $field->input( [1] );
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'Test for errors 2' );
 ok( eq_array( $field->value, [1], 'test array' ), 'Check [1]');
 
 $field->input( [1,2] );
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'Test for errors 3' );
 ok( eq_array( $field->value, [1,2], 'test array' ), 'Check [1,2]');
 
 $field->input( [1,2,4] );
-$field->validate_field;
+$field->field_validate;
 ok( $field->has_errors, 'Test for errors 4' );
 is( $field->errors->[0], "'4' is not a valid value", 'Error message' );
 

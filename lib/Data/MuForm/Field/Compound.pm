@@ -73,7 +73,7 @@ sub BUILD {
 
 # this is for testing compound fields outside
 # of a form
-sub test_validate_field {
+sub test_field_validate {
     my $self = shift;
     unless( $self->form ) {
         if( $self->has_input ) {
@@ -83,7 +83,7 @@ sub test_validate_field {
             $self->fill_from_fields();
         }
     }
-    $self->validate_field;
+    $self->field_validate;
     unless( $self->form ) {
         foreach my $err_fld (@{$self->error_fields}) {
             $self->push_error($err_fld->all_errors);

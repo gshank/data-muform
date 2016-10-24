@@ -45,22 +45,22 @@ $field = $form->field('password');
 ok( $field,  'got password field' );
 
 $field->input( '2192ab201def' );
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'Test for errors 1' );
 
 $field->input( 'ab1' );
-$field->validate_field;
+$field->field_validate;
 ok( $field->has_errors, 'too short' );
 $field->clear_errors;
 
 $field->input( '' );
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'empty password accepted' );
 is($field->no_update, 1, 'noupdate has been set on password field' );
 
 my $pass = 'my4user5name';
 $field->input( $pass );
-$field->validate_field;
+$field->field_validate;
 ok( !$field->has_errors, 'just right' );
 is ( $field->value, $pass, 'Input and value match' );
 

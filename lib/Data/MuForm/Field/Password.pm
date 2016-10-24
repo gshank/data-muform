@@ -46,7 +46,7 @@ sub get_class_messages  {
 }
 
 
-after 'validate_field' => sub {
+after 'field_validate' => sub {
     my $self = shift;
 
     if ( !$self->required && !( defined( $self->value ) && length( $self->value ) ) ) {

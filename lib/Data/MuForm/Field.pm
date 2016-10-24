@@ -344,7 +344,7 @@ the DB model.
 =item apply
 
 Use the 'apply' keyword to specify an ArrayRef of constraints and coercions to
-be executed on the field at validate_field time.
+be executed on the field at field_validate time.
 
    has_field 'test' => (
       apply => [ TinyType,
@@ -528,6 +528,7 @@ sub is_active {
     return $self->_active if $self->_has_active;
     return $self->active;
 }
+sub multiple { }
 sub is_inactive { ! $_[0]->is_active }
 has 'disabled' => ( is => 'rw', default => 0 );
 has 'no_update' => ( is => 'rw', default => 0 );
@@ -883,6 +884,7 @@ has 'required' => ( is => 'rw', default => 0 );
 has 'required_when' => ( is => 'rw', isa => HashRef, predicate => 'has_required_when' );
 has 'unique' => ( is => 'rw', isa => Bool, predicate => 'has_unique' );
 sub validated { !$_[0]->has_errors && $_[0]->has_input }
+sub normalize_input { } # intended for field classes, to make sure input is in correct form, mostly multiple or not
 
 sub input_defined {
     my ($self) = @_;
@@ -917,10 +919,12 @@ sub has_some_value {
 sub base_validate { }
 sub validate {1}
 
-sub validate_field {
+sub field_validate {
     my $self = shift;
 
     return if ( $self->has_fields && $self->skip_fields_without_input && ! $self->has_input );
+
+    $self->normalize_input;
 
     my $continue_validation = 1;
     if ( ( $self->required ||
@@ -964,10 +968,12 @@ sub validate_field {
     }
 
     $self->value( $self->trim->($self->value) ) if $self->trim;
-    $self->base_validate; # why? also transforms? split out into a 'base_transform' and move the validation?
-    $self->apply_actions;
-    $self->validate;
 
+    $self->validate;  # this is field class validation. Do it before the other validations.
+
+    $self->apply_actions;  # this could be either from the field definitions or from a custom field
+
+    # this is validate_<field name> or methods->{validate => ...} validation
     if ( my $meth = $self->get_method('validate') ) {
         $meth->($self);
     }

@@ -126,7 +126,7 @@ sub fields_validate {
         next if ( !$field->is_active || $field->disabled );
         next if ( $self->skip_fields_without_input && ! $field->has_input && ! $field->has_input_without_param );
         # Validate each field and "inflate" input -> value.
-        $field->validate_field;    # this calls the field's 'validate' routine
+        $field->field_validate;    # this calls all the various validation routines
         $value_hash{ $field->accessor } = $field->value
             if ( $field->has_value && !$field->no_update );
     }
@@ -543,13 +543,13 @@ sub _get_value {
         # this must be an array, so that DBIx::Class relations are arrays not resultsets
         @values = $obj->$accessor;
         # for non-DBIC blessed object where access returns arrayref
-        if ( scalar @values == 1 && ref $values[0] eq 'ARRAY' && $field->has_flag('multiple') ) {
+        if ( scalar @values == 1 && ref $values[0] eq 'ARRAY' && $field->multiple ) {
             @values = @{$values[0]};
         }
     }
     elsif ( exists $obj->{$accessor} ) {
         my $v = $obj->{$accessor};
-        if($field->has_flag('multiple') && ref($v) eq 'ARRAY'){
+        if($field->multiple && ref($v) eq 'ARRAY'){
             @values = @$v;
         } else {
             @values = $v;
@@ -564,18 +564,7 @@ sub _get_value {
         @values = $field->transform_default_to_value->($field, @values);
     }
     my $value;
-    # this is different than FH, I'm unsure why;
-    # there was a problem with a default [1,3] ending up as [[1,3]]
-    # in t/field_setup/default.t because of switching to getting
-    # non-model defaults from init_values
-    # used to be:
-    #     if( $field->has_flag('multiple')) {
-    #         $value = scalar @values == 1 && ! defined $values[0] ? [] : \@values;
-    #     }
-    # maybe because of 'transform_default_to_value'? But defaults have always been
-    # able to be [1,3] for multiples. Accidentally worked before? Well, using
-    # init_values for missing attributes was never tested well.
-    if( $field->has_flag('multiple')) {
+    if( $field->multiple ) {
         if ( scalar @values == 1 && ! defined $values[0] ) {
             $value = [];
         }

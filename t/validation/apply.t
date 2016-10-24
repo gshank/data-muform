@@ -10,7 +10,7 @@ my $field = Data::MuForm::Field::Text->new( name => 'test',
 );
 ok( $field, 'field with Collapse' );
 $field->input('This  is  a   test');
-$field->validate_field;
+$field->field_validate;
 is( $field->value, 'This is a test');
 
 $field = Data::MuForm::Field::Text->new( name => 'test',
@@ -18,7 +18,7 @@ $field = Data::MuForm::Field::Text->new( name => 'test',
 );
 ok( $field, 'field with Upper' );
 $field->input('This is a test');
-$field->validate_field;
+$field->field_validate;
 is( $field->value, 'THIS IS A TEST');
 
 $field = Data::MuForm::Field::Text->new( name => 'test',
@@ -26,7 +26,7 @@ $field = Data::MuForm::Field::Text->new( name => 'test',
 );
 ok( $field, 'field with Lower' );
 $field->input('This Is a Test');
-$field->validate_field;
+$field->field_validate;
 is( $field->value, 'this is a test');
 
 $field = Data::MuForm::Field::Text->new( name => 'test',
@@ -35,7 +35,7 @@ $field = Data::MuForm::Field::Text->new( name => 'test',
 );
 ok( $field, 'field with Trim' );
 $field->input('  This is a test   ');
-$field->validate_field;
+$field->field_validate;
 is( $field->value, 'This is a test');
 
 done_testing;

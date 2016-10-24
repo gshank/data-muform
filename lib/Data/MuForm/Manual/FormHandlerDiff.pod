@@ -162,6 +162,10 @@ Added 'build_field_id' as a possible form method to build field ids.
 
 Renamed push_errors and push_form_errors to push_error and push_form_error.
 
+Internal method 'validate_field' (sometimes used for field tests) renamed to 'field_validate'
+
+Removed internal method 'base_validate', added 'normalize_input' instead (for handling multiple/non-multiple, etc)
+
 =cut
 
 1;

@@ -962,7 +962,7 @@ sub after_update_model {
             # where all repeatables have primary keys.
             my $needs_reload = 0;
             foreach my $sub_field ( $field->all_fields ) {
-                if ( $sub_field->has_flag('is_compound') && $sub_field->has_primary_key ) {
+                if ( $sub_field->is_compound && $sub_field->has_primary_key ) {
                     foreach my $pk_field ( @{ $sub_field->primary_key } ) {
                         $needs_reload++ unless $pk_field->fif;
                     }

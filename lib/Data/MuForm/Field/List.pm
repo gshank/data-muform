@@ -47,7 +47,7 @@ sub has_valid {
    return scalar @{$self->valid} ? 1 : 0;
 }
 
-sub base_validate {
+sub validate {
     my $self = shift;
 
     if ( $self->has_valid ) {

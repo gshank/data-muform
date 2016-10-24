@@ -89,19 +89,19 @@ SKIP: {
     my $field = Data::MuForm::Field->new( name => 'Test1', apply => [ State ] );
     ok( $field, 'created field with type' );
     $field->input('GG');
-    ok( !$field->validate_field, 'field did not validate');
+    ok( !$field->field_validate, 'field did not validate');
     is( $field->errors->[0], 'Not a valid state', 'correct error message for State' );
     $field->clear_errors;
     $field->input('NY');
-    ok( $field->validate_field, 'state field validated');
+    ok( $field->field_validate, 'state field validated');
     # Email
     $field = Data::MuForm::Field->new( name => 'Test', apply => [ Email ] );
     $field->input('gail@gmail.com');
-    ok( $field->validate_field, 'email field validated' );
+    ok( $field->field_validate, 'email field validated' );
     ok( !$field->has_errors, 'email field is valid');
 
     $field->input('not_an_email');
-    $field->validate_field;
+    $field->field_validate;
     is( $field->errors->[0], 'Email is not valid', 'error from Email' );
     $field->clear_errors;
 
@@ -129,12 +129,12 @@ SKIP: {
         $field = Data::MuForm::Field->new(name => 'Test', apply => [&$type]);
         for (@$good) {
             $field->input($_);
-            ok($field->validate_field, "$name validated");
+            ok($field->field_validate, "$name validated");
             ok(!$field->has_errors, "$name field is valid");
         }
         for (@$bad) {
             $field->input($_);
-            ok(!$field->validate_field, "$name validation failed");
+            ok(!$field->field_validate, "$name validation failed");
             is($field->errors->[0], $error_msg, "error from $name");
         }
     }
@@ -151,7 +151,7 @@ SKIP: {
         $field = Data::MuForm::Field->new(name => 'Test', apply => [&$type]);
         while (my ($from, $to) = splice @trans, 0, 2) {
         $field->input($from);
-        ok($field->validate_field, "$name validated");
+        ok($field->field_validate, "$name validated");
         is($field->value, $to , "$name field transformation");
         }
     }

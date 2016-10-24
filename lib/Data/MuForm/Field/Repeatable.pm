@@ -165,7 +165,7 @@ sub fields_validate {
     foreach my $field ( $self->all_fields ) {
         next if ( ! $field->active );
         # Validate each field and "inflate" input -> value.
-        $field->validate_field;    # this calls the field's 'validate' routine
+        $field->field_validate;    # this calls the field's 'validate' routine
         push @value_array, $field->value if $field->has_value;
     }
     $self->value( \@value_array );
