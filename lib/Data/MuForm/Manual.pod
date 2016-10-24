@@ -60,10 +60,6 @@ How to render and write your own custom rendering code.
 
 Issues and setup for database forms.
 
-=head2 L<Data::MuForm::Manual::Tutorial>
-
-Builds on the Catalyst tutorial. Step-by-step guide.
-
 =head2 L<Data::MuForm::Manual::Testing>
 
 Test your forms

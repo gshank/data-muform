@@ -13,7 +13,7 @@ Data::MuForm::Renderer::Base
 
 Base functionality for renderers, including rendering standard form controls.
 
-Generally you should always create your own custom renderer class which inherits
+You should normally create your own custom renderer class which inherits
 from this one. In it you should set the various standard defaults for your
 rendering, and override some of the methods, like 'render_errors'. You should
 also create custom layouts using the layout sub naming convention so they can
@@ -120,6 +120,8 @@ has 'default_rdgo_layout' => ( is => 'rw', default => 'labels_right' );
 
 has 'default_cbgo_layout' => ( is => 'rw', default => 'labels_right' );
 
+has 'default_display_layout' => ( is => 'rw', default => 'span' );
+
 has 'default_field_wrapper' => ( is => 'rw', default => 'simple' );
 
 has 'default_wrapper_tag' => ( is => 'rw', default => 'div' );
@@ -221,6 +223,9 @@ sub render_field {
   elsif ( $layout_type eq 'list' ) { # list
      $out = $self->render_layout_list($rargs);
   }
+  elsif ( $layout_type eq 'display' ) {
+     $out = $self->render_layout_display($rargs);
+  }
   else {  # $layout_type eq 'standard'
      $out = $self->render_layout_standard($rargs);
   }
@@ -260,10 +265,7 @@ sub render_repeatable {
     $out .= $self->render_label($rargs);
 
     foreach my $field ( @$fields ) {
-#       my $id = $field->id . '.inst';
-#       $out .= qq{\n<div class="repinst" id="$id">};
         $out .= $field->render;
-#       $out .= qq{</div>};
     }
     $out = $self->wrap_field($rargs, $out);
     return $out;
@@ -880,6 +882,30 @@ sub render_layout_list {
        $out .= $self->element_wrapper($rargs, $element);
        $size--;
     }
+    return $out;
+}
+
+sub render_layout_display {
+  my ( $self, $rargs ) = @_;
+
+  # render the field layout
+  my $layout = $rargs->{layout} || $self->default_display_layout;
+  my $layout_meth = $self->can("layout_$layout");
+  die "layout method '$layout' not found" unless $layout_meth;
+  my $out = '';
+  $out .= $layout_meth->($self, $rargs);
+  return $out;
+}
+
+sub layout_span {
+  my ( $self, $rargs ) = @_;
+
+    my $out= '<span';
+    $out .= ' id="' . $rargs->{id} . '"';
+    $out .= process_attrs($rargs->{element_attr});
+    $out .= '>';
+    $out .= $rargs->{fif};
+    $out .= '</span>';
     return $out;
 }
 
