@@ -56,10 +56,6 @@ Errors: setting them, getting them.
 
 How to render and write your own custom rendering code.
 
-=head2 L<Data::MuForm::Manual::Database>
-
-Issues and setup for database forms.
-
 =head2 L<Data::MuForm::Manual::Testing>
 
 Test your forms

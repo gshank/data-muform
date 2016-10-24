@@ -200,7 +200,7 @@ operate on.
 
 =head3 submitted
 
-Note that FormHandler by default uses empty params as a signal that the
+Note that MuForm by default uses empty params as a signal that the
 form has not actually been submitted, and so will not attempt to validate
 a form with empty params. Most of the time this works OK, but if you
 have a small form with only the controls that do not return a post
@@ -217,7 +217,7 @@ if there are extra params in the params hash and it is not a 'POST' request.
 
 =head3 fif  (fill in form)
 
-If you don't use FormHandler rendering and want to fill your form values in
+If you don't use MuForm rendering and want to fill your form values in
 using some other method (such as with HTML::FillInForm or using a template)
 this returns a hash of values that are equivalent to params which you may
 use to fill in your form.
@@ -230,7 +230,7 @@ Or you can use the 'fif' method on individual fields:
 
    [% form.field('title').fif %]
 
-If you use FormHandler to render your forms or field you probably won't use
+If you use MuForm to render your forms or field you probably won't use
 these methods.
 
 =head3 value
@@ -257,11 +257,11 @@ searching the 'field_name_space' for the field class.
 =head3 has_field
 
 The most common way of declaring fields is the 'has_field' syntax.
-Using the 'has_field' syntax sugar requires C< use Data::MuForm::Moose; >
-or C< use Data::MuForm::Moose::Role; > in a role.
+Using the 'has_field' syntax sugar requires C< use Data::MuForm::Meta; >.
 See L<Data::MuForm::Manual::Intro>
 
-   use Data::MuForm::Moose;
+   use Moo;
+   use Data::MuForm::Meta;
    has_field 'field_name' => ( type => 'FieldClass', .... );
 
 =head3 field_list
@@ -504,7 +504,7 @@ such as setting a stash key. ('is_valid' is a synonym for this flag)
 
 Flag to indicate that validation has been run. This flag will be
 false when the form is initially loaded and displayed, since
-validation is not run until FormHandler has params to validate.
+validation is not run until MuForm has params to validate.
 
 =head3 field_prefix
 
@@ -597,6 +597,7 @@ sub all_repeatable_fields {
 #========= Rendering ==========
 has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
 has 'action' => ( is => 'rw' );
+has 'enctype' => ( is => 'rw' );
 has 'renderer_class' => ( is => 'ro', default => 'Data::MuForm::Renderer::Base' );
 has 'renderer' => ( is => 'rw', lazy => 1, builder => 'build_renderer' );
 sub build_renderer {
@@ -622,6 +623,7 @@ sub base_render_args {
     method => $self->http_method,
   };
   $args->{action} = $self->action if $self->action;
+  $args->{enctype} = $self->enctype if $self->enctype;
   return $args;
 }
 

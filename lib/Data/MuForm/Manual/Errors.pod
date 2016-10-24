@@ -124,8 +124,9 @@ for example, the 'get_message' method will look first in user-set field specific
 then in user-supplied form messages, finally in messages provided by the field classes.
 
    package MyApp::Form;
-   use HTML::FormHandler::Moose;
-   extends 'HTML::FormHandler';
+   use Moo;
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm';
 
    sub build_messages {
        return { required => '....', my_message => '....' };

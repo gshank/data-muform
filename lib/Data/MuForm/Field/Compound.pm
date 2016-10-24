@@ -10,8 +10,7 @@ use Types::Standard ('Bool', 'ArrayRef');
 =head1 SYNOPSIS
 
 This field class is designed as the base (parent) class for fields with
-multiple subfields. Examples are L<HTML::FormHandler::Field::DateTime>
-and L<HTML::FormHandler::Field::Duration>.
+multiple subfields. An example is L<Data::MuForm::Field::CompoundDateTime>.
 
 A compound parent class requires the use of sub-fields prepended
 with the parent class name plus a dot
@@ -36,19 +35,7 @@ fields (and subclasses, like Repeatable).
 
 The process method of this field runs the process methods on the child fields
 and then builds a hash of these fields values.  This hash is available for
-further processing by L<HTML::FormHandler::Field/actions> and the validate method.
-
-=head2 widget
-
-Widget type is 'compound'
-
-=head2 build_update_subfields
-
-You can set 'defaults' or other settings in a 'build_update_subfields' method,
-which contains attribute settings that will be merged with field definitions
-when the fields are built. Use the 'by_flag' key with 'repeatable', 'compound',
-and 'contains' subkeys, or use the 'all' key for settings which apply to all
-subfields in the compound field.
+further processing by L<Data::MuForm::Field/actions> and the validate method.
 
 =cut
 

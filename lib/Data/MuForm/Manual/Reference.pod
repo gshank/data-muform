@@ -29,7 +29,7 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
    fields           Field arrayref
    sorted_fields    The sorted array of fields
    field( $name )   Returns a field object
-   has_field        Moose-y sugar for declaring fields
+   has_field        Sugar for declaring fields
    field_list       Non-moose-y way to define fields
 
    clear            Resets state. Used in persistent forms.
@@ -166,11 +166,7 @@ as L<Data::MuForm::Manual> and in L<Data::MuForm>.
    render_errors
    render_label
 
-=head2 Field attributes managed by FormHandler
-
-These attributes are usually accessed in a subroutine or in a template, but are
-usually set only by FormHandler. ('value' may be changed as a transform _in a
-validation routine_.)
+=head2 Field attributes
 
    init_value    Initial value from the database
    value         The value of your field.

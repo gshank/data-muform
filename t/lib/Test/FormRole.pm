@@ -1,5 +1,5 @@
 package Test::FormRole;
-use Moose::Role;
+use Moo::Role;
 use Data::MuForm::Meta;
 
 has_field 'flotsam';

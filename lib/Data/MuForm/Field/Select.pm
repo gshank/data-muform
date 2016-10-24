@@ -61,8 +61,8 @@ options in on ->new or ->process.
 In a custom field class:
 
    package MyApp::Field::WeekDay;
-   use Moose;
-   extends 'HTML::FormHandler::Field::Select';
+   use Moo;
+   extends 'Data::MuForm::Field::Select';
    ....
    sub build_options { <returns a valid options arrayref> }
 
