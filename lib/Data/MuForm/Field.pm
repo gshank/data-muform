@@ -7,10 +7,6 @@ use Scalar::Util ('blessed', 'weaken');
 use Data::Clone ('data_clone');
 use Data::MuForm::Localizer;
 use Data::MuForm::Merge ('merge');
-# causes errors if I use this. Figure out later how
-# to use Moose types
-#use Moose::Util::TypeConstraints;
-
 with 'Data::MuForm::Common';
 
 =head1 NAME
@@ -551,7 +547,15 @@ sub default_trim {
     return ref $value eq 'ARRAY' ? \@values : $values[0];
 }
 sub has_fields { } # compound fields will override
-has 'methods' => ( is => 'rw', isa => HashRef, default => sub {{}} );
+has 'methods' => ( is => 'rw', isa => HashRef, builder => 'build_methods', trigger => 1 );
+sub build_methods {{}}
+sub _trigger_methods {
+    my ( $self, $new_methods ) = @_;
+    my $base_methods = $self->build_methods;
+    my $methods = merge($new_methods, $base_methods);
+    $self->{methods} = $methods;
+
+}
 sub get_method {
    my ( $self, $meth_name ) = @_;
    return  $self->{methods}->{$meth_name};
@@ -565,24 +569,11 @@ sub is_form {0}
 sub no_fif {0}
 
 around BUILDARGS => sub {
-  my ( $orig, $class, %args ) = @_;
+  my ( $orig, $class, %field_attr ) = @_;
 
-  # allow using 'inactive => 1' in a field definition
-  if ( exists $args{inactive} ) {
-     my $inactive = delete $args{inactive};
-     $args{active} = $inactive ? 0 : 1;
-  }
-  if ( grep { $_ =~ /ra\./ } keys %args ) {
-      mangle_args(\%args);
-  }
-  if ( my @keys = grep { $_ =~ /msg\./ } keys %args ) {
-     foreach my $key ( @keys ) {
-         my $value = delete $args{$key};
-         $key =~ s/msg\.//;
-         $args{messages}{$key} = $value;
-     }
-  }
-  return $class->$orig(%args);
+  munge_field_attr(\%field_attr);
+
+  return $class->$orig(%field_attr);
 };
 
 
@@ -623,39 +614,6 @@ sub _install_methods {
     }
 }
 
-sub mangle_args {
-    my $args = shift;
-
-    my $translate = {
-         ea => 'element_attr',
-         la => 'label_attr',
-         wa => 'wrapper_attr',
-         era => 'error_attr',
-         ewa => 'element_wrapper_attr',
-    };
-    my $render_args = $args->{render_args};
-    my $ra = delete $args->{ra};
-    if ( $render_args && $ra ) {
-        $render_args = merge($render_args, $ra);
-    }
-    else {
-        $render_args = $render_args || $ra || {};
-    }
-    my @ra_keys = grep { $_ =~ /ra\./ } keys %$args;
-    foreach my $key ( @ra_keys ) {
-        my @seg = split('\.', $key);
-        shift @seg;
-        my $new_key = $translate->{$seg[0]} || $seg[0];
-        if ( $seg[1] ) {
-            $render_args->{$new_key}{$seg[1]} = $args->{$key};
-        }
-        else {
-            $render_args->{$new_key} = $args->{$key};
-        }
-        delete $args->{$key};
-    }
-    $args->{render_args} = $render_args;
-}
 
 sub fif {
     my $self = shift;

@@ -7,6 +7,7 @@ use Type::Utils;
 use Data::Clone ('data_clone');
 use Class::Load ('load_optional_class');
 use Scalar::Util 'blessed';
+with 'Data::MuForm::Common';
 
 =head2 NAME
 
@@ -354,6 +355,7 @@ sub _update_or_create {
             $field = $parent->field( $field_attr->{name} );
             die "Field to update for " . $field_attr->{name} . " not found"
                 unless $field;
+            munge_field_attr($field_attr);
             foreach my $key ( keys %{$field_attr} ) {
                 next if $key eq 'name' || $key eq 'form' || $key eq 'parent' ||
                     $key eq 'full_name' || $key eq 'type';
