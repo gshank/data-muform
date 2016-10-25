@@ -389,6 +389,11 @@ sub _order_fields {
     # number all unordered fields by 5
     my $order = 5;
     foreach my $field ( $self->all_fields ) {
+        if ( $field->has_fields ) {
+            $field->_order_fields;
+        }
+        # fields will default to 0, so we
+        # rewrite order if 0
         $field->order($order) unless $field->order;
         $order = $order + 5;
     }

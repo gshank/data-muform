@@ -749,7 +749,7 @@ sub build_input_type { 'text' }
 # could have everything in one big "pass to the renderer" hash?
 has 'layout' => ( is => 'rw' );
 has 'layout_group' => ( is => 'rw' );
-has 'order' => ( is => 'rw', isa => Int, default => 0 );
+has 'order' => ( is => 'rw', default => 0 );
 has 'html5_type_attr' => ( is => 'rw' );
 
 sub base_render_args {

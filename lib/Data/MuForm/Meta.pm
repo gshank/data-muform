@@ -1,6 +1,17 @@
 package Data::MuForm::Meta;
 # ABSTRACT: Meta magic to create 'has_fields'
 
+=head1 NAME
+
+Data::MuForm::Meta
+
+=head1 SYNOPSIS
+
+This file imports the 'has_field' sugar into the MuForm form and field
+packages.
+
+=cut
+
 use Moo::_Utils;
 
 sub import {
@@ -27,6 +38,9 @@ sub import {
     # eval the basic functions into the caller package. It does not work to do these
     # with '_install_coderef' - C3 gets confused, and they could get cleaned away
     # 'maybe::next::method' necessary to get it to walk the tree
+    # Note: _field_packages isn't actually used in MuForm code, but is left here
+    # for possible diagnostic use. It will return an array of the packages
+    # into which this code was imported.
     eval "package ${target};
         sub _meta_fields { shift->maybe::next::method(\@_) }
         sub _field_packages { shift->maybe::next::method(\@_) }";
