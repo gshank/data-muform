@@ -10,6 +10,9 @@ Data::MuForm::Meta
 This file imports the 'has_field' sugar into the MuForm form and field
 packages.
 
+Thanks to Matt Trout who provided this method and assistance in
+getting it working.
+
 =cut
 
 use Moo::_Utils;
