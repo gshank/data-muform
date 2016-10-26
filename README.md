@@ -20,6 +20,7 @@ from the [Dist::Zilla]( https://metacpan.org/pod/Dist::Zilla) distribution that 
 
 Once you have [Dist::Zilla]( https://metacpan.org/pod/Dist::Zilla) installed this distribution can be build or installed using [dzil]( https://metacpan.org/pod/distribution/Dist-Zilla/bin/dzil):
 
+     dzil authordeps --missing | cpanm  # Installs packages needed to build
      dzil build   # Generates a build directory and the tar.gz of the Data::MuForm distribution
      dzil install # Installs the distribution.
 
