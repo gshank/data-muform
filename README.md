@@ -7,7 +7,7 @@ It is a conversion of HTML::FormHandler to Moo. The core behavior is the same,
 but things have been regularized, simplified, renamed, and in some cases re-written.
 Rendering is substantially changed.
 
-A MuForm 'validator' or 'form' is a Perl subclass of L<Data::MuForm>. In your
+A MuForm 'validator' or 'form' is a Perl subclass of Data::MuForm. In your
 class you define fields and validators. Because it's a Perl class written with
 Moo, you have a lot of flexibility and control.
 
