@@ -102,7 +102,7 @@ to override if you have a wrapper for the whole form.
 
 =head2 render
 
-  [% form.field('foo').render({ element_attr = { class = 'xxx ppp' }, layout = 'bare'} });
+  [% form.field('foo').render({ element_attr = { class = 'xxx ppp' }, layout = 'bare'} }) %]
 
 =head2 render_element
 
