@@ -39,7 +39,7 @@ documentation.
 
 Description of the various ways of setting defaults.
 
-=head2 L<Data::MuForm::Manual::Transforms>
+=head2 L<Data::MuForm::Manual::Transformations>
 
 Transformation of input and value attributes at various points in
 the validation and update process.

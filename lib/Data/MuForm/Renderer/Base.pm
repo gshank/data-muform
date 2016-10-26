@@ -66,6 +66,84 @@ and have it just work.
 
   [% form.render %]
 
+=head2 Renderer defaults
+
+=back
+
+=item default_standard_layout
+
+For normal inputs and select fields.
+
+Provided:
+
+  lbl_ele_err    - label, element, error
+  lbl_wrele_err  - label, wrapped element, error
+
+Create new layouts starting with 'layout_<name>'.
+
+=item default_cb_layout
+
+Default checkbox layout. Create new checkbox layouts with methods starting
+with 'cb_layout_<name>'.
+
+Provided:
+
+   cbwrll - checkbox, wrapped, label left
+   cbwrlr - checkbox, wrapped, label right
+   cbnowrll - checkbox, not wrapped, label left
+   cb2l   - checkbox, 2 labels
+
+=item default_rdgo_layout
+
+Default radiogroup option layout
+
+Provided:
+
+   labels_left
+   labels_right
+
+Supply more with 'rdgo_layout_<name>'.
+
+=item default_cbgo_layout
+
+Default checkbox group option layout
+
+Provided:
+
+   labels_left
+   labels_right
+
+Supply more with 'cbgo_layout_<name>'.
+
+=item default_display_layout
+
+Default 'display' field layout.
+
+Provided:
+
+    span
+
+Provide more options with 'layout_<name>'.
+
+=item default_field_wrapper
+
+Default field wrapper. Supply more with 'wrapper_<name>'.
+
+Provided:
+
+   simple
+   fieldset
+
+=item default_wrapper_tag
+
+Default wrapper tag. Default: 'div'.
+
+=item default_error_tag
+
+Default error tag.
+
+=over
+
 =head1 Layouts
 
 The 'standard' layouts are for all fields that don't have another layout type.
@@ -90,7 +168,7 @@ Checkbox group options layouts are named 'cbgo_layout_<layout name>'.
 In the field:
 
     render (render_field, render_compound or render_repeatable in the renderer)
-    render_element
+    render_element (for standard single elements)
     render_label
     render_errors
 

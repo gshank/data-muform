@@ -525,7 +525,7 @@ will return the field_prefix + "." + field full_name
 
 =cut
 
-has 'name' => ( is => 'ro', isa => Str, builder => 'build_name');
+has 'name' => ( is => 'ro', builder => 'build_name');
 sub build_name {
     my $self = shift;
     my $class = ref $self;
@@ -533,7 +533,7 @@ sub build_name {
     $name ||= $class;
     return $name;
 }
-has 'id' => ( is => 'ro', isa => Str, lazy => 1, builder => 'build_id' );
+has 'id' => ( is => 'ro', lazy => 1, builder => 'build_id' );
 sub build_id { $_[0]->name }
 has 'submitted' => ( is => 'rw', default => undef );  # three values: 0, 1, undef
 has 'processed' => ( is => 'rw', default => 0 );
@@ -595,10 +595,11 @@ sub all_repeatable_fields {
 }
 
 #========= Rendering ==========
-has 'http_method'   => ( is  => 'ro', isa => Str, default => 'post' );
+has 'http_method'   => ( is  => 'ro', default => 'post' );
 has 'action' => ( is => 'rw' );
 has 'enctype' => ( is => 'rw' );
-has 'renderer_class' => ( is => 'ro', default => 'Data::MuForm::Renderer::Base' );
+has 'renderer_class' => ( is => 'ro', builder => 'build_renderer_class' );
+sub build_renderer_class { 'Data::MuForm::Renderer::Base' }
 has 'renderer' => ( is => 'rw', lazy => 1, builder => 'build_renderer' );
 sub build_renderer {
     my $self = shift;

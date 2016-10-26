@@ -233,10 +233,11 @@ method. Fallback is to use the field's full name.
 The 'render_args' hashref contains keys which are used in rendering, with shortcuts
 for easier specification in a field definition.
 
-   element_attr - ea - hashref
-   label_attr   - la - hashref
-   wrapper_attr - wa - hashref
-   errors_attr  - era - hashref
+   element_attr         - ea
+   label_attr           - la
+   wrapper_attr         - wa
+   error_attr           - era
+   element_wrapper_attr - ewa
 
    has_field 'foo' => ( render_args => { element_attr => { readonly => 1, my_attr => 'abc' }} );
    has_field 'foo' => ( 'ra.ea' => { readonly => 1, my_attr => 'abc' } );
@@ -478,7 +479,7 @@ sub build_id {
    }
    return $self->prefixed_name;
 }
-has 'prefixed_name' => ( isa => Str, is => 'rw', lazy => 1, builder => 'build_prefixed_name');
+has 'prefixed_name' => ( is => 'rw', lazy => 1, builder => 'build_prefixed_name');
 sub build_prefixed_name {
     my $self = shift;
     my $prefix = ( $self->form && $self->form->field_prefix ) ? $self->field_prefix. "." : '';
@@ -491,10 +492,10 @@ has 'input' => ( is => 'rw', predicate => 'has_input', clearer => 'clear_input' 
 has 'input_without_param' => ( is => 'rw', predicate => 'has_input_without_param' );
 has 'value' => ( is => 'rw', predicate => 'has_value', clearer => 'clear_value' );
 has 'init_value' => ( is => 'rw', predicate => 'has_init_value', clearer => 'clear_init_value' );
-has 'no_value_if_empty' => ( is => 'rw', isa => Bool );
-has 'input_param' => ( is => 'rw', isa => Str );
+has 'no_value_if_empty' => ( is => 'rw' );
+has 'input_param' => ( is => 'rw' );
 has 'filled_from' => ( is => 'rw', clearer => 'clear_filled_from' );
-has 'password' => ( is => 'rw', isa => Bool, default => 0 );
+has 'password' => ( is => 'rw', default => 0 );
 has 'accessor' => ( is => 'rw', lazy => 1, builder => 'build_accessor' );
 sub build_accessor {
     my $self     = shift;
@@ -526,7 +527,7 @@ sub is_inactive { ! $_[0]->is_active }
 has 'disabled' => ( is => 'rw', default => 0 );
 has 'no_update' => ( is => 'rw', default => 0 );
 has 'writeonly' => ( is => 'rw', default => 0 );
-has 'is_contains' => ( is => 'rw', isa => Bool );
+has 'is_contains' => ( is => 'rw' );
 has 'apply' => ( is => 'rw', default => sub {[]} ); # for field defnitions
 sub has_apply { return scalar @{$_[0]->{apply}} }
 has 'base_apply' => ( is => 'rw', builder => 'build_base_apply' ); # for field classes
@@ -559,8 +560,8 @@ sub get_method {
    return  $self->{methods}->{$meth_name};
 }
 
-has 'validate_when_empty' => ( is => 'rw', isa => Bool );
-has 'not_nullable' => ( is => 'rw', isa => Bool );
+has 'validate_when_empty' => ( is => 'rw' );
+has 'not_nullable' => ( is => 'rw' );
 sub is_repeatable {}
 sub is_compound {}
 sub is_form {0}
@@ -838,7 +839,7 @@ has 'transform_value_to_fif' => ( is => 'rw', predicate => 'has_transform_value_
 
 has 'required' => ( is => 'rw', default => 0 );
 has 'required_when' => ( is => 'rw', isa => HashRef, predicate => 'has_required_when' );
-has 'unique' => ( is => 'rw', isa => Bool, predicate => 'has_unique' );
+has 'unique' => ( is => 'rw', predicate => 'has_unique' );
 sub validated { !$_[0]->has_errors && $_[0]->has_input }
 sub normalize_input { } # intended for field classes, to make sure input is in correct form, mostly multiple or not
 

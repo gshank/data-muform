@@ -278,13 +278,13 @@ sub build_options {[]}
 sub has_options { shift->num_options }
 sub num_options { scalar @{$_[0]->options} }
 sub all_options { @{$_[0]->options} }
-has 'options_from' => ( isa => Str, is => 'rw', default => 'none' );
-has 'do_not_reload' => ( isa => Bool, is => 'ro' );
-has 'no_option_validation' => ( isa => Bool, is => 'rw' );
+has 'options_from' => ( is => 'rw', default => 'none' );
+has 'do_not_reload' => ( is => 'ro' );
+has 'no_option_validation' => ( is => 'rw' );
 
-has 'multiple' => ( is => 'ro', isa => Bool, default => 0 );
+has 'multiple' => ( is => 'ro', default => 0 );
 has 'size' => ( is => 'rw' );
-has 'empty_select' => ( is => 'rw', isa => Str, predicate => 'has_empty_select' );
+has 'empty_select' => ( is => 'rw', predicate => 'has_empty_select' );
 
 # add trigger to 'value' so we can enforce arrayref value for multiple
 has '+value' => ( trigger => 1 );
@@ -397,7 +397,8 @@ sub _load_options {
     if (scalar @$opts) {
         # sort options if sort method exists
         $opts = $self->sort_options($opts) if $self->methods->{sort};
-        $self->options($opts);
+        # we don't want to trigger and re-order, so set directly
+        $self->{options} = $opts;
     }
 }
 

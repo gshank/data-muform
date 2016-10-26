@@ -9,8 +9,8 @@ use Types::Standard -types;
 
 has '+size'                 => ( default => 8 );
 has 'precision'             => ( is => 'rw', default => 2 );
-has 'decimal_symbol'        => ( isa => Str, is => 'rw', default => '.');
-has 'decimal_symbol_for_db' => ( isa => Str, is => 'rw', default => '.');
+has 'decimal_symbol'        => ( is => 'rw', default => '.');
+has 'decimal_symbol_for_db' => ( is => 'rw', default => '.');
 has '+transform_input_to_value' => ( default => sub { *input_to_value } );
 has '+transform_value_to_fif'   => ( default => sub { *value_to_fif } );
 

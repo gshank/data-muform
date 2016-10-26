@@ -130,20 +130,18 @@ This might be useful if the form is being re-presented to the user.
 =cut
 
 has 'contains' => (
-#   isa       => 'Data::MuForm::Field',
     is        => 'rw',
     predicate => 'has_contains',
 );
 
-has 'init_instance' => ( is => 'rw', isa => HashRef,
-    default => sub {{}},
+has 'init_instance' => ( is => 'rw', isa => HashRef, default => sub {{}},
 );
 sub  has_init_instance { exists $_[0]->{init_instance} && scalar keys %{$_[0]->{init_instance}} }
 
-has 'num_when_empty' => ( isa => Int,  is => 'rw', default => 1 );
-has 'num_extra'      => ( isa => Int,  is => 'rw', default => 0 );
-has 'setup_for_js'   => ( isa => Bool, is => 'rw' );
-has 'index'          => ( isa => Int,  is => 'rw', default => 0 );
+has 'num_when_empty' => ( is => 'rw', default => 1 );
+has 'num_extra'      => ( is => 'rw', default => 0 );
+has 'setup_for_js'   => ( is => 'rw' );
+has 'index'          => ( is => 'rw', default => 0 );
 sub is_repeatable {1}
 #has '+widget'        => ( default => 'Repeatable' );
 
