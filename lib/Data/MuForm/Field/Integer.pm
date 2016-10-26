@@ -25,29 +25,18 @@ sub get_class_messages {
     }
 }
 
-has '+base_apply' => ( default => sub {[
-        {
-            transform => sub {
-                my $value = shift;
-                $value =~ s/^\+//;
-                return $value;
-                }
-        },
-        {
-            check => sub { $_[0] =~ /^-?[0-9]+$/ },
-            message => sub {
-                my ( $value, $field ) = @_;
-                return $field->get_message('integer_needed');
-            },
-        }
-    ]}
-);
-
 sub validate {
     my $field = shift;
 
     my $value = $field->value;
     return 1 unless defined $value;
+
+    $value =~ s/^\+//;
+    $field->value($value);
+
+    unless ( $value =~ /^-?[0-9]+$/ ) {
+        $field->add_error($field->get_message('integer_needed'));
+    }
 
     my $low  = $field->range_start;
     my $high = $field->range_end;

@@ -27,7 +27,8 @@ sub get_class_messages  {
     }
 }
 
-has '+base_apply' => ( default => sub {
+sub build_base_apply {
+    return
     [   {   # remove any leading currency symbol
             transform => sub {
                 my ( $value, $field ) = @_;
@@ -62,8 +63,8 @@ has '+base_apply' => ( default => sub {
                 return [ $field->get_message('currency_convert'), $value ];
             },
         },
-    ]
-});
+    ];
+}
 
 
 =head1 DESCRIPTION

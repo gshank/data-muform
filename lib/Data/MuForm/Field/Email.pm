@@ -30,7 +30,7 @@ sub get_class_messages  {
     }
 }
 
-has '+base_apply' => ( default => sub {
+sub build_base_apply {
     [
         {
             transform => sub {
@@ -56,7 +56,7 @@ has '+base_apply' => ( default => sub {
             },
         }
     ]
-});
+}
 
 =head1 DESCRIPTION
 

@@ -34,7 +34,7 @@ You can create custom field classes:
     use Data::MuForm::Meta;
     extends 'Data::MuForm::Field::Text';
 
-    has 'my_attribute' => ( isa => 'Str', is => 'rw' );
+    has 'my_attribute' => ( is => 'rw' );
 
     sub validate { <perform validation> }
 
@@ -442,14 +442,11 @@ C<< validate_<field_name> >> exists, it will be used instead.
 Periods in field names will be replaced by underscores, so that the field
 'addresses.city' will use the 'validate_addresses_city' method for validation.
 
-   has_field 'my_foo' => ( validate_method => \&my_foo_validation );
-   sub my_foo_validation { ... }
-   has_field 'title' => ( isa => 'Str', set_validate => 'check_title' );
-
 =head2 apply actions
 
 Use Type::Tiny types;
 
+   use Types::Standard ('PosInteger');
    has_field 'foo' => ( apply => [ PosInteger ] );
 
 
@@ -532,7 +529,8 @@ has 'writeonly' => ( is => 'rw', default => 0 );
 has 'is_contains' => ( is => 'rw', isa => Bool );
 has 'apply' => ( is => 'rw', default => sub {[]} ); # for field defnitions
 sub has_apply { return scalar @{$_[0]->{apply}} }
-has 'base_apply' => ( is => 'rw', default => sub {[]} );  # for field classes
+has 'base_apply' => ( is => 'rw', builder => 'build_base_apply' ); # for field classes
+sub build_base_apply {[]}
 sub has_base_apply { return scalar @{$_[0]->{base_apply}} }
 has 'trim' => ( is => 'rw', default => sub { *default_trim } );
 sub default_trim {
