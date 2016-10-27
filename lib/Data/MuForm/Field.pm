@@ -751,6 +751,7 @@ sub get_render_args {
 
 sub render {
   my ( $self, $rargs ) = @_;
+  munge_render_field_attr($rargs);
   my $render_args = $self->get_render_args(%$rargs);
   return $self->renderer->render_field($render_args);
 }

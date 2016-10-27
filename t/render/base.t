@@ -45,7 +45,7 @@ is_html( $rendered, $expected, 'label rendered okay');
 
 $form->process( params => { foo => '', bar => 1, sol => 'Some text' } );
 
-# text field
+# text field render_element
 $rendered = $form->field('foo')->render_element({ class => 'bm10 x333' });
 $expected = q{
   <input type="text" id="foo" name="foo" class="bm10 x333 error" maxlength="10" value="">
@@ -59,6 +59,17 @@ $expected  = q{
   <span>'Foo' field is required</span>
 };
 is_html( $rendered, $expected, 'rendered errors okay');
+
+# text field render
+$rendered = $form->field('foo')->render({ 'ea.class' => 'fftt' });
+$expected = q{
+<div>
+  <label for="foo">Foo</label>
+  <input class="fftt error" id="foo" maxlength="10" name="foo" type="text" value="" />
+  <span>&apos;Foo&apos; field is required</span>
+</div>
+};
+is_html( $rendered, $expected, 'rendered field with ra changes ok');
 
 # select field
 $rendered = $form->field('bar')->render_element({ class => 'select 666' });

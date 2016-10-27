@@ -30,16 +30,17 @@ sub munge_field_attr {
   return $field_attr;
 }
 
+my $shortcuts = {
+     ea => 'element_attr',
+     la => 'label_attr',
+     wa => 'wrapper_attr',
+     era => 'error_attr',
+     ewa => 'element_wrapper_attr',
+};
+
 sub munge_field_attr_ra {
     my $args = shift;
 
-    my $translate = {
-         ea => 'element_attr',
-         la => 'label_attr',
-         wa => 'wrapper_attr',
-         era => 'error_attr',
-         ewa => 'element_wrapper_attr',
-    };
     my $render_args = $args->{render_args};
     my $ra = delete $args->{ra};
     if ( $render_args && $ra ) {
@@ -52,7 +53,7 @@ sub munge_field_attr_ra {
     foreach my $key ( @ra_keys ) {
         my @seg = split('\.', $key);
         shift @seg;
-        my $new_key = $translate->{$seg[0]} || $seg[0];
+        my $new_key = $shortcuts->{$seg[0]} || $seg[0];
         if ( $seg[1] ) {
             $render_args->{$new_key}{$seg[1]} = $args->{$key};
         }
@@ -62,6 +63,19 @@ sub munge_field_attr_ra {
         delete $args->{$key};
     }
     $args->{render_args} = $render_args;
+}
+
+sub munge_render_field_attr {
+    my $args = shift;
+    if ( my @keys = grep { $_ =~ /^.{2,}\./ } keys %$args ) {
+         foreach my $key (@keys) {
+             my @seg = split('\.', $key );
+             if ( my $new_key = $shortcuts->{$seg[0]} ) {
+                 my $value = delete $args->{$key};
+                 $args->{$new_key}{$seg[1]} = $value;
+             }
+         }
+    }
 }
 
 sub has_flag {
