@@ -31,7 +31,7 @@ sub import {
         my ( $name, @options ) = @_;
         return unless $name;
         my $names = ( ref($name) eq 'ARRAY' ) ? $name : [ ($name) ];
-        push @_meta_fields, { name => $_, @options } for @$names;
+        push @_meta_fields, { name => $_, source => $target, @options } for @$names;
     };
 
     # function to insert 'around' modifiers into the calling package

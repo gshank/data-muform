@@ -123,6 +123,52 @@ as checking in the database that a username is unique:
     }
     1;
 
+=head2 Order fields from a role
+
+Given a Moo::Role with fields:
+ 
+    package MyApp::Form::Role::MyFields;
+    use Moo::Role;
+    use Data::MuForm::Meta;
+
+    has_field 'r-one';
+    has_field 'r-two';
+    has_field 'r-three';
+
+...And a Form class which includes those fields.
+
+    package MyApp::Form::TestRole;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    with 'MyApp::Form::Role::MyFields';
+
+    has_field 'f-one';
+    has_field 'f-two';
+    has_field 'f-three';
+    has_field 'f-four';
+
+...Order the fields in an 'order_fields' sub in the form.
+
+    # put role fields between f-two and f-three
+    sub order_fields {
+        my $self = shift;
+        my @form_order = (1, 2, 6, 7, 8);
+        my @role_order = (3, 4, 5);
+        foreach my $field ( $self->all_fields ) {
+            my $order;
+            if ( $field->source eq __PACKAGE__ ) {
+                $order = shift @form_order;
+            }
+            else {
+                $order = shift @role_order;
+            }
+            $field->order($order);
+        }
+    }
+
+
 =cut
 
 1;

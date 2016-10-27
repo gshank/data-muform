@@ -59,17 +59,34 @@ is_deeply( \@orders, [ 5, 5, 10, 25, 35, 99 ], 'order in expected order' );
     has_field 'f-three';
     has_field 'f-four';
 
+    # put role fields between f-two and f-three
+    sub order_fields {
+        my $self = shift;
+        my @form_order = (1, 2, 6, 7, 8);
+        my @role_order = (3, 4, 5);
+        foreach my $field ( $self->all_fields ) {
+            my $order;
+            if ( $field->source eq __PACKAGE__ ) {
+                $order = shift @form_order;
+            }
+            else {
+                $order = shift @role_order;
+            }
+            $field->order($order);
+        }
+    }
+
 }
 
 $form = MyApp::Form::TestRole->new;
 ok( $form, 'form built' );
 
-is( $form->field('f-one')->order, 5, 'first field' );
-is( $form->field('f-two')->order, 10, 'second field' );
-is( $form->field('f-three')->order, 15, 'third field' );
-is( $form->field('f-four')->order, 20, 'fourth field' );
-is( $form->field('r-one')->order, 25, 'fifth field' );
-is( $form->field('r-two')->order, 30, 'sixth field' );
-is( $form->field('r-three')->order, 35, 'seventh field' );
+is( $form->field('f-one')->order, 1, 'first field' );
+is( $form->field('f-two')->order, 2, 'second field' );
+is( $form->field('f-three')->order, 6, 'third field' );
+is( $form->field('f-four')->order, 7, 'fourth field' );
+is( $form->field('r-one')->order, 3, 'fifth field' );
+is( $form->field('r-two')->order, 4, 'sixth field' );
+is( $form->field('r-three')->order, 5, 'seventh field' );
 
 done_testing;

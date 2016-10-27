@@ -505,6 +505,7 @@ sub build_accessor {
 }
 has 'custom' => ( is => 'rw' );
 has 'parent' => ( is  => 'rw',   predicate => 'has_parent', weak_ref => 1 );
+has 'source' => ( is => 'rw' );
 has 'errors' => ( is => 'rw', isa => ArrayRef, default => sub {[]} );
 sub has_errors { my $self = shift; return scalar @{$self->errors}; }
 sub all_errors { my $self = shift; return @{$self->errors}; }
