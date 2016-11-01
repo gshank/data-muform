@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Data::Dumper;
 
 use lib 't/lib';
 
@@ -25,7 +24,7 @@ my $expected =  [
    { 'name' => 'jetsam', source => 'Test::FormRole' },
 ];
 
-diag(Dumper(\@meta_fields));
+note(explain(\@meta_fields));
 
 is_deeply( \@meta_fields, $expected, 'got the meta fields we expected' );
 
