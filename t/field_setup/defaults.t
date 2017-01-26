@@ -12,6 +12,8 @@ use lib 't/lib';
     has_field 'foo' => ( default => 'default_foo' );
     has_field 'bar' => ( default => '' );
     has_field 'bax' => ( default => 'default_bax' );
+    has_field 'box' => ( 'meth.default' => \&some_default );
+    sub some_default { 'bibbidy' }
 }
 
 my $form = Test::Defaults->new;
@@ -19,6 +21,7 @@ my $cmp_fif = {
     foo => 'default_foo',
     bar => '',
     bax => 'default_bax',
+    box => 'bibbidy',
 };
 # test that defaults in fields are used in
 # filling in the form
@@ -29,7 +32,7 @@ is_deeply( $form->fif, $cmp_fif, 'fif has right defaults' );
 # test that an init_values overrides defaults in fields
 my $init_obj = { foo => '', bar => 'testing', bax => '' };
 $form->process( init_values => $init_obj, params => {} );
-is_deeply( $form->fif, { foo => '', bar => 'testing', bax => '' }, 'object overrides defaults');
+is_deeply( $form->fif, { foo => '', bar => 'testing', bax => '', box => 'bibbidy' }, 'object overrides defaults');
 
 =comment
 # default_over_obj not implemented
