@@ -1023,4 +1023,14 @@ sub render_errors {
   return $self->renderer->render_form_errors($render_args);
 }
 
+# just for top level fields
+sub render_hidden_fields {
+  my $self = shift;
+  foreach my $field ( $self->all_sorted_fields ) {
+    if ( $field->type eq 'Hidden' && $field->has_value ) {
+      $field->render_element;
+    }
+  }
+}
+
 1;
