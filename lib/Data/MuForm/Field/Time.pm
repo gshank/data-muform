@@ -1,4 +1,5 @@
 package Data::MuForm::Field::Time;
+# ABSTRACT: Time field
 use Moo;
 extends 'Data::MuForm::Field::Text';
 

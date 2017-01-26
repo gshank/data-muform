@@ -1,4 +1,5 @@
 package Data::MuForm::Field::URL;
+# ABSTRACT: URL field
 use Moo;
 extends 'Data::MuForm::Field::Text';
 use Regexp::Common ('URI');

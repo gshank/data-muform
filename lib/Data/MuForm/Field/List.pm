@@ -1,4 +1,5 @@
 package Data::MuForm::Field::List;
+# ABSTRACT: List field
 use Moo;
 extends 'Data::MuForm::Field::Text';
 use Types::Standard -types;
