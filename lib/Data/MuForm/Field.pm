@@ -928,7 +928,7 @@ sub field_validate {
 
     $self->value( $self->trim->($self->value) ) if $self->trim;
 
-    $self->validate;  # this is field class validation. Do it before the other validations.
+    $self->validate($self->value);  # this is field class validation. Do it before the other validations.
 
     $self->apply_actions;  # this could be either from the field definitions or from a custom field
 
