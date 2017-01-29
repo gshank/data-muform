@@ -70,7 +70,7 @@ and have it just work.
 
 =back
 
-=item default_standard_layout
+=item standard_layout
 
 For normal inputs and select fields.
 
@@ -81,7 +81,7 @@ Provided:
 
 Create new layouts starting with 'layout_<name>'.
 
-=item default_cb_layout
+=item cb_layout
 
 Default checkbox layout. Create new checkbox layouts with methods starting
 with 'cb_layout_<name>'.
@@ -93,7 +93,7 @@ Provided:
    cbnowrll - checkbox, not wrapped, label left
    cb2l   - checkbox, 2 labels
 
-=item default_rdgo_layout
+=item rdgo_layout
 
 Default radiogroup option layout
 
@@ -104,7 +104,7 @@ Provided:
 
 Supply more with 'rdgo_layout_<name>'.
 
-=item default_cbgo_layout
+=item cbgo_layout
 
 Default checkbox group option layout
 
@@ -115,7 +115,7 @@ Provided:
 
 Supply more with 'cbgo_layout_<name>'.
 
-=item default_display_layout
+=item display_layout
 
 Default 'display' field layout.
 
@@ -125,7 +125,7 @@ Provided:
 
 Provide more options with 'layout_<name>'.
 
-=item default_field_wrapper
+=item field_wrapper
 
 Default field wrapper. Supply more with 'wrapper_<name>'.
 
@@ -134,11 +134,11 @@ Provided:
    simple
    fieldset
 
-=item default_wrapper_tag
+=item wrapper_tag
 
 Default wrapper tag. Default: 'div'.
 
-=item default_error_tag
+=item error_tag
 
 Default error tag.
 
@@ -190,23 +190,25 @@ has 'form' => ( is => 'ro', weak_ref => 1 );
 
 has 'localizer' => ( is => 'ro' );
 
-has 'default_standard_layout' => ( is => 'rw', default => 'lbl_ele_err' );
+has 'standard_layout' => ( is => 'rw', default => 'lbl_ele_err' );
 
-has 'default_cb_layout' => ( is => 'rw', default => 'cbwrlr' );
+has 'cb_layout' => ( is => 'rw', default => 'cbwrlr' );
 
-has 'default_rdgo_layout' => ( is => 'rw', default => 'labels_right' );
+has 'rdgo_layout' => ( is => 'rw', default => 'labels_right' );
 
-has 'default_cbgo_layout' => ( is => 'rw', default => 'labels_right' );
+has 'cbgo_layout' => ( is => 'rw', default => 'labels_right' );
 
-has 'default_display_layout' => ( is => 'rw', default => 'span' );
+has 'display_layout' => ( is => 'rw', default => 'span' );
 
-has 'default_field_wrapper' => ( is => 'rw', default => 'simple' );
+has 'field_wrapper' => ( is => 'rw', default => 'simple' );
 
-has 'default_wrapper_tag' => ( is => 'rw', default => 'div' );
+has 'wrapper_tag' => ( is => 'rw', default => 'div' );
 
-has 'default_error_tag' => ( is => 'rw', default => 'span' );
+has 'error_tag' => ( is => 'rw', default => 'span' );
 
-has 'default_render_element_errors' => ( is => 'rw', default => 1 );
+has 'error_class' => ( is => 'rw', default => 'error_message' );
+
+has 'render_element_errors' => ( is => 'rw', default => 1 );
 
 sub BUILD {
     my $self = shift;
@@ -317,7 +319,7 @@ sub wrap_field {
   my ( $self, $rargs, $rendered ) = @_;
 
   # wrap the field
-  my $wrapper = $rargs->{wrapper} || $self->default_field_wrapper;
+  my $wrapper = $rargs->{wrapper} || $self->field_wrapper;
   return $rendered if $wrapper eq 'none';
   my $wrapper_meth = $self->can("wrapper_$wrapper") || die "wrapper method '$wrapper' not found";
   my $out = $wrapper_meth->($self, $rargs, $rendered);
@@ -548,7 +550,7 @@ sub render_element {
   my $out = $self->$meth($rargs);
   # this enables doing field.render_element without having to
   # render the errors for each field.
-  if ( $self->default_render_element_errors && $do_errors ) {
+  if ( $self->render_element_errors && $do_errors ) {
     $out .= $self->render_errors($rargs);
   }
   return $out;
@@ -591,9 +593,10 @@ sub render_errors {
   $self->render_hook($rargs);
   my $errors = $rargs->{errors} || [];
   my $out = '';
-  my $error_tag = $rargs->{error_tag} || $self->default_error_tag;
+  my $error_tag = $rargs->{error_tag} || $self->error_tag;
+  my $error_class = $rargs->{error_class} || $self->error_class;
   foreach my $error (@$errors) {
-    $out .= qq{\n<$error_tag>$error</$error_tag>};
+    $out .= qq{\n<$error_tag class="$error_class">$error</$error_tag>};
   }
   return $out;
 }
@@ -630,7 +633,7 @@ sub render_option {
 sub render_layout_radiogroup {
   my ( $self, $rargs ) = @_;
 
-  my $rdgo_layout = $rargs->{rdgo_layout} || $self->default_rdgo_layout;
+  my $rdgo_layout = $rargs->{rdgo_layout} || $self->rdgo_layout;
   my $rdgo_layout_meth = $self->can("rdgo_layout_$rdgo_layout") or die "Radio layout '$rdgo_layout' not found";
 
   my $out = $self->render_label($rargs);
@@ -701,7 +704,7 @@ sub render_layout_checkbox {
     my ( $self, $rargs) = @_;
 
   my $cb_element = $self->render_checkbox($rargs);
-  my $cb_layout = $rargs->{cb_layout} || $self->default_cb_layout;
+  my $cb_layout = $rargs->{cb_layout} || $self->cb_layout;
   my $meth = $self->can("cb_layout_$cb_layout") || die "Checkbox layout '$cb_layout' not found";
   my $out = '';
   $out = $meth->($self, $rargs, $cb_element);
@@ -764,7 +767,7 @@ sub render_layout_checkboxgroup {
   my ( $self, $rargs ) = @_;
 
   my $out = $self->render_label($rargs);
-  my $cbgo_layout = $rargs->{cbgo_layout} || $self->default_cbgo_layout;
+  my $cbgo_layout = $rargs->{cbgo_layout} || $self->cbgo_layout;
   my $cbgo_layout_meth = $self->can("cbgo_layout_$cbgo_layout")
      || die "Checkbox group option layout '$cbgo_layout' not found";;
   # render options
@@ -874,7 +877,7 @@ sub render_layout_standard {
   my ( $self, $rargs ) = @_;
 
   # render the field layout
-  my $layout = $rargs->{layout} || $self->default_standard_layout;
+  my $layout = $rargs->{layout} || $self->standard_layout;
   my $layout_meth = $self->can("layout_$layout");
   die "layout method '$layout' not found" unless $layout_meth;
   my $out = '';
@@ -918,7 +921,7 @@ sub layout_no_label {
 sub wrapper_simple {
     my ( $self, $rargs, $rendered ) = @_;
 
-    my $tag = $rargs->{wrapper_attr}{tag} || $self->default_wrapper_tag;
+    my $tag = $rargs->{wrapper_attr}{tag} || $self->wrapper_tag;
     my $out = qq{\n<$tag };
     $out .= process_attrs($rargs->{wrapper_attr}, ['tag']);
     $out .= qq{>};
@@ -973,7 +976,7 @@ sub render_layout_display {
   my ( $self, $rargs ) = @_;
 
   # render the field layout
-  my $layout = $rargs->{layout} || $self->default_display_layout;
+  my $layout = $rargs->{layout} || $self->display_layout;
   my $layout_meth = $self->can("layout_$layout");
   die "layout method '$layout' not found" unless $layout_meth;
   my $out = '';

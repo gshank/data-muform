@@ -49,7 +49,7 @@ $form->process( params => { foo => '', bar => 1, sol => 'Some text' } );
 $rendered = $form->field('foo')->render_element({ class => 'bm10 x333' });
 $expected = q{
   <input type="text" id="foo" name="foo" class="bm10 x333 error" maxlength="10" value="">
-  <span>&apos;Foo&apos; field is required</span>
+  <span class="error_message">&apos;Foo&apos; field is required</span>
 };
 is_html( $rendered, $expected, 'got expected output for text element with error');
 
@@ -57,7 +57,7 @@ is_html( $rendered, $expected, 'got expected output for text element with error'
 # text field errors
 $rendered = $form->field('foo')->render_errors;
 $expected  = q{
-  <span>'Foo' field is required</span>
+  <span class="error_message">'Foo' field is required</span>
 };
 is_html( $rendered, $expected, 'rendered errors okay');
 
@@ -67,7 +67,7 @@ $expected = q{
 <div>
   <label for="foo">Foo</label>
   <input class="fftt error" id="foo" maxlength="10" name="foo" type="text" value="" />
-  <span>&apos;Foo&apos; field is required</span>
+  <span class="error_message">&apos;Foo&apos; field is required</span>
 </div>
 };
 is_html( $rendered, $expected, 'rendered field with ra changes ok');
@@ -112,7 +112,7 @@ $expected = q{
   <div class="tpt">
   <label for="foo">Foo</label>
   <input class="error" id="foo" maxlength="10" name="foo" type="text" value="" />
-  <span>'Foo' field is required</span>
+  <span class="error_message">'Foo' field is required</span>
   </div>
 };
 is_html( $rendered, $expected, 'foo field rendered correctly' );
@@ -122,7 +122,7 @@ $expected = q{
 <form id="Test" method="post">
   <div>
     <label for="foo">Foo</label>
-    <input class="error" id="foo" maxlength="10" name="foo" type="text" value="" /> <span>&apos;Foo&apos; field is required</span>
+    <input class="error" id="foo" maxlength="10" name="foo" type="text" value="" /> <span class="error_message">&apos;Foo&apos; field is required</span>
   </div>
   <div>
     <label for="bar">Bar</label>

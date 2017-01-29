@@ -20,7 +20,7 @@ use lib 't/lib';
 #   }}
 #   sub build_form_wrapper_class { 'form_wrapper' }
 
-    sub build_renderer_args { { default_cb_layout => 'cbwrll' } }
+    sub build_renderer_args { { cb_layout => 'cbwrll' } }
     has '+name' => ( default => 'testform' );
     has_field 'test_field' => (
         size  => 20,
