@@ -759,7 +759,7 @@ sub render {
 
 sub render_element {
   my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args( element_attr => $rargs );
+  my $render_args = $self->get_render_args( element_attr => $rargs, from_field => 1 );
   return $self->renderer->render_element($render_args);
 }
 

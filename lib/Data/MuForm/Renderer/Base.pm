@@ -206,6 +206,8 @@ has 'default_wrapper_tag' => ( is => 'rw', default => 'div' );
 
 has 'default_error_tag' => ( is => 'rw', default => 'span' );
 
+has 'default_render_element_errors' => ( is => 'rw', default => 1 );
+
 sub BUILD {
     my $self = shift;
     if ( $self->form ) {
@@ -538,11 +540,18 @@ sub render_textarea {
 sub render_element {
   my ( $self, $rargs ) = @_;
 
+  my $from_field = delete $rargs->{from_field};
   $rargs->{rendering} = 'element';
   $self->render_hook($rargs);
   my $form_element = $rargs->{form_element};
   my $meth = "render_$form_element";
-  return $self->$meth($rargs);
+  my $out = $self->$meth($rargs);
+  # this enables doing field.render_element without having to
+  # render the errors for each field.
+  if ( $self->default_render_element_errors && $from_field ) {
+    $out .= $self->render_errors($rargs);
+  }
+  return $out;
 }
 
 =head2 render_label
