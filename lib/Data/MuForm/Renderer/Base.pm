@@ -406,9 +406,6 @@ sub process_attrs {
                 $value = $attrs->{$attr};
             }
         }
-        if ( $value =~ /[&"<>]/ ) {
-            $value = html_filter($value);
-        }
         push @use_attrs, sprintf( '%s="%s"', $attr, $value );
     }
     my $out = join( ' ', @use_attrs );

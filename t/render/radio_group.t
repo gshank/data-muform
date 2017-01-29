@@ -15,7 +15,7 @@ use Data::MuForm::Test;
         'ra.ewa.class' => 'my_radio',
         options => [
             { value => 'no & never', label => 'No & Never', id => 'opt1' },
-            { value => '"yes"', label => 'Yes', id => 'opt2' },
+            { value => 'yes', label => 'Yes', id => 'opt2' },
         ]
     );
 
@@ -62,7 +62,7 @@ my $expected = q{
     </label>
   </div>
   <div class="my_radio">
-    <label class="radio" for="opt2"><input name="opt_in" id="opt2" type="radio" value="&quot;yes&quot;" />
+    <label class="radio" for="opt2"><input name="opt_in" id="opt2" type="radio" value="yes" />
       Yes
     </label>
   </div>
