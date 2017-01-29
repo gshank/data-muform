@@ -252,7 +252,7 @@ L<Data::MuForm::Field>. If you want additional attributes you can
 define your own field classes (or apply a role to a field class - see
 L<Data::MuForm::Manual::Cookbook>). The field 'type' (used in field
 definitions) is the short class name of the field class, used when
-searching the 'field_name_space' for the field class.
+searching the 'field_namespace' for the field class.
 
 =head3 has_field
 
@@ -343,7 +343,7 @@ methods.
 =head3 field_namespace
 
 Use to look for field during form construction. If a field is not found
-with the field_name_space (or Data::MuForm/Data::MuFormX),
+with the field_namespace (or Data::MuForm/Data::MuFormX),
 the 'type' must start with a '+' and be the complete package name.
 
 =head3 fields
