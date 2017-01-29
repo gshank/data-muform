@@ -68,7 +68,7 @@ and have it just work.
 
 =head2 Renderer defaults
 
-=back
+=over 4
 
 =item default_standard_layout
 
@@ -142,7 +142,7 @@ Default wrapper tag. Default: 'div'.
 
 Default error tag.
 
-=over
+=back
 
 =head1 Layouts
 

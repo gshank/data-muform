@@ -49,7 +49,7 @@ sub loc_nx {
   return $out;
 }
 
-=comment
+=cut
 
 sub loc_px {
   my ($self, $msgid, %args) = @_;
@@ -498,4 +498,3 @@ sub extract_header_msgstr {
 }
 
 1;
-
