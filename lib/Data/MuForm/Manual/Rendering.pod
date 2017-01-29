@@ -145,7 +145,7 @@ For the select field, including 'select', 'radiogroup' and 'checkboxgroup' rende
 
 =head1 Rendering loops
 
-=head all_sorted_fields
+=head2 all_sorted_fields
 
    [%  FOR field IN form.all_sorted_field %]
       <div class="...">

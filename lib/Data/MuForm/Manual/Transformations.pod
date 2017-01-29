@@ -66,6 +66,8 @@ strips beginning and trailing spaces.
 Set this attribute to null to skip trimming, or supply a different
 sub. This method is called right after 'transform_input_to_value'.
 
+=back
+
 =head2 Transform during validation
 
 You can also transform during validation, in a field validation sub or in
