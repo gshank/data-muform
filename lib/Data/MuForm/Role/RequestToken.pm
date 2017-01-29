@@ -1,5 +1,5 @@
 package Data::MuForm::Role::RequestToken;
-#ABSTRACT Role to incluse a token for csrf protection
+# ABSTRACT: Role to incluse a token for csrf protection
 use Moo::Role;
 use Data::MuForm::Meta;
 

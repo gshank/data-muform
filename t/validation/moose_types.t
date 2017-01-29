@@ -6,9 +6,9 @@ use Test::Exception;
 use lib 't/lib';
 
 SKIP: {
-    eval { require Moose::Util::TypeConstraints };
+    eval { require Moose::Util::TypeConstraints; require MooseX::Types; };
 
-    skip "Moose::Util::TypeConstraints not installed", 9 if $@;
+    skip "Moose::Util::TypeConstraints or MooseX::Types not installed", 9 if $@;
 
 
     use MyApp::Types (':all');

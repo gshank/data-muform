@@ -51,7 +51,5 @@ sub validate {
     $self->value($duration);
 }
 
-__PACKAGE__->meta->make_immutable;
-use namespace::autoclean;
 1;
 

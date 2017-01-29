@@ -22,6 +22,4 @@ sub base_render_args {
     return $args;
 }
 
-__PACKAGE__->meta->make_immutable;
-use namespace::autoclean;
 1;

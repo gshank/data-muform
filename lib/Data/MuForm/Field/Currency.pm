@@ -98,6 +98,4 @@ for example C<1,000,000,000>. Defaults to I<false>.
 
 =cut
 
-__PACKAGE__->meta->make_immutable;
-use namespace::autoclean;
 1;

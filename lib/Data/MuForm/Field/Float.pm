@@ -86,8 +86,6 @@ sub validate {
     return 1;
 }
 
-__PACKAGE__->meta->make_immutable;
-use namespace::autoclean;
 1;
 
 __END__

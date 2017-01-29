@@ -71,6 +71,4 @@ L<Email::Valid>
 
 =cut
 
-__PACKAGE__->meta->make_immutable;
-use namespace::autoclean;
 1;
