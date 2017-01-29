@@ -540,7 +540,7 @@ sub render_textarea {
 sub render_element {
   my ( $self, $rargs ) = @_;
 
-  my $from_field = delete $rargs->{from_field};
+  my $do_errors = delete $rargs->{do_errors};
   $rargs->{rendering} = 'element';
   $self->render_hook($rargs);
   my $form_element = $rargs->{form_element};
@@ -548,7 +548,7 @@ sub render_element {
   my $out = $self->$meth($rargs);
   # this enables doing field.render_element without having to
   # render the errors for each field.
-  if ( $self->default_render_element_errors && $from_field ) {
+  if ( $self->default_render_element_errors && $do_errors ) {
     $out .= $self->render_errors($rargs);
   }
   return $out;

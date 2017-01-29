@@ -759,7 +759,10 @@ sub render {
 
 sub render_element {
   my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args( element_attr => $rargs, from_field => 1 );
+  my $args = { element_attr => $rargs };
+  my $do_errors = delete $rargs->{do_errors};
+  $args->{do_errors} = defined $do_errors ? $do_errors : 1;
+  my $render_args = $self->get_render_args(%$args);
   return $self->renderer->render_element($render_args);
 }
 
