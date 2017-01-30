@@ -24,10 +24,15 @@ Data::MuForm
 
 =head1 SYNOPSIS
 
-Moo conversion of Data::MuForm, with more emphasis on data
-validation and a new way of rendering.
+Moo conversion of HTML::FormHandler, with more emphasis on data
+validation and a new way of rendering. The core behavior is basically
+the same as FormHandler, but some names have been changed, some
+functionality removed, some added. It will be necessary to change
+your forms to convert to MuForm, but it shouldn't be difficult.
 
-See the manual at L<Data::MuForm::Manual>.
+See the manual at L<Data::MuForm::Manual>, and in particular
+L<Data::MuForm::Manual::FormHandlerDiff> if you're already using
+FormHandler.
 
     my $validator = MyApp::Form::Test->new;
     $validator->check( data => $params );
