@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use HTML::FormHandler::Test;
+use Data::MuForm::Test;
 
 
 {

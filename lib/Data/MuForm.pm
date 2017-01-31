@@ -55,7 +55,7 @@ An example of a custom form class:
     extends 'Data::MuForm';
 
     has_field 'name' => ( type => 'Text' );
-    has_field 'age' => ( type => 'Integer', apply => [ 'MinimumAge' ] );
+    has_field 'age' => ( type => 'Integer', apply => [ MinimumAge ] );
     has_field 'hobbies' => ( type => 'Multiple' );
     has_field 'address' => ( type => 'Compound' );
     has_field 'address.city' => ( type => 'Text' );
