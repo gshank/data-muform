@@ -13,27 +13,44 @@ Data::MuForm::Renderer::Base
 
 Base functionality for renderers, including rendering standard form controls.
 
-You should normally create your own custom renderer class which inherits
-from this one. In it you should set the various standard defaults for your
-rendering, and override some of the methods, like 'render_errors'. You should
+You can use this base renderer if it does everything that you need. The
+various attributes can be set in a form class:
+
+  sub build_renderer_args { { error_tag => 'label' } }
+
+In many cases you might want to create your own custom renderer class which inherits
+from this one. In it you can set the various standard defaults for your
+rendering, and override some of the methods, like 'render_errors'. You can
 also create custom layouts using the layout sub naming convention so they can
 be found.
 
 There is a 'render_hook' which can be used to customize things like classes and
 attributes. It is called on every 'render_field', 'render_element', 'render_errors',
-and 'render_label' call. The hook can be used in the renderer or in the form class,
+and 'render_label' call. The hook can be used in a custom renderer or in the form class,
 whichever is most appropriate.
 
-This is Perl code, and can be customized however you want. This base renderer is
-supplied as a library of useful routines. You could replace it entirely if you want,
-as long you implement the methods that are used in the form and field classes.
+This base renderer is supplied as a library of useful routines. You could replace it
+entirely if you want, as long you implement the methods that are used in the form
+and field classes.
 
-As part of an attempt to separate the core code more from the rendering code, and
-limit the explosion of various rendering attributes, the
-rendering is always done using a 'render_args' hashref of the pieces of the form
-and field that are needed for rendering.  Most of the rendering settings are set
-as keys in the render_args hashref, with some exceptions. This means that you
-can just start using a new render_args hashref key in your custom rendering code
+The rendering is always done using a 'render_args' hashref of the pieces of the form
+and field that are needed for rendering. Instead of having lots of rendering attributes
+in the fields, with additional rendering pieces and settings in other attributes (like
+the 'tags' hashref in FormHandler, most of the rendering settings are passed along
+as keys in the render_args hashref.
+
+The 'render_args' can be defined in a field definition:
+
+  has_field 'foo' => ( type => 'Text', render_args => { element => { class => ['abc', 'def'] }} );
+  or
+  has_field 'foo' => ( type => 'Text', 'ra.ea.class' => ['abc', 'def'] );
+
+Or passed in on a render call:
+
+  $field->render({ 'ea.class' => 'abc' });
+
+If you have custom rendering code that depends on some new flag, you
+can just start using a new render_args hashref key in your custom code
 without having to do anything special to get it there. You have to set it somewhere
 of course, either in the field definition or passed in on the rendering calls.
 
@@ -61,12 +78,21 @@ in the template:
       <div class="field-errors">[% field.render_errors %]</div>
    </div>
 
-And yet another goal has been to make it possible to render a form automatically
+Another goal has been to make it possible to render a form automatically
 and have it just work.
 
   [% form.render %]
 
-=head2 Renderer defaults
+=head2 Renderer attributes
+
+In a form class:
+
+  sub build_renderer_args { { error_tag => 'label', cb_layout => 'cbwrll' } }
+
+In a Renderer subclass:
+
+  has '+error_tag' => ( default => 'label' );
+  has '+cb_layout' => ( default => 'cbwrll' );
 
 =over 4
 
@@ -142,6 +168,15 @@ Default wrapper tag. Default: 'div'.
 
 Default error tag.
 
+=item error_class
+
+The default class added to the rendered errors.
+
+=item render_element_errors
+
+This is for when you are just doing 'render_element', but want to also render
+the errors, without having to do a separate call. It's off by default.
+
 =back
 
 =head1 Layouts
@@ -208,7 +243,7 @@ has 'error_tag' => ( is => 'rw', default => 'span' );
 
 has 'error_class' => ( is => 'rw', default => 'error_message' );
 
-has 'render_element_errors' => ( is => 'rw', default => 1 );
+has 'render_element_errors' => ( is => 'rw', default => 0 );
 
 sub BUILD {
     my $self = shift;

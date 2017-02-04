@@ -11,6 +11,8 @@ use_ok('Data::MuForm::Renderer::Base');
     use Data::MuForm::Meta;
     extends 'Data::MuForm';
 
+    sub build_renderer_args {{ render_element_errors => 1 }}
+
     has_field 'foo' => ( required => 1, maxlength => 10 );
     has_field 'bar' => (
         type => 'Select',

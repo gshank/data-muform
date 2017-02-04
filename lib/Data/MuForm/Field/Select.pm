@@ -115,6 +115,11 @@ Additional attributes can be added in the options array hashref.
 
   [{ value => 1, label => 'one', id => 'first' }, { value => 1, label => 'two', id => 'second' }]
 
+You can also use an 'attributes' hashref to set additional renderable option
+attributes (compatible with FH).
+
+  [{ value => 1, label => 'one', attributes => { 'data-field' => { 'key' => '...' } } }]
+
 Note that you should *not* set 'checked' or 'selected' attributes in options.
 That is handled by setting a field default.
 
