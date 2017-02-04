@@ -506,7 +506,9 @@ sub render_select_option {
     my $label = $self->localize($option->{label});
     my $out = '';
     $out .= qq{\n<option };
-    $out .= process_attrs($option, ['label', 'order']);
+    my $attrs = $option;
+    $attrs = {%$attrs, %{$option->{attributes}}} if exists $option->{attributes};
+    $out .= process_attrs($attrs, ['label', 'order']);
     if ( defined $fif && ( ($multiple && exists $fif_lookup{$value}) || ( $fif eq $value ) ) ) {
         $out .= q{selected="selected" };
     }
@@ -655,7 +657,9 @@ sub render_radio_option {
     my $out = qq{<input type="radio" };
     $out .= qq{name="$name" };
     $out .= qq{id="$name$order" } unless $option->{id};
-    $out .= process_attrs($option, ['label', 'order']);
+    my $attrs = $option;
+    $attrs = {%$attrs, %{$option->{attributes}}} if exists $option->{attributes};
+    $out .= process_attrs($attrs, ['label', 'order']);
     if ( $rargs->{fif} eq $option->{value} ) {
         $out .= qq{checked="checked" };
     }
@@ -758,7 +762,9 @@ sub render_checkbox_option {
   if ( defined $fif && ( ($multiple && exists $fif_lookup{$value}) || ( $fif eq $value ) ) ) {
       $out .= q{checked="checked" };
   }
-  $out .= process_attrs($option, ['label', 'order']);
+  my $attrs = $option;
+  $attrs = {%$attrs, %{$option->{attributes}}} if exists $option->{attributes};
+  $out .= process_attrs($attrs, ['label', 'order']);
   $out .= "/>";
   return $out;
 }
