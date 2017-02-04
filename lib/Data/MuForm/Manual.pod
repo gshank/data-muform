@@ -35,6 +35,10 @@ with your controllers.
 Organized list of MuForm fields, with links to specific
 documentation.
 
+=head2 L<Data::MuForm::Manual::Hooks>
+
+Documents the standard places to override form processing.
+
 =head2 L<Data::MuForm::Manual::Defaults>
 
 Description of the various ways of setting defaults.

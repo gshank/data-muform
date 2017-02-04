@@ -903,10 +903,6 @@ sub validate_form {
     $self->validate;       # hook
     $self->validate_model; # hook
     $self->fields_set_value;
-    # $self->build_errors;
-
-    # 'validated' depends on no errors...
-
     $self->submitted(undef);
     $self->ran_validation(1);
 }
