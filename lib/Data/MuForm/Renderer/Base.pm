@@ -298,7 +298,7 @@ sub render_start {
     my $method = $rargs->{method};
     my $out = qq{<form };
     $out .= qq{id="$name" };
-    $out .= qq{method="$method" };
+    $out .= process_attrs($rargs->{form_attr}, ['id','name']);
     $out .= q{>};
 }
 
@@ -312,11 +312,13 @@ sub render_form_errors {
     my ( $self, $rargs ) = @_;
     my $out = '';
     if ( scalar @{$rargs->{form_errors}} ) {
-        $out .= q{<div class="form_errors>};
-        foreach my $error ( @{$rargs->{form_errors}} ) {
-            $out .= qq{<span>$error</span>};
-        }
-        $out .= q{</div>};
+      $out .= q{<div class="form_errors>};
+      my $error_tag = $rargs->{error_tag} || $self->error_tag;
+      my $error_class = $rargs->{error_class} || $self->error_class;
+      foreach my $error ( @{$rargs->{form_errors}} ) {
+        $out .= qq{\n<$error_tag class="$error_class">$error</$error_tag>};
+      }
+      $out .= q{</div>};
     }
     return $out;
 }
@@ -441,8 +443,9 @@ sub process_attrs {
     my @use_attrs;
     my %skip;
     @skip{@$skip} = ();
-    for my $attr( sort keys %$attrs ) {
+    for my $attr ( sort keys %$attrs ) {
         next if exists $skip{$attr};
+        next if $attr eq 'rendering';
         my $value = '';
         if( defined $attrs->{$attr} ) {
             if( ref $attrs->{$attr} eq 'ARRAY' ) {

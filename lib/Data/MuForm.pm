@@ -636,10 +636,12 @@ sub base_render_args {
     name => $self->name,
     id => $self->name,
     form_errors => $self->form_errors || [],
-    method => $self->http_method,
+    form_attr => {
+      method => $self->http_method,
+    }
   };
-  $args->{action} = $self->action if $self->action;
-  $args->{enctype} = $self->enctype if $self->enctype;
+  $args->{form_attr}->{action} = $self->action if $self->action;
+  $args->{form_attr}->{enctype} = $self->enctype if $self->enctype;
   return $args;
 }
 
@@ -1018,19 +1020,21 @@ sub render {
 
 sub render_start {
   my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args(%$rargs, rendering => 'form_start');
+  my $render_args = $self->get_render_args( form_attr => $rargs, rendering => 'form_start');
   return $self->renderer->render_start($render_args);
 }
 
 sub render_end {
   my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args(%$rargs, rendering => 'form_end');
+  # is there any need for attributes on a form end tag? never seen any...
+  my $render_args = $self->get_render_args(rendering => 'form_end');
   return $self->renderer->render_end($render_args);
 }
 
 sub render_errors {
   my ( $self, $rargs ) = @_;
-  my $render_args = $self->get_render_args(%$rargs, rendering => 'form_errors');
+  # we're not doing 'form_error_attr'. only processing 'error_tag' and 'error_class'
+  my $render_args = $self->get_render_args( %$rargs, rendering => 'form_errors');
   return $self->renderer->render_form_errors($render_args);
 }
 
