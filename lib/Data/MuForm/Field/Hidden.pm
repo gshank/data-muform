@@ -4,8 +4,6 @@ package Data::MuForm::Field::Hidden;
 use Moo;
 extends 'Data::MuForm::Field::Text';
 
-has '+html5_type_attr' => ( default => 'hidden' );
-
 sub build_input_type { 'hidden' }
 
 =head1 DESCRIPTION

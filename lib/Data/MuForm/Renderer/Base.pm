@@ -177,6 +177,13 @@ The default class added to the rendered errors.
 This is for when you are just doing 'render_element', but want to also render
 the errors, without having to do a separate call. It's off by default.
 
+=item is_html5
+
+Render using the html5_input_type for the field (if one exists). Currently
+the following fields have an html5_input_type: Currency (number), Date (date),
+Email (email), Integer (number), URL (url). You can set the html5_input_type
+in the field definition.
+
 =back
 
 =head1 Layouts
@@ -244,6 +251,8 @@ has 'error_tag' => ( is => 'rw', default => 'span' );
 has 'error_class' => ( is => 'rw', default => 'error_message' );
 
 has 'render_element_errors' => ( is => 'rw', default => 0 );
+
+has 'is_html5' => ( is => 'rw', default => 0 );
 
 sub BUILD {
     my $self = shift;
@@ -463,6 +472,9 @@ sub render_input {
   my ( $self, $rargs ) = @_;
 
   my $input_type = $rargs->{input_type};
+  if ( $self->is_html5 && $rargs->{html5_input_type} ) {
+    $input_type = $rargs->{html5_input_type};
+  }
   # checkboxes are special
   return $self->render_checkbox($rargs) if $input_type eq 'checkbox';
 

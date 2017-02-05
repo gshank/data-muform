@@ -14,6 +14,8 @@ A URL field;
 
 =cut
 
+has '+html5_input_type' => ( default => 'url' );
+
 our $class_messages = {
     'invalid_url' => 'Invalid URL',
 };

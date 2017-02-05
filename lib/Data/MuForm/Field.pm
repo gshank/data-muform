@@ -708,7 +708,7 @@ sub build_input_type { 'text' }
 has 'layout' => ( is => 'rw' );
 has 'layout_group' => ( is => 'rw' );
 has 'order' => ( is => 'rw', default => 0 );
-has 'html5_type_attr' => ( is => 'rw' );
+has 'html5_input_type' => ( is => 'rw', predicate => 'has_html5_input_type' );
 
 sub base_render_args {
   my $self = shift;
@@ -726,6 +726,7 @@ sub base_render_args {
     layout_type => 'standard',
     is_contains => $self->is_contains,
   };
+  $args->{html5_input_type} = $self->html5_input_type if $self->has_html5_input_type;
   return $args;
 }
 

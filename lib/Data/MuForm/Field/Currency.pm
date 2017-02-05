@@ -4,7 +4,7 @@ package Data::MuForm::Field::Currency;
 use Moo;
 extends 'Data::MuForm::Field::Text';
 
-has '+html5_type_attr' => ( default => 'number' );
+has '+html5_input_type' => ( default => 'number' );
 has 'currency_symbol' => (
     is      => 'ro',
     default => '$',

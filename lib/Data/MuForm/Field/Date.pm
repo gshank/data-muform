@@ -70,7 +70,7 @@ the ISO date format.)
 
 =cut
 
-has '+html5_type_attr' => ( default => 'date' );
+has '+html5_input_type' => ( default => 'date' );
 has 'format' => ( is => 'rw', default => "%Y-%m-%d" );
 has 'locale'     => ( is => 'rw' );
 has 'time_zone'  => ( is => 'rw' );

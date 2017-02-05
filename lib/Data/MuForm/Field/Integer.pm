@@ -5,6 +5,7 @@ use Moo;
 use Data::MuForm::Meta;
 extends 'Data::MuForm::Field::Text';
 
+has '+html5_input_type' => ( default => 'number' );
 has '+size' => ( default => 8 );
 
 has 'range_start' => ( is => 'rw' );

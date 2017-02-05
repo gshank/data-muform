@@ -11,6 +11,7 @@ our $class_messages = {
     'email_format' => 'Email should be of the format [_1]',
 };
 
+has '+html5_input_type' => ( default => 'email' );
 has 'email_valid_params' => ( is => 'rw', isa => HashRef );
 has 'preserve_case' => ( is => 'rw' );
 
