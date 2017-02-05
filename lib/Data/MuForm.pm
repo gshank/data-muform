@@ -382,6 +382,16 @@ method also works:
     $self->field('media')->field('caption'); # works
     $self->subfield('media.caption'); # works
 
+=head3 build_field_id
+
+Create a 'build_field_id' sub in the form class to use a common method for
+constructing field ids.
+
+    sub build_field_id {
+       my ( $self, $field ) = @_;
+       return $field->name . '_' . $self->id;
+    }
+
 =head2 Constraints and validation
 
 Most validation is performed on a per-field basis, and there are a number

@@ -64,11 +64,16 @@ The only required attribute.
 =item type
 
 The class or type of the field. The 'type' of L<Data::MuForm::Field::Currency>
-is 'Currency'. Classes that you define yourself are prefixed with '+'.
+is 'Currency'.
 
 =item id
 
-The id to use when rendering.
+The id to use when rendering. This can come from a number of different places.
+
+  1) field definition
+  2) field 'build_id' method
+  3) form 'build_field_id' method
+  4) field prefixed_name
 
 =item accessor
 

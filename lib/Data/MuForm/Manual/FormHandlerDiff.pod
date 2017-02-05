@@ -166,6 +166,8 @@ Internal method 'validate_field' (sometimes used for field tests) renamed to 'fi
 
 Removed internal method 'base_validate', added 'normalize_input' instead (for handling multiple/non-multiple, etc)
 
+Renamed 'html5_type_attr' to 'html5_input_type'.
+
 =cut
 
 1;

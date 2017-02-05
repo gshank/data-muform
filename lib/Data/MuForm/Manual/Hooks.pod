@@ -41,6 +41,10 @@ to do 'add_field', if you're creating a new form object on every request.
         }
     }
 
+(Note: the above is purely an example, but you don't need to do that to have
+a common form build_id method. You only have to create a 'build_field_id' sub
+in the form class.)
+
 Note that looking in the 'index' will get you all the fields, but if you use
 the 'all_fields' method, you would only get the top-level fields and would need
 to also loop through sub-fields (such as in a Compound or Repeatable) if you
