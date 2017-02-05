@@ -35,4 +35,12 @@ is( $tr_str, "Value must be between 5 and 10", 'range_incorrect');
 $tr_str = $localizer->loc_x("Value must be less than or equal to {high}", high => 20 );
 is( $tr_str, "Value must be less than or equal to 20", 'range_too_high' );
 
+# loc_nx
+$tr_str = $localizer->loc_nx("First message {num_digits}", "Second message {num_digits}", 2, num_digits => 2 );
+is( $tr_str, "Second message 2", 'got correct nx string' );
+$tr_str = $localizer->loc_nx("First message {num_digits}", "Second message {num_digits}", 1, num_digits => 1 );
+is( $tr_str, "First message 1", 'got correct nx string' );
+$tr_str = $localizer->loc_nx("First message {num_digits}", "Second message {num_digits}", 3, num_digits => 4 );
+is( $tr_str, "Second message 4", 'got correct nx string' );
+
 done_testing;

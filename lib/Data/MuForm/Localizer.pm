@@ -56,15 +56,15 @@ sub loc_px {
 
   return $msgid;
 }
+=cut
 
 sub loc_npx {
-  my ($self, $msgid, $msgid_plural, $cout,  %args) = @_;
-#   my ($self, $msgctxt, $msgid, $msgid_plural, $count, @args) = @_;
-#   my $translation = $self->translate($msgctxt, $msgid, $msgid_plural, $count, 1);
-
-  return $msgid;
+  my ($self, $msgctxt, $msgid, $msgid_plural, $count, %args) = @_;
+  #   my ($self, $msgctxt, $msgid, $msgid_plural, $count, @args) = @_;
+  my $msg = $self->translate($msgctxt, $msgid, $msgid_plural, $count, 1);
+  my $out = $self->expand_named( $msg, %args );
+  return $out;
 }
-=cut
 
 our $lexicons = {
 };
