@@ -81,7 +81,9 @@ sub get_lexicon {
 sub load_lexicon {
   my ( $self, $lang ) = @_;
 
-  my $file = "lib/Data/MuForm/Messages/$lang.po";
+  my $file = $self->module_path;
+  $file =~ s/Localizer.pm//;
+  $file .= "Messages/$lang.po";
   my $lexicon = $self->load_file($file);
   return $lexicon;
 }
@@ -496,5 +498,13 @@ sub extract_header_msgstr {
         ),
     )};
 }
+
+sub module_path {
+  (my $filename = __PACKAGE__ ) =~ s#::#/#g;
+  $filename .= '.pm';
+  my $path = $INC{$filename};
+  return $path;
+}
+
 
 1;

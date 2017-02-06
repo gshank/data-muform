@@ -13,7 +13,10 @@ my $localizer = Data::MuForm::Localizer->new(
 ok( $localizer, 'created localizer' );
 
 my $lexicon = $localizer->get_lexicon;
+
 ok( $lexicon, 'got lexicon' );
+
+ok( keys(%$lexicon) > 40, 'we got a lexicon with data' );
 
 # error_occurred
 my $tr_str = $localizer->loc_('error occurred');
@@ -43,4 +46,5 @@ is( $tr_str, "First message 1", 'got correct nx string' );
 $tr_str = $localizer->loc_nx("First message {num_digits}", "Second message {num_digits}", 3, num_digits => 4 );
 is( $tr_str, "Second message 4", 'got correct nx string' );
 
+like( $localizer->module_path, qr{lib/Data/MuForm/Localizer.pm}, 'got path' );
 done_testing;
