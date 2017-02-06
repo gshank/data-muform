@@ -16,7 +16,7 @@ use Data::MuForm::Localizer;
 use MooX::Aliases;
 use Data::MuForm::Merge ('merge');
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
