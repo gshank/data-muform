@@ -446,6 +446,7 @@ sub process_attrs {
     for my $attr ( sort keys %$attrs ) {
         next if exists $skip{$attr};
         next if $attr eq 'rendering';
+        next if ref $attrs->{$attr} eq 'HASH';
         my $value = '';
         if( defined $attrs->{$attr} ) {
             if( ref $attrs->{$attr} eq 'ARRAY' ) {
