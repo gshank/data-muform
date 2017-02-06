@@ -88,7 +88,8 @@ is_deeply( $form->field('mox')->options, $expected, 'got expected options for ar
 $form = MyApp::Form::Test3->new;
 ok( $form );
 
-diag( $form->field('bar')->render_element );
+my $rendered_select = $form->field('bar')->render;
+unlike( $rendered_select, qr/attributes/, 'no "attributes" string in rendering' );
 
 
 done_testing;
