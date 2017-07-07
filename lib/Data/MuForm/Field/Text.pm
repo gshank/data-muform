@@ -30,7 +30,7 @@ sub base_render_args {
     my $args = $self->next::method(@_);
     $args->{element_attr}->{size} = $self->size if $self->size;
     $args->{element_attr}->{maxlength} = $self->maxlength if $self->maxlength;
-    $args->{element_attr}->{minlength} = $self->minlenght if $self->minlength;
+    $args->{element_attr}->{minlength} = $self->minlength if $self->minlength;
     return $args;
 }
 
