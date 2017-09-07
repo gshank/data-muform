@@ -360,7 +360,7 @@ so this is a tree structure.
 =head3 sorted_fields
 
 Returns those fields from the fields array which are currently active, ordered
-by the 'order' attribute. This is the method that returns the ields that are
+by the 'order' attribute. This is the method that returns the fields that are
 looped through when rendering.
 
 This method is context sensitive via 'wantarray' on the return.  If you request
