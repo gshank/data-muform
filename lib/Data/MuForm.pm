@@ -360,8 +360,26 @@ so this is a tree structure.
 =head3 sorted_fields
 
 Returns those fields from the fields array which are currently active, ordered
-by the 'order' attribute. This is the method that returns the fields that are
+by the 'order' attribute. This is the method that returns the ields that are
 looped through when rendering.
+
+This method is context sensitive via 'wantarray' on the return.  If you request
+an array you will get the fields as an array; if you request a scalar you will
+get a hashreference instead:
+
+    my @fields = $form->sorted_fields; # array of fields
+    my $fields = $form->sorted_fields: # arrayref of fields
+
+If you prefer to avoid calling context magic you should use the method
+L<all_sorted_fields> which is the same thing except always returns an array.
+
+B<NOTE> This method is intended for backward compatiblity with L<HTML::FormHandler>
+and we recommend using the L<all_sorted_fields> method instead.
+
+=head3 all_sorted_fields
+
+Similar to L</sorted_fields> but always returns the field objects as an array
+no matter what the calling context.
 
 =head3 field($name), subfield($name)
 
@@ -1015,7 +1033,7 @@ sub get_render_args {
 sub render {
   my ( $self, $rargs ) = @_;
   my $render_args = $self->get_render_args(%$rargs, rendering => 'form');
-  return $self->renderer->render_form($render_args, $self->sorted_fields);
+  return $self->renderer->render_form($render_args,  scalar($self->sorted_fields));
 }
 
 sub render_start {
