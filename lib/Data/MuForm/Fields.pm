@@ -103,7 +103,7 @@ sub all_sorted_fields {
 sub sorted_fields {
     my $self = shift;
     my @fields = $self->all_sorted_fields;
-    return \@fields;
+    return wantarray ? @fields : \@fields;
 }
 
 sub field_index {
