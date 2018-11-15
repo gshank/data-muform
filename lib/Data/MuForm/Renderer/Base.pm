@@ -312,7 +312,7 @@ sub render_form_errors {
     my ( $self, $rargs ) = @_;
     my $out = '';
     if ( scalar @{$rargs->{form_errors}} ) {
-      $out .= q{<div class="form_errors>};
+      $out .= q{<div class="form_errors">};
       my $error_tag = $rargs->{error_tag} || $self->error_tag;
       my $error_class = $rargs->{error_class} || $self->error_class;
       foreach my $error ( @{$rargs->{form_errors}} ) {
