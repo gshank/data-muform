@@ -15,7 +15,7 @@ getting it working.
 
 =cut
 
-use Moo::_Utils;
+use Moo::_Utils qw(_install_coderef);
 
 sub import {
     my $class = shift;
