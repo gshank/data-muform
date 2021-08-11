@@ -9,18 +9,16 @@ use_ok ( 'Data::MuForm::Localizer' );
 
 my $class = 'Data::MuForm::Localizer';
 
-eq_or_diff
-    my $extract_ref = $class->extract_header_msgstr(<<'EOT'),
+my $msgstr = <<'EOT';
 Content-Type: text/plain; charset=UTF-8
 Plural-Forms: nplurals=2; plural=n != 1
 EOT
-    {
-        charset     => 'UTF-8',
-        nplurals    => 2,
-        plural      => 'n != 1',
-        plural_code => sub {},
-    },
-    'extract_ok';
+
+my $extract_ref = $class->extract_header_msgstr($msgstr);
+
+is($extract_ref->{charset}, 'UTF-8', 'charset ok');
+is($extract_ref->{nplurals}, '2', 'nplurals ok');
+is($extract_ref->{plural}, 'n != 1', 'plural ok');
 
 eq_or_diff
     {
