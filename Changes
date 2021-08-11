@@ -2,6 +2,12 @@ Revision history for Perl module Data::MuForm
 
 0.05 2018-07-02
  -  Typo in text field
+ 
+0.04 TBD
+ - Fixed typo in minlength constraint
+ - Changed the method 'sorted_fields' to check wantarray so as to be more
+   compatible with existing code, but document the preferred approach is
+   to use 'all_sorted_fields'.
 
 0.04 2017-02-05
  - allow $option->{attributes}

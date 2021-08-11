@@ -312,7 +312,7 @@ sub render_form_errors {
     my ( $self, $rargs ) = @_;
     my $out = '';
     if ( scalar @{$rargs->{form_errors}} ) {
-      $out .= q{<div class="form_errors>};
+      $out .= q{<div class="form_errors">};
       my $error_tag = $rargs->{error_tag} || $self->error_tag;
       my $error_class = $rargs->{error_class} || $self->error_class;
       foreach my $error ( @{$rargs->{form_errors}} ) {
@@ -627,7 +627,7 @@ sub render_label {
   my $id = $rargs->{id};
   my $label = $rargs->{display_label} || $self->localize($rargs->{label});
   my $out = qq{\n<label };
-  $out .= qq{for="$id"};
+  $out .= qq{for="$id" };
   $out .= process_attrs($rargs->{label_attr});
   $out .= qq{>};
   $out .= qq{$left_of_label$label$right_of_label};
@@ -1045,7 +1045,7 @@ sub layout_span {
   my ( $self, $rargs ) = @_;
 
     my $out= '<span';
-    $out .= ' id="' . $rargs->{id} . '"';
+    $out .= ' id="' . $rargs->{id} . '" ';
     $out .= process_attrs($rargs->{element_attr});
     $out .= '>';
     $out .= $rargs->{fif};
