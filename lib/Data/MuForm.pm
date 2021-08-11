@@ -943,7 +943,7 @@ sub validate { }
 # hook for model validation
 sub validate_model { }
 
-sub validated { my $self = shift; return $self->ran_validation && ! $self->has_error_fields; }
+sub validated { my $self = shift; return $self->ran_validation && ! $self->has_errors; }
 
 sub get_default_value { }
 
