@@ -847,10 +847,6 @@ sub setup {
     my $params = data_clone( $self->params );
     if ( $self->submitted ) {
         $self->fill_from_params($params, 1 );
-        # if the params submitted don't match fields, it shouldn't count as 'submitted'
-        if ( ! scalar keys %{$self->input} ) {
-            $self->submitted(0);
-        }
     }
 
 }

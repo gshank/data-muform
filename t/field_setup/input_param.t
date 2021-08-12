@@ -28,18 +28,11 @@ ok( ! $form1->validated, 'not validated' );
 ok( $form1->has_errors, 'errors for required' );
 
 
-# This used to work differently in FH. The params here
-# are essentially empty (because 'base_name' isn't valid for
-# submitting for that field). Text fields don't force validation
-# when no existing param, so it seems correct that the 'base_name'
-# field isn't processed (just like it would if no param in other
-# circumstances).. However, it was wrong that 'validated'
-# succeeded. Fixed by unsetting ->submitted if no actual input keys.
 my $form2 = Test::InputParam->new;
 ok( $form2, 'Created Form' );
 my %params2 = ( base_name => 'This is a mapped input' );
 $form2->process(params=>\%params2);
 ok( ! $form2->validated, 'got correct failing result' );
-ok( ! $form2->has_errors, 'No errors' );
+ok( $form2->has_errors, 'Has errors' );
 
 done_testing;

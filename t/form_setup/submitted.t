@@ -34,4 +34,26 @@ $req_method = 'POST';
 $form->process( submitted => ( $req_method eq 'POST' ), params => {} );
 ok( $form->ran_validation, 'validation was performed with empty params and submitted flag' );
 
+# From issue
+$form = Data::MuForm->new(
+    field_list => [
+        {
+            type => "Text",
+            required => 1,
+            name => "name"
+        }
+    ]
+);
+
+$form->process(
+    params => {},
+    submitted => 1
+);
+
+ok($form->ran_validation, 'Form was validated');
+
+ok($form->has_errors, 'Form has errors');
+
+ok(! $form->validated, 'Form not validated');
+
 done_testing;
