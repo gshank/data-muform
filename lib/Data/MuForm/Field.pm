@@ -851,7 +851,7 @@ has 'transform_value_to_fif' => ( is => 'rw', predicate => 'has_transform_value_
 has 'required' => ( is => 'rw', default => 0 );
 has 'required_when' => ( is => 'rw', isa => HashRef, predicate => 'has_required_when' );
 has 'unique' => ( is => 'rw', predicate => 'has_unique' );
-sub validated { !$_[0]->has_errors && $_[0]->has_input }
+sub validated { my $self = shift;  ! $self->has_errors && $self->has_input }
 sub normalize_input { } # intended for field classes, to make sure input is in correct form, mostly multiple or not
 
 sub input_defined {
