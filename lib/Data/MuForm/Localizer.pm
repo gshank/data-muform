@@ -81,6 +81,14 @@ sub get_lexicon {
 sub load_lexicon {
   my ( $self, $lang ) = @_;
 
+  # $lang is interpolated into the catalog filename below, so it has to
+  # be a bare locale tag.  Anything else, in particular a value holding
+  # '/' or '..' segments, would load a catalog from outside the messages
+  # directory.  Returning undef here is what a locale with no catalog
+  # already does: the message falls back to the msgid.
+  return undef
+    if ! defined $lang || $lang !~ m{\A[A-Za-z0-9_.\-]+\z};
+
   my $file = $self->module_path;
   $file =~ s/Localizer.pm//;
   $file .= "Messages/$lang.po";
@@ -404,47 +412,176 @@ sub join_message_key {
 }
 
 #====== Header Extract =======
-my $perlify_plural_forms_ref__code_ref = sub {
-    my $plural_forms_ref = shift;
 
-    ${$plural_forms_ref} =~ s{ \b ( nplurals | plural | n ) \b }{\$$1}xmsg;
+# The Plural-Forms expression from the catalog reaches a string eval, so
+# it has to be checked before it is used.  A character allowlist is not
+# enough: **, //, ++ and <> are Perl operators spelled with the same
+# characters the gettext plural operators use.  The header is therefore
+# tokenized and parsed against the gettext plural grammar (gettext's
+# plural.y: the variable n, unsigned integers, the conditional and the C
+# integer operators, nothing else), and the code that is evaluated is
+# generated from the accepted tokens rather than from the header text.
+
+# Longest match first, so that <= is one token and not < followed by =.
+# A single & or |, an identifier other than n, and anything else outside
+# the grammar leave the expression untokenizable.
+my $plural_tokenize__code_ref = sub {
+    my $expression = shift;
+
+    my @tokens;
+    pos $expression = 0;
+    TOKEN:
+    while ( pos $expression < length $expression ) {
+        $expression =~ m{ \G [ \t]+ }xmsgc
+            and next TOKEN;
+        $expression =~ m{
+            \G (
+                [0-9]+ | n \b
+                | \|\| | && | == | != | <= | >=
+                | [-+*/%<>?:!()]
+            )
+        }xmsgc
+            or return;
+        push @tokens, $1;
+    }
+
+    return \@tokens;
+};
+
+# Binary operators by C precedence, lowest binding first.  The
+# conditional binds lower still and is right associative, so it is
+# parsed separately.
+my @plural_binary_operators = (
+    [ q{||} ],
+    [ q{&&} ],
+    [ q{==}, q{!=} ],
+    [ q{<}, q{>}, q{<=}, q{>=} ],
+    [ q{+}, q{-} ],
+    [ q{*}, q{/}, q{%} ],
+);
+
+my $plural_expression__code_ref;
+my $plural_binary__code_ref;
+my $plural_unary__code_ref;
+
+# Each parser returns the Perl source for what it accepted, or nothing
+# if the tokens are not that production.
+$plural_expression__code_ref = sub {
+    my ( $tokens, $index_ref ) = @_;
+
+    my $condition = $plural_binary__code_ref->( $tokens, $index_ref, 0 );
+    defined $condition
+        or return;
+    my $token = $tokens->[ ${$index_ref} ];
+    defined $token && $token eq q{?}
+        or return $condition;
+    ${$index_ref}++;
+    my $then = $plural_expression__code_ref->( $tokens, $index_ref );
+    defined $then
+        or return;
+    $token = $tokens->[ ${$index_ref} ];
+    defined $token && $token eq q{:}
+        or return;
+    ${$index_ref}++;
+    my $else = $plural_expression__code_ref->( $tokens, $index_ref );
+    defined $else
+        or return;
+
+    return "( $condition ? $then : $else )";
+};
+
+$plural_binary__code_ref = sub {
+    my ( $tokens, $index_ref, $level ) = @_;
+
+    $level <= $#plural_binary_operators
+        or return $plural_unary__code_ref->( $tokens, $index_ref );
+    my $left = $plural_binary__code_ref->( $tokens, $index_ref, $level + 1 );
+    defined $left
+        or return;
+    OPERATOR:
+    while ( defined( my $token = $tokens->[ ${$index_ref} ] ) ) {
+        grep { $token eq $_ } @{ $plural_binary_operators[$level] }
+            or last OPERATOR;
+        ${$index_ref}++;
+        my $right = $plural_binary__code_ref->( $tokens, $index_ref, $level + 1 );
+        defined $right
+            or return;
+        $left = "( $left $token $right )";
+    }
+
+    return $left;
+};
+
+$plural_unary__code_ref = sub {
+    my ( $tokens, $index_ref ) = @_;
+
+    my $token = $tokens->[ ${$index_ref} ];
+    defined $token
+        or return;
+    if ( $token eq q{!} ) {
+        ${$index_ref}++;
+        my $operand = $plural_unary__code_ref->( $tokens, $index_ref );
+        defined $operand
+            or return;
+        return "( ! $operand )";
+    }
+    if ( $token eq q{n} ) {
+        ${$index_ref}++;
+        return q{$n};
+    }
+    if ( $token =~ m{ \A [0-9]+ \z }xms ) {
+        ${$index_ref}++;
+        return $token;
+    }
+    if ( $token eq q{(} ) {
+        ${$index_ref}++;
+        my $inner = $plural_expression__code_ref->( $tokens, $index_ref );
+        defined $inner
+            or return;
+        $token = $tokens->[ ${$index_ref} ];
+        defined $token && $token eq q{)}
+            or return;
+        ${$index_ref}++;
+        return "( $inner )";
+    }
 
     return;
 };
 
-my $nplurals__code_ref = sub {
+# Returns the nplurals count, the plural expression as it stands in the
+# header, and the Perl source generated from it, or nothing if the
+# header is not a gettext plural header.
+my $plural_forms_parse__code_ref = sub {
     my $plural_forms = shift;
 
-    $perlify_plural_forms_ref__code_ref->(\$plural_forms);
-    my $code = <<"EOC";
-        my \$n = 0;
-        my (\$nplurals, \$plural);
-        $plural_forms;
-        \$nplurals;
-EOC
-    my $nplurals = eval $code;
+    defined $plural_forms
+        or return;
+    my ( $nplurals, $plural ) = $plural_forms =~ m{
+        \A
+        nplurals [ ]* = [ ]* ( [0-9]+ ) [ ]* ;
+        [ ]*
+        plural   [ ]* = [ ]* ( [^;\n]+? ) [ ]* ;? [ ]*
+        \z
+    }xms
+        or return;
+    my $tokens = $plural_tokenize__code_ref->($plural)
+        or return;
+    my $index = 0;
+    my $code = $plural_expression__code_ref->( $tokens, \$index );
+    defined $code && $index == @{$tokens}
+        or return;
 
-    return $nplurals;
-};
-
-my $plural__code_ref = sub {
-    my $plural_forms = shift;
-
-    return $plural_forms =~ m{ \b plural= ( [^;\n]+ ) }xms;
+    return ( 0 + $nplurals, $plural, $code );
 };
 
 my $plural_code__code_ref = sub {
-    my $plural_forms = shift;
+    my $plural_expression = shift;
 
-    $perlify_plural_forms_ref__code_ref->(\$plural_forms);
     my $code = <<"EOC";
         sub {
             my \$n = shift;
 
-            my (\$nplurals, \$plural);
-            $plural_forms;
-
-            return 0 + \$plural;
+            return 0 + ( $plural_expression );
         }
 EOC
     my $code_ref = eval $code;
@@ -472,6 +609,10 @@ sub extract_header_msgstr {
     }xms
         or die 'Plural-Forms not found in header';
     ## use critic (ComplexRegexes)
+    my ( $nplurals, $plural, $plural_expression )
+        = $plural_forms_parse__code_ref->($plural_forms);
+    defined $plural_expression
+        or die 'Plural-Forms is not a gettext plural expression';
     my ( $charset ) = $header_msgstr =~ m{
         ^
         Content-Type:
@@ -487,9 +628,9 @@ sub extract_header_msgstr {
     }xms;
 
     return {(
-        nplurals    => $nplurals__code_ref->($plural_forms),
-        plural      => $plural__code_ref->($plural_forms),
-        plural_code => $plural_code__code_ref->($plural_forms),
+        nplurals    => $nplurals,
+        plural      => $plural,
+        plural_code => $plural_code__code_ref->($plural_expression),
         charset     => $charset,
         (
             $multiplural_nplurals
