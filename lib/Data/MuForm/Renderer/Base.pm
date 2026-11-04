@@ -458,7 +458,7 @@ sub process_attrs {
                 $value = $attrs->{$attr};
             }
         }
-        push @use_attrs, sprintf( '%s="%s"', $attr, $value );
+        push @use_attrs, sprintf( '%s="%s"', $attr, html_filter($value) );
     }
     my $out = join( ' ', @use_attrs );
     return $out;
@@ -527,7 +527,7 @@ sub render_select {
   my $options = $rargs->{options};
   foreach my $option ( @$options ) {
       if ( my $label = $option->{group} ) {
-          $label = $self->localize( $label );
+          $label = html_filter( $self->localize( $label ) );
           $out .= qq{\n<optgroup label="$label">};
           foreach my $group_opt ( @{ $option->{options} } ) {
               $out .= $self->render_select_option($rargs, $group_opt);
@@ -554,7 +554,7 @@ sub render_select_option {
     my %fif_lookup;
     @fif_lookup{@$fif} = () if $multiple;
 
-    my $label = $self->localize($option->{label});
+    my $label = html_filter($self->localize($option->{label}));
     my $out = '';
     $out .= qq{\n<option };
     my $attrs = $option;
@@ -738,7 +738,7 @@ sub render_radio_label {
 
   $right_of_label ||= '';
   $left_of_label ||= '';
-  my $label = $self->localize($option->{label});
+  my $label = html_filter($self->localize($option->{label}));
 
   my $attrs = { class => ['radio'] };
   $attrs->{for} = $option->{id} ? $option->{id} : $rargs->{name} . $option->{order};
@@ -859,7 +859,7 @@ sub render_checkbox_label {
 
   $right_of_label ||= '';
   $left_of_label ||= '';
-  my $label = $self->localize($option->{label});
+  my $label = html_filter($self->localize($option->{label}));
 
   my $attrs = { class => ['checkbox'] };
   $attrs->{for} = $option->{id} ? $option->{id} : $rargs->{name} . $option->{order};
